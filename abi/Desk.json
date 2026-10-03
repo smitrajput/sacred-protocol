@@ -78,6 +78,19 @@
  },
  {
   "type": "function",
+  "name": "MAX_MIN_DOWN_PAYMENT",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
   "name": "MAX_RATE_BPS",
   "inputs": [],
   "outputs": [
@@ -418,6 +431,19 @@
  },
  {
   "type": "function",
+  "name": "minDownPayment",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
   "name": "nextId",
   "inputs": [],
   "outputs": [
@@ -677,6 +703,19 @@
     "name": "guardian_",
     "type": "address",
     "internalType": "address"
+   }
+  ],
+  "outputs": [],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "setMinDownPayment",
+  "inputs": [
+   {
+    "name": "minDownPayment_",
+    "type": "uint256",
+    "internalType": "uint256"
    }
   ],
   "outputs": [],
@@ -1347,6 +1386,11 @@
  {
   "type": "error",
   "name": "TooManyTickets",
+  "inputs": []
+ },
+ {
+  "type": "error",
+  "name": "TooSmall",
   "inputs": []
  },
  {

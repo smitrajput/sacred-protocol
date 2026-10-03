@@ -93,7 +93,7 @@ contract Handler is Test {
 
     function open(uint256 who, uint256 dp, uint256 lev, bool longTerm) external {
         address u = traders[who % traders.length];
-        dp = bound(dp, 10 * USDC, 5_000 * USDC);
+        dp = bound(dp, 100 * USDC, 5_000 * USDC);
         lev = bound(lev, 10_100, 30_000);
         _fresh();
         vm.prank(u);

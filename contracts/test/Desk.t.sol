@@ -97,6 +97,15 @@ contract DeskTest is Base {
         desk.open(1_000 * USDC, 30_000, 14 days, 5_000_001);
     }
 
+    function test_open_revertsBelowMinimumDownPayment() public {
+        vm.prank(trader);
+        vm.expectRevert(Desk.TooSmall.selector);
+        desk.open(99 * USDC, 30_000, 14 days, 0);
+        vm.prank(admin);
+        vm.expectRevert(Desk.OutOfBounds.selector);
+        desk.setMinDownPayment(10_001 * USDC);
+    }
+
     function test_open_respectsMaxLive() public {
         vm.prank(admin);
         desk.setParams(1_000, 100, 20_000, 30_000, 100_000 * USDC, 1);
@@ -392,7 +401,7 @@ contract DeskTest is Base {
     /// principal plus markup, the trader never pays more than they chose to, and the
     /// desk ends empty.
     function testFuzz_lifecycle(uint256 dp, uint256 lev, uint256 priceAtExit, uint256 wait, uint8 exit) public {
-        dp = bound(dp, 10 * USDC, 10_000 * USDC);
+        dp = bound(dp, 100 * USDC, 10_000 * USDC);
         lev = bound(lev, 10_100, 30_000);
         priceAtExit = bound(priceAtExit, 20_000, 200_000);
         wait = bound(wait, 0, 20 days);

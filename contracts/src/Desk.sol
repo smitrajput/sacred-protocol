@@ -49,6 +49,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     error OutOfBounds();
     error ZeroAddress();
     error Slippage();
+    error TooSmall();
 
     enum Status {
         None,
@@ -92,6 +93,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     uint256 public constant MAX_LIVE = 500;
     uint256 public constant MAX_SALE_TOLERANCE_BPS = 500;
     uint256 public constant MAX_KEEPER_FEE = 20e6;
+    uint256 public constant MAX_MIN_DOWN_PAYMENT = 10_000e6;
 
     IERC20 public immutable usdc;
     IERC20 public immutable coin;
@@ -112,6 +114,8 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     uint256 public maxLeverageBps;
     uint256 public maxCost = 100_000e6;
     uint256 public maxLive = 200;
+    /// Keeps dust tickets from filling the live list.
+    uint256 public minDownPayment = 100e6;
     uint256 public saleToleranceBps = 100;
     uint256 public keeperFee = 1e6;
     mapping(uint256 => bool) public termAllowed;
@@ -206,6 +210,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         if (leverageBps <= BPS || leverageBps > maxLeverageBps) revert BadLeverage();
         if (!termAllowed[term]) revert BadTerm();
         if (liveIds.length >= maxLive) revert TooManyTickets();
+        if (downPayment < minDownPayment) revert TooSmall();
         uint256 cost = TicketMath.cost(downPayment, leverageBps);
         if (cost == 0 || cost > maxCost) revert TooLarge();
         uint256 financed = cost - downPayment;
@@ -258,8 +263,8 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         uint256 surplus = proceeds - s;
         uint256 share = TicketMath.profitShare(surplus, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
         _toFund(share);
-        usdc.safeTransfer(t.owner, surplus - share);
         _end(id, t, Status.Closed, proceeds, surplus - share, share, 0);
+        usdc.safeTransfer(t.owner, surplus - share);
     }
 
     /// Pay the settlement amount in USDC and take the coin. The profit share is
@@ -278,8 +283,9 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         usdc.safeTransferFrom(msg.sender, address(this), s + share);
         _payVault(id, t, s);
         _toFund(share);
-        coin.safeTransfer(t.owner, t.qty);
+        uint256 qty = t.qty;
         _end(id, t, Status.PaidOff, coinValue, 0, share, 0);
+        coin.safeTransfer(t.owner, qty);
     }
 
     /// Reduce the balance. The coin stays pledged.
@@ -431,6 +437,11 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         if (saleToleranceBps_ > MAX_SALE_TOLERANCE_BPS || keeperFee_ > MAX_KEEPER_FEE) revert OutOfBounds();
         saleToleranceBps = saleToleranceBps_;
         keeperFee = keeperFee_;
+    }
+
+    function setMinDownPayment(uint256 minDownPayment_) external onlyOwner {
+        if (minDownPayment_ > MAX_MIN_DOWN_PAYMENT) revert OutOfBounds();
+        minDownPayment = minDownPayment_;
     }
 
     function setTerm(uint256 term, bool allowed) external onlyOwner {

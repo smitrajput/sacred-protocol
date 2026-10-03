@@ -177,14 +177,20 @@ multisig can propose to and execute from (`script/Deploy.s.sol`).
 | `Desk.t.sol`, `Vault.t.sol` | Foundry unit + fuzz (1,000 runs each) | Every function, every revert, the design's worked examples, a fuzzed full ticket lifecycle | 68 passed |
 | `TicketMath.t.sol` | Foundry fuzz | Bounds and monotonicity of the arithmetic | 4 passed |
 | `Invariant.t.sol` | Foundry invariant (64 runs x 120 calls) | Nine system invariants under random deposits, withdrawals, cut-offs, tickets, prices and time | 9 passed |
-| `TicketMath.t.sol` `check_*` | Halmos symbolic execution | Eight properties of the arithmetic for all inputs in stated ranges | First run: 2 proved, 6 timed out in the solver. The checks were then narrowed to the launch terms; that rerun had not finished when this was written |
+| `TicketMath.t.sol` `check_*` | Halmos symbolic execution | Eight properties of the arithmetic for all inputs in stated ranges | **2 proved, 6 not proved** (solver timed out at 180 s each, twice) |
 | `server/tests` | pytest | Keeper logic, points, indexer, API, and one end to end run against anvil | 16 passed |
 | `frontend/lib/math.test.js` | vitest | The frontend's arithmetic matches the contract to the unit | 11 passed |
 
 What was **not** done:
 
-- **No Certora or other full formal verification.** Halmos proves properties of the
-  pure arithmetic only. The stateful contracts are covered by fuzzing and invariants,
+- **Symbolic execution mostly did not finish.** Halmos proved `check_splitConserves` and
+  `check_profitShareBounded`. The other six checks (earned markup bounds and
+  monotonicity, settlement never above the balance, the 70% floor, cost bounds) multiply
+  and divide symbolic values, and the Yices solver timed out on each, even after the
+  checks were narrowed to the 7 and 14 day terms. Bitwuzla was not installed. Those six
+  properties are covered by fuzz tests only, which sample and do not prove.
+- **No Certora or other full formal verification.** Halmos targets the pure arithmetic
+  only. The stateful contracts are covered by fuzzing and invariants,
   which sample behaviour and do not prove it.
 - **No fork test** against real Uniswap and Chainlink on Arbitrum. Swaps and feeds are
   mocked.

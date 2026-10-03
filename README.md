@@ -177,7 +177,7 @@ multisig can propose to and execute from (`script/Deploy.s.sol`).
 | `Desk.t.sol`, `Vault.t.sol` | Foundry unit + fuzz (1,000 runs each) | Every function, every revert, the design's worked examples, a fuzzed full ticket lifecycle | 68 passed |
 | `TicketMath.t.sol` | Foundry fuzz | Bounds and monotonicity of the arithmetic | 4 passed |
 | `Invariant.t.sol` | Foundry invariant (64 runs x 120 calls) | Nine system invariants under random deposits, withdrawals, cut-offs, tickets, prices and time | 9 passed |
-| `TicketMath.t.sol` `check_*` | Halmos symbolic execution | Eight properties of the arithmetic for all inputs in stated ranges | HALMOS_RESULT |
+| `TicketMath.t.sol` `check_*` | Halmos symbolic execution | Eight properties of the arithmetic for all inputs in stated ranges | First run: 2 proved, 6 timed out in the solver. The checks were then narrowed to the launch terms; that rerun had not finished when this was written |
 | `server/tests` | pytest | Keeper logic, points, indexer, API, and one end to end run against anvil | 16 passed |
 | `frontend/lib/math.test.js` | vitest | The frontend's arithmetic matches the contract to the unit | 11 passed |
 

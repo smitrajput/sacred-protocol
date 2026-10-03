@@ -23,6 +23,12 @@ import {IAggregatorV3, ISwapRouter} from "../src/interfaces/External.sol";
 contract Deploy is Script {
     uint256 internal constant TIMELOCK_DELAY = 2 days;
 
+    TimelockController internal timelock;
+    Oracle internal oracle;
+    BackstopFund internal fund;
+    Vault internal vault;
+    Desk internal desk;
+
     function run() external {
         uint256 pk = vm.envUint("PRIVATE_KEY");
         address me = vm.addr(pk);
@@ -32,19 +38,19 @@ contract Deploy is Script {
 
         address[] memory roles = new address[](1);
         roles[0] = multisig;
-        TimelockController timelock = new TimelockController(TIMELOCK_DELAY, roles, roles, address(0));
+        timelock = new TimelockController(TIMELOCK_DELAY, roles, roles, address(0));
 
-        Oracle oracle = new Oracle(
+        oracle = new Oracle(
             IAggregatorV3(vm.envAddress("FEED")),
             IAggregatorV3(vm.envAddress("SEQUENCER_FEED")),
             vm.envOr("FEED_MAX_AGE", uint256(1 hours)),
             uint8(vm.envUint("COIN_DECIMALS"))
         );
-        BackstopFund fund = new BackstopFund(usdc, vm.envAddress("TREASURY"), me);
-        Vault vault = new Vault(
+        fund = new BackstopFund(usdc, vm.envAddress("TREASURY"), me);
+        vault = new Vault(
             usdc, vm.envAddress("MANAGER"), me, vm.envUint("BUCKET_CAP"), vm.envUint("FIRST_CUTOFF"), vm.envString("NAME")
         );
-        Desk desk = new Desk(
+        desk = new Desk(
             usdc,
             IERC20(vm.envAddress("COIN")),
             IVault(address(vault)),

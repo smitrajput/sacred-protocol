@@ -13,19 +13,28 @@ import {MockERC20, MockFeed, MockRouter} from "../src/mocks/Mocks.sol";
 /// Local demo deployment on anvil with mock USDC, WBTC, feed and market.
 /// The deployer is admin and manager. Writes ../deployments/local.json.
 contract DeployLocal is Script {
+    MockERC20 internal usdc;
+    MockERC20 internal coin;
+    MockFeed internal feed;
+    MockRouter internal router;
+    Oracle internal oracle;
+    BackstopFund internal fund;
+    Vault internal vault;
+    Desk internal desk;
+
     function run() external {
         uint256 pk = vm.envOr("PRIVATE_KEY", uint256(0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80));
         address me = vm.addr(pk);
         vm.startBroadcast(pk);
 
-        MockERC20 usdc = new MockERC20("USD Coin", "USDC", 6);
-        MockERC20 coin = new MockERC20("Wrapped BTC", "WBTC", 8);
-        MockFeed feed = new MockFeed(8, 60_000e8);
-        MockRouter router = new MockRouter(usdc, coin, 60_000e6);
-        Oracle oracle = new Oracle(IAggregatorV3(address(feed)), IAggregatorV3(address(0)), 365 days, 8);
-        BackstopFund fund = new BackstopFund(IERC20(address(usdc)), me, me);
-        Vault vault = new Vault(IERC20(address(usdc)), me, me, 1_000_000e6, block.timestamp + 7 days, "Destiny BTC Term");
-        Desk desk = new Desk(
+        usdc = new MockERC20("USD Coin", "USDC", 6);
+        coin = new MockERC20("Wrapped BTC", "WBTC", 8);
+        feed = new MockFeed(8, 60_000e8);
+        router = new MockRouter(usdc, coin, 60_000e6);
+        oracle = new Oracle(IAggregatorV3(address(feed)), IAggregatorV3(address(0)), 365 days, 8);
+        fund = new BackstopFund(IERC20(address(usdc)), me, me);
+        vault = new Vault(IERC20(address(usdc)), me, me, 1_000_000e6, block.timestamp + 7 days, "Destiny BTC Term");
+        desk = new Desk(
             IERC20(address(usdc)), IERC20(address(coin)), IVault(address(vault)), ISwapRouter(address(router)), 500, oracle, IFund(address(fund)), 30_000, me
         );
         vault.setDesk(address(desk));

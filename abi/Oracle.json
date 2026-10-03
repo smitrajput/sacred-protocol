@@ -1,0 +1,146 @@
+[
+ {
+  "type": "constructor",
+  "inputs": [
+   {
+    "name": "feed_",
+    "type": "address",
+    "internalType": "contract IAggregatorV3"
+   },
+   {
+    "name": "sequencerFeed_",
+    "type": "address",
+    "internalType": "contract IAggregatorV3"
+   },
+   {
+    "name": "maxAge_",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "coinDecimals",
+    "type": "uint8",
+    "internalType": "uint8"
+   }
+  ],
+  "stateMutability": "nonpayable"
+ },
+ {
+  "type": "function",
+  "name": "SEQUENCER_GRACE",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "feed",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "contract IAggregatorV3"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "maxAge",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "price",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "quantity",
+  "inputs": [
+   {
+    "name": "usdc",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "sequencerFeed",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "contract IAggregatorV3"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "value",
+  "inputs": [
+   {
+    "name": "qty",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "error",
+  "name": "BadPrice",
+  "inputs": []
+ },
+ {
+  "type": "error",
+  "name": "SequencerDown",
+  "inputs": []
+ },
+ {
+  "type": "error",
+  "name": "StalePrice",
+  "inputs": []
+ }
+]

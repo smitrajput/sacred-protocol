@@ -9,6 +9,9 @@ fs_permissions = [{ access = "read-write", path = "../deployments" }]
 remappings = [
   "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
   "forge-std/=lib/forge-std/src/",
+  "v4-core/=lib/v4-core/",
+  "solady/=lib/solady/src/",
+  "solmate/=lib/solmate/",
 ]
 
 [fuzz]

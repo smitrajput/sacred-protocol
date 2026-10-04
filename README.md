@@ -1,4 +1,4 @@
-# Destiny: term mode
+# Sacred: term mode
 
 Halal leverage for traders and real yield for depositors, with no interest anywhere.
 This repository holds the first working version: **term mode, end to end**.
@@ -102,7 +102,8 @@ stateDiagram-v2
 3. The BackstopFund's USDC.
 4. The bucket's depositors, through the share price, in proportion.
 
-(The design's "staked DES" layer is not in this version. See section 7.)
+(With `StakedBackstopFund`, staked SCR is sold after the fund's USDC and before the
+depositors. See section 7.)
 
 ## 3. Contracts
 
@@ -113,10 +114,33 @@ stateDiagram-v2
 | `Vault.sol` | ~300 | OpenZeppelin ERC20, Ownable2Step, ReentrancyGuard, SafeERC20 | One bucket: shares, deposit and withdrawal queues, weekly cut-off, loss reserve, lending to the desk |
 | `Desk.sol` | ~330 | OpenZeppelin Ownable2Step, ReentrancyGuard, SafeERC20; Uniswap v3 router | Tickets: open, close, pay off, part pay, settle; holds pledged coins |
 | `BackstopFund.sol` | ~70 | OpenZeppelin Ownable2Step, SafeERC20 | Receives the profit share, sets aside 20% for the treasury, covers shortfalls for registered vaults |
+| `Reserve.sol` | ~110 | OpenZeppelin Ownable2Step, SafeERC20 | Liquidity reserve: holds USDC, deposits into a bucket that is short for its withdrawal queue |
+| `StakedBackstopFund.sol` | ~230 | OpenZeppelin Ownable2Step, ReentrancyGuard, SafeERC20; Uniswap v4 | Fund version two: SCR staking with cooldown, 90 day USDC stream to stakers, shortfall cover from USDC then a capped sale of staked SCR |
+| `token/SacredTokenDummy.sol` | ~150 | OpenZeppelin ERC20Burnable; Standard Reserve | SCR: 1 billion cap, settles only through the hooked pool |
+| `token/TaxHook.sol` | ~260 | Uniswap v4, solady; Standard Reserve | Pool fee in USDC on buys and sells, launch decay, average price, fund exemption |
+| `token/SacredMinter.sol` | ~40 | OpenZeppelin Ownable2Step | Only minter: 900 million at genesis, 100 million to the reserve sale |
+| `token/LiquidityManager.sol` | ~70 | OpenZeppelin Ownable2Step; Uniswap v4 | Opens the pool and adds the protocol's liquidity; cannot remove it |
+| `token/ReserveSale.sol` | ~80 | OpenZeppelin Ownable2Step, ReentrancyGuard | Sells new SCR for USDC to the reserve, delivered staked |
+| `token/FeeSplitter.sol` | ~25 | OpenZeppelin SafeERC20 | Pool fee: 20% treasury, then the reserve to its target, then the fund |
+| `token/AddressRegistry.sol` | ~40 | OpenZeppelin Ownable2Step; Standard Reserve | Lockable address bindings the token and hook read |
 | `mocks/Mocks.sol` | test only | OpenZeppelin ERC20 | Mock token, feed and router |
 
 Production ownership: an OpenZeppelin `TimelockController` (2 day delay) that only a
-multisig can propose to and execute from (`script/Deploy.s.sol`).
+multisig can propose to and execute from.
+
+Deployment is two scripts, run by one deployer in this order. Both check their inputs
+before sending anything (contract code, decimals, a live price feed, the sequencer feed
+on Arbitrum One, the Uniswap pool, a contract multisig) and stop if one is wrong.
+
+1. `script/DeployToken.s.sol` deploys the SCR side and the time-lock. It searches for
+   the CREATE2 salt that gives the hook an address carrying its Uniswap v4 permission
+   bits, and locks the registry bindings that must never change.
+2. `script/Deploy.s.sol` deploys one bucket and, given `FUND` and `RESERVE`, wires it to
+   the staking fund and the reserve. Run it once per coin.
+
+`contracts/.env.arbitrum.example` lists the Arbitrum One addresses, each checked against
+the chain. After both scripts, the deployer opens the SCR pool and adds the protocol's
+liquidity, and the multisig accepts ownership of every contract through the time-lock.
 
 ### The rules the code keeps (and where they are tested)
 
@@ -177,6 +201,10 @@ multisig can propose to and execute from (`script/Deploy.s.sol`).
 | `Desk.t.sol`, `Vault.t.sol` | Foundry unit + fuzz (1,000 runs each) | Every function, every revert, the design's worked examples, a fuzzed full ticket lifecycle | 68 passed |
 | `TicketMath.t.sol` | Foundry fuzz | Bounds and monotonicity of the arithmetic | 4 passed |
 | `Invariant.t.sol` | Foundry invariant (64 runs x 120 calls) | Nine system invariants under random deposits, withdrawals, cut-offs, tickets, prices and time | 9 passed |
+| `TaxHook.t.sol` | Foundry unit + fuzz, real Uniswap v4 `PoolManager` | The pool fee for all four swap shapes, launch decay, liquidity rules, the venue gate; run with USDC as currency0 and as currency1 | 46 passed |
+| `SacredSystem.t.sol` | Foundry unit + fuzz + integration | Minter, liquidity manager, fee splitter, reserve, reserve sale and staking fund, wired together with the real `Vault`; both currency orders | 138 passed |
+| `DeployToken.t.sol` | Foundry | The SCR deploy script: mined hook address, wiring, ownership hand-over, a trade on the deployed pool | 5 passed |
+| `ArbitrumFork.t.sol` | Foundry fork of Arbitrum One | Both deploy scripts as run; a 3x BTC ticket opened and closed on the real Uniswap v3 pool at the real Chainlink price; the SCR pool, reserve sale and a shortfall sale on the real Uniswap v4 `PoolManager` | 5 passed (2026-10-04, public RPC) |
 | `TicketMath.t.sol` `check_*` | Halmos symbolic execution | Eight properties of the arithmetic for all inputs in stated ranges | **2 proved, 6 not proved** (solver timed out at 180 s each, twice) |
 | `server/tests` | pytest | Keeper logic, points, indexer, API, and one end to end run against anvil | 16 passed |
 | `frontend/lib/math.test.js` | vitest | The frontend's arithmetic matches the contract to the unit | 11 passed |
@@ -192,8 +220,10 @@ What was **not** done:
 - **No Certora or other full formal verification.** Halmos targets the pure arithmetic
   only. The stateful contracts are covered by fuzzing and invariants,
   which sample behaviour and do not prove it.
-- **No fork test** against real Uniswap and Chainlink on Arbitrum. Swaps and feeds are
-  mocked.
+- **The fork test is opt-in.** `ArbitrumFork.t.sol` runs both deploy scripts against a
+  fork of Arbitrum One and is skipped unless `ARBITRUM_RPC_URL` is set. Every other
+  suite mocks swaps and feeds. The fork test covers the WBTC bucket only, at the
+  chain's state on the day it is run.
 - **The frontend was built and its arithmetic tested, but it was not driven in a
   browser with a wallet.**
 - **No audit.**
@@ -205,7 +235,11 @@ Run everything:
 cd contracts
 git clone --depth 1 --branch v5.1.0 https://github.com/OpenZeppelin/openzeppelin-contracts lib/openzeppelin-contracts
 git clone --depth 1 https://github.com/foundry-rs/forge-std lib/forge-std
+git clone --depth 1 --branch v4.0.0 https://github.com/Uniswap/v4-core lib/v4-core
+git clone --depth 1 https://github.com/Vectorized/solady lib/solady
+git clone --depth 1 https://github.com/transmissions11/solmate lib/solmate   # v4-core PoolManager, tests only
 forge test
+ARBITRUM_RPC_URL=https://arb1.arbitrum.io/rpc forge test --match-contract ArbitrumFork   # optional
 halmos --contract TicketMathTest --function check_ --solver-timeout-assertion 180000
 
 # server
@@ -248,10 +282,30 @@ cd frontend && npm run dev                        # terminal 4
 
 ## 7. What differs from the design document
 
-- **No DES, staking, reserve sales or pool hook.** The BackstopFund here holds USDC
-  only. Of what it receives, 20% is set aside for the treasury and 80% stays as
-  shortfall cover with no other way out. The staker stream and the liquidity reserve's
-  15% need the next fund version.
+- **The SCR side is built and deploys with the buckets, but nothing is live.** The
+  token, minter, pool hook, liquidity manager, reserve, reserve sale, fee splitter and
+  the staking fund (`StakedBackstopFund`) are tested together against a real Uniswap v4
+  `PoolManager` and the real `Vault`. The bucket deploy script wires a bucket to the
+  staking fund and the reserve when it is given them. The `Desk` unit tests and the
+  local deploy script still use version one of the fund (`BackstopFund`), which holds
+  USDC only.
+- **The token and hook are adapted from Standard Reserve's verified contracts** on
+  Robinhood Chain (MIT). The token is theirs with names changed, so it still carries a
+  launch wallet cap of 1.2 million SCR that the design does not mention. The hook is
+  re-denominated from ETH to USDC and trimmed.
+- **The launch fee starts above the design's 1% and 3%** and decays to them. The
+  ceiling on a manually set fee is 5%, as designed.
+- **The token deploys under a placeholder name.** On chain it is `SacredTokenDummy`
+  with the ticker `SRD`. This document and the code comments still call it SCR.
+- **The reserve deposits only when a bucket is short for its withdrawal queue.** The
+  design also says "or the bucket is full", which the vault's cap would reject.
+- **A shortfall sale of staked SCR stops 10% below the pool's average price** (the
+  design leaves the price-impact limit open) and is capped at 30% of the stake.
+- **Leaving the stake is a 14 day cooldown followed by a 7 day window.** Shares in
+  cooldown still earn and can still be sold for a shortfall. The window is not in the
+  design; without it a staker could sit permanently ready to leave.
+- **No protocol-owned stake, no airdrop, no staker votes on the dials.** The time-lock
+  sets every parameter.
 - **No staker discount on the profit share.** It is a flat 30%.
 - **Unfilled withdrawals are returned, not carried over.** When cash is short, every
   request is paid in the same proportion and the unredeemed shares go back to the
@@ -300,10 +354,32 @@ cd frontend && npm run dev                        # terminal 4
 
 ```
 sacred/
-  contracts/   src/ (Vault, Desk, Oracle, BackstopFund, TicketMath, mocks), test/, script/
+  contracts/   src/ (Vault, Desk, Oracle, BackstopFund, StakedBackstopFund, Reserve,
+               TicketMath, token/, mocks), test/, script/
   server/      destiny/ (chain, keeper, indexer, points, api), tests/
   frontend/    app/ (page, providers), lib/ (math, contracts), abi/
   abi/         contract ABIs for the server
   deployments/ local.json, written by the local deploy script
   export_abi.py
 ```
+
+## 10. Next steps
+
+- **Stablecoin vaults on Robinhood Chain.** Version one, with the token, deploys on
+  Arbitrum One. Buckets on Robinhood Chain come next, taking USDG deposits. The token,
+  its pool, the reserve and the staking fund stay on Arbitrum One, because the token
+  settles through one hooked pool. A bucket on another chain cannot call the staking
+  fund in the same transaction, so it starts with the USDC-only `BackstopFund` and its
+  own loss reserve. Cover across chains needs a messaging layer and is not designed.
+- **Staker discount on the profit share.** The design lets a trader who has staked at
+  least a set amount of SCR pay less than the 30% profit share. It exists to give
+  traders a reason to hold SCR. Both numbers are unset in the design. It is left out
+  of version one: it cuts the fund's income, needs a `Desk` change, and adds a ruling
+  for the board.
+- **Staker voting.** The design has stakers set the risk dials (rates, caps, leverage,
+  new buckets) inside the board's ceilings. The reason is the founder's Shariah
+  position that stakers are loss-bearing partners, not paid guarantors, and a say over
+  the risk they underwrite supports that. It is not needed to launch. The multisig and
+  time-lock already set those dials inside ceilings fixed in code, and voting lets
+  anyone who buys enough SCR vote for more risk. It is deferred until the board rules
+  on the stakers' reward.

@@ -1,21 +1,94 @@
-:root { --bg: #f3f6f2; --card: #fbfcfa; --ink: #16241f; --mute: #5c6b66; --accent: #0f5c4a; --edge: #c5d2cc; --warn: #9b3d2e; }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: system-ui, -apple-system, sans-serif; line-height: 1.45; }
-main { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; display: flex; flex-direction: column; gap: 20px; }
-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-h1 { margin: 0; color: var(--accent); font-size: 1.6rem; }
-h2 { margin: 0 0 8px; font-size: 1.15rem; color: var(--accent); }
-section { background: var(--card); border: 1px solid var(--edge); border-radius: 10px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.stat span { display: block; color: var(--mute); font-size: 0.8rem; }
-.stat b { font-variant-numeric: tabular-nums; }
-.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-input, select { padding: 8px 10px; border: 1px solid var(--edge); border-radius: 6px; font: inherit; min-width: 0; }
-button { padding: 8px 14px; border: 0; border-radius: 6px; background: var(--accent); color: #fff; font: inherit; cursor: pointer; }
-button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-button:disabled { opacity: 0.5; cursor: not-allowed; }
-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--edge); font-size: 0.9rem; }
-.scroll { overflow-x: auto; }
-.note { color: var(--mute); font-size: 0.85rem; }
-.error { color: var(--warn); font-size: 0.9rem; }
+/*
+  Site-wide tokens and base styles.
+
+  The landing page is the deep-green "desk"; the ticket on it is white "paper". The colours come
+  from the lightpaper (deep green 0F5C4A, gold rule B8892B, ink 16241F), adjusted for a dark ground.
+  The app under /app has its own light theme, scoped under .app in app/app/app.css.
+*/
+
+:root {
+  color-scheme: dark;
+
+  /* The desk */
+  --ground: #0b2f27;
+  --ground-raised: #10413a;
+  --rule: #1f4d42;
+  --rule-strong: #2f6457;
+
+  /* Text on the desk */
+  --ink: #ecf2ee;
+  --ink-2: #aec1b8;
+  --ink-3: #809790;
+
+  /* The one accent: the lightpaper's gold rule, brightened for a dark ground */
+  --gold: #d6ab52;
+  --gold-bright: #e6c070;
+
+  /* Paper: the ticket */
+  --paper: #fbfcfa;
+  --paper-ink: #16241f;
+  --paper-mute: #5c6b66;
+  --paper-rule: #d9e2dd;
+  --paper-edge: #b9c7c0;
+  --paper-warn: #9b3d2e;
+
+  --radius: 6px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --measure: 62ch;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 1.5rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+svg {
+  display: block;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--ground);
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}

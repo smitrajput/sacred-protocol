@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { DAY, cost, earned, exitPreview, formatUsdc, markup, parseUsdc, profitShare, quote, settlement } from "./math.js";
+import { DAY, cost, earned, exitPreview, formatAmount, formatUsdc, markup, parseUsdc, profitShare, quantityAt, quote, settlement, valueAt } from "./math.js";
 
 const USDC = 1_000_000n;
 const launch = { baseRateBps: 1_000n, surchargeBps: 100n, surchargeAboveBps: 20_000n };
@@ -78,5 +78,19 @@ describe("formatting and parsing", () => {
     expect(parseUsdc("abc")).toBe(null);
     expect(parseUsdc("1.0000001")).toBe(null);
     expect(parseUsdc("-5")).toBe(null);
+  });
+});
+
+describe("display helpers", () => {
+  it("formats token amounts with any number of decimals", () => {
+    expect(formatAmount(742_700_000_000_000_000n, 18, 4)).toBe("0.7427");
+    expect(formatAmount(1_234_567_890n, 6, 2)).toBe("1,234.57");
+  });
+
+  it("quantity and value mirror the oracle", () => {
+    const price = 2_500n * USDC;
+    const qty = quantityAt(2_000n * USDC, price, 18);
+    expect(qty).toBe(800_000_000_000_000_000n); // 0.8 coin
+    expect(valueAt(qty, price, 18)).toBe(2_000n * USDC);
   });
 });

@@ -1,5 +1,5 @@
 {
-  "name": "destiny-frontend",
+  "name": "sacred-frontend",
   "private": true,
   "scripts": {
     "dev": "next dev",

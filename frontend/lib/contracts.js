@@ -14,8 +14,14 @@ export const addresses = {
   oracle: env("ORACLE", local.oracle),
 };
 export const apiUrl = env("API_URL", "http://127.0.0.1:8000");
-export const coinSymbol = env("COIN_SYMBOL", "BTC");
-export const coinDecimals = Number(env("COIN_DECIMALS", "8"));
+
+// A production build with no contract addresses runs the app in preview: sample figures and no
+// transactions. Local development keeps reading the anvil deployment from local.json.
+export const preview = !process.env.NEXT_PUBLIC_VAULT && process.env.NODE_ENV === "production";
+
+// The local deployment's mock coin is WBTC with 8 decimals; the preview shows the ETH bucket.
+export const coinSymbol = env("COIN_SYMBOL", preview ? "ETH" : "BTC");
+export const coinDecimals = Number(env("COIN_DECIMALS", preview ? "18" : "8"));
 
 export const vault = { address: addresses.vault, abi: vaultAbi };
 export const desk = { address: addresses.desk, abi: deskAbi };

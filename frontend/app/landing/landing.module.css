@@ -1,0 +1,467 @@
+/*
+  Styles for the landing page sections. Tokens come from app/globals.css; buttons and the
+  paper panel from app/shared/shared.module.css. The live ticket adds Ticket.module.css.
+*/
+
+/* ---- Layout primitives ---- */
+
+.wrap {
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2.5rem);
+}
+
+.section {
+  border-top: 1px solid var(--rule);
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+}
+
+/* ---- Type roles ---- */
+
+.h1 {
+  font: 600 clamp(2.75rem, 1.6rem + 5vw, 5.25rem) / 1 var(--font-serif);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.h2 {
+  font: 600 clamp(1.9rem, 1.3rem + 2.4vw, 2.9rem) / 1.1 var(--font-serif);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  max-width: 24ch;
+}
+
+.h3 {
+  font: 600 1.4rem / 1.25 var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  margin-top: 1.25rem;
+  font-size: 1.25rem;
+  color: var(--ink-2);
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+.body {
+  color: var(--ink-2);
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+.small {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+  max-width: var(--measure);
+  text-wrap: pretty;
+}
+
+/* Buttons come from app/shared/shared.module.css. */
+
+/* ---- Nav ---- */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  height: 4.5rem;
+}
+
+.brand {
+  font: 600 1.5rem / 1 var(--font-serif);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.navLinks {
+  display: none;
+  gap: 2rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--ink-2);
+}
+
+.navLinks a {
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.navLinks a:hover {
+  color: var(--ink);
+}
+
+@media (min-width: 768px) {
+  .navLinks {
+    display: flex;
+  }
+}
+
+/* ---- Hero: statement left, the ticket right ---- */
+
+.hero {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+  padding-block: clamp(2rem, 5vw, 4.5rem) clamp(4rem, 8vw, 7rem);
+}
+
+@media (min-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 6fr);
+    gap: 4.5rem;
+  }
+}
+
+.heroLead {
+  margin-top: 1.5rem;
+  font-size: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  color: var(--ink-2);
+  max-width: 34ch;
+  text-wrap: pretty;
+}
+
+.ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2.25rem;
+}
+
+/* ---- How it works: a rail of four steps ---- */
+
+.steps {
+  list-style: none;
+  margin: 3.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 2rem;
+  counter-reset: step;
+}
+
+@media (min-width: 768px) {
+  .steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.step {
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 1.25rem;
+  color: var(--ink-2);
+  font-size: 1.0625rem;
+  text-wrap: pretty;
+}
+
+.step::before {
+  counter-increment: step;
+  content: counter(step);
+  display: block;
+  margin-bottom: 0.75rem;
+  font: 600 2rem / 1 var(--font-serif);
+  color: var(--gold);
+}
+
+.caption {
+  margin-top: 1.5rem;
+}
+
+.afterList {
+  margin-top: 1.25rem;
+}
+
+.afterRows {
+  margin-top: 2rem;
+}
+
+/* ---- The three contracts: a ruled table ---- */
+
+.contracts {
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+.contractRows {
+  margin-top: 1.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.contractRow {
+  display: grid;
+  gap: 0.25rem 2rem;
+  padding-block: 1.25rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 768px) {
+  .contractRow {
+    grid-template-columns: 9rem 15rem minmax(0, 1fr);
+  }
+}
+
+.contractName {
+  font: 600 1.25rem / 1.3 var(--font-serif);
+}
+
+.contractBetween {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+  padding-top: 0.15rem;
+}
+
+.contractLine {
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+/* ---- Rules: statement left, proof in code right ---- */
+
+.rules {
+  margin-top: 3rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.rule {
+  display: grid;
+  gap: 0.75rem 3rem;
+  padding-block: 1.75rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 860px) {
+  .rule {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.ruleText {
+  font: 600 clamp(1.25rem, 1rem + 0.9vw, 1.6rem) / 1.25 var(--font-serif);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.ruleProof {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.ruleProof code {
+  display: block;
+  margin-top: 0.5rem;
+  font: 0.85rem / 1.4 var(--font-mono);
+  color: var(--gold);
+  word-break: break-all;
+}
+
+/* ---- Safety: the loss order beside the backtests ---- */
+
+.safetyGrid {
+  display: grid;
+  gap: 3.5rem;
+  margin-top: 3.5rem;
+}
+
+@media (min-width: 960px) {
+  .safetyGrid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 5rem;
+  }
+}
+
+.layers {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  counter-reset: layer;
+}
+
+/* Each layer is tinted gold, fading as the loss moves down. */
+.layer {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: 1rem;
+  align-items: baseline;
+  padding: 1.1rem 1.25rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--gold) var(--tint), transparent);
+  font-size: 1.125rem;
+}
+
+.layer:nth-child(1) {
+  --tint: 30%;
+}
+.layer:nth-child(2) {
+  --tint: 21%;
+}
+.layer:nth-child(3) {
+  --tint: 13%;
+}
+.layer:nth-child(4) {
+  --tint: 6%;
+}
+
+.layer::before {
+  counter-increment: layer;
+  content: counter(layer);
+  font: 600 1.5rem / 1 var(--font-serif);
+  color: var(--gold);
+}
+
+.table {
+  width: 100%;
+  margin-top: 1.5rem;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+}
+
+.table th {
+  padding: 0 1rem 0.6rem 0;
+  text-align: left;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.table td {
+  padding: 0.9rem 1rem 0.9rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+}
+
+.table td:first-child {
+  font: 600 1.1rem / 1.3 var(--font-serif);
+  color: var(--ink);
+}
+
+.table td:last-child,
+.table th:last-child {
+  padding-right: 0;
+}
+
+/* ---- Shariah: four objections, four answers ---- */
+
+.pairs {
+  display: grid;
+  gap: 2.5rem 3rem;
+  margin-top: 3.5rem;
+}
+
+@media (min-width: 768px) {
+  .pairs {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.objection {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--ink-3);
+}
+
+.answer {
+  font: 600 clamp(1.3rem, 1.1rem + 0.8vw, 1.6rem) / 1.3 var(--font-serif);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.caveat {
+  margin-top: 3.5rem;
+  max-width: var(--measure);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.caveat em {
+  color: var(--ink);
+}
+
+/* ---- Status: words left, the launch plan right ---- */
+
+.status {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (min-width: 960px) {
+  .status {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 5rem;
+    align-items: start;
+  }
+}
+
+.plan {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+  counter-reset: plan;
+}
+
+.plan li {
+  display: grid;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+  gap: 0.75rem;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.plan li::before {
+  counter-increment: plan;
+  content: counter(plan) ".";
+  font: 600 1.25rem / 1.5 var(--font-serif);
+  color: var(--gold);
+}
+
+.plan b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---- Footer ---- */
+
+.footer {
+  border-top: 1px solid var(--rule);
+  padding-block: 3rem 4rem;
+  display: grid;
+  gap: 1.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.footer p {
+  max-width: 70ch;
+  text-wrap: pretty;
+}
+
+.footerLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footerLinks a {
+  color: var(--ink-2);
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+}
+
+.footerLinks a:hover {
+  text-decoration: underline;
+}

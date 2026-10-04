@@ -43,15 +43,22 @@ export function exitPreview({ coinValue, settlementAmount, paidIn }) {
   return { canClose: true, toTrader: surplus - toFund, toFund, profit: surplus > paidIn ? surplus - paidIn : 0n };
 }
 
-export function formatUsdc(units, digits = 2) {
+// Mirrors Oracle.quantity and Oracle.value for a price given in USDC units.
+export const quantityAt = (usdcAmount, priceUnits, coinDecimals) => (usdcAmount * 10n ** BigInt(coinDecimals)) / priceUnits;
+export const valueAt = (qty, priceUnits, coinDecimals) => (qty * priceUnits) / 10n ** BigInt(coinDecimals);
+
+// A token amount with `decimals`, rounded half up to `digits` and grouped with commas.
+export function formatAmount(units, decimals, digits = 2) {
   const negative = units < 0n;
   const abs = negative ? -units : units;
-  const scale = 10n ** BigInt(6 - digits);
+  const scale = 10n ** BigInt(decimals - digits);
   const rounded = (abs + scale / 2n) / scale;
   const whole = rounded / 10n ** BigInt(digits);
   const frac = (rounded % 10n ** BigInt(digits)).toString().padStart(digits, "0");
   return `${negative ? "-" : ""}${whole.toLocaleString("en-US")}.${frac}`;
 }
+
+export const formatUsdc = (units, digits = 2) => formatAmount(units, 6, digits);
 
 export function parseUsdc(text) {
   const clean = String(text).trim().replace(/,/g, "");

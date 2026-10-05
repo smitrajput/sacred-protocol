@@ -27,6 +27,22 @@
   color: var(--ink-2);
 }
 
+.barRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+/* The wallet's points, served by the API; absent when the server is off. */
+.points {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .preview {
   margin: 0.5rem 0 1.5rem;
   padding: 0.9rem 1rem;

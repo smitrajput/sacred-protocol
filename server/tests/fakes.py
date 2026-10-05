@@ -3,9 +3,10 @@ from destiny.chain import Ticket
 
 
 class FakeChain:
-    def __init__(self, now=1_000, next_cutoff=2_000):
+    def __init__(self, now=1_000, next_cutoff=2_000, token_side=True):
         self._now = now
         self._next_cutoff = next_cutoff
+        self.token_side = token_side
         self.tickets = {}
         self.log = []
         self.fail_settle = set()
@@ -35,6 +36,16 @@ class FakeChain:
 
     def bucket(self):
         return {"idle": 98_000, "lent": 2_000, "nav": 100_000}
+
+    def backstop(self):
+        if not self.token_side:
+            return None
+        return {"totalStaked": 10_000 * 10**18, "totalShares": 10_000 * 10**18, "available": 500, "usdcHeld": 700}
+
+    def reserve_sale(self):
+        if not self.token_side:
+            return None
+        return {"open": True, "price": 100_000, "reserveAssets": 1_000, "reserveTarget": 10_000}
 
     def events(self, from_block, to_block):
         return [e for e in self._events if from_block <= e["block"] <= to_block]

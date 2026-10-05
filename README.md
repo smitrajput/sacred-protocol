@@ -2,13 +2,14 @@
 
 Halal leverage for traders and real yield for depositors, with no interest anywhere.
 This repository holds the first working version: **term mode, end to end**.
-Nothing here is deployed, audited, or certified by a Shariah board.
+It is deployed on Arbitrum One (addresses in [section 3](#deployed-on-arbitrum-one)), but
+nothing here is audited or certified by a Shariah board.
 
 | Part | Where | Language | What it does |
 | --- | --- | --- | --- |
 | Contracts | `contracts/` | Solidity 0.8.26, Foundry | The vault, the ticket desk, the price reader, the backstop fund |
-| Server | `server/` | Python, FastAPI, web3.py | A keeper that settles due tickets and runs the weekly cut-off; a read API; points |
-| Frontend | `frontend/` | JavaScript, Next.js, wagmi, viem | Open, close, pay off and part pay tickets; deposit, withdraw and claim |
+| Server | `server/` | Python, FastAPI, web3.py | A keeper that settles due tickets and runs the weekly cut-off; a read API for the bucket, the fund, the sale and points |
+| Frontend | `frontend/` | JavaScript, Next.js, wagmi, viem, Playwright | Four roles in one page: traders open, close, pay off and part pay tickets; depositors deposit, withdraw and claim; stakers stake SCR and claim USDC; SCR buyers buy from the reserve sale. Browser flows for each |
 | ABIs and addresses | `abi/`, `deployments/` | JSON | Written by `export_abi.py` and the local deploy script |
 
 ## 1. The system in one paragraph
@@ -30,13 +31,17 @@ flowchart LR
   subgraph Users
     D[Depositor]
     T[Trader]
+    ST[Staker]
+    B[SCR buyer]
     K[Keeper or anyone]
   end
   subgraph Onchain
     V[Vault<br/>shares, queues, reserve]
     DK[Desk<br/>tickets, pledged coins]
     O[Oracle<br/>Chainlink reader]
-    F[BackstopFund]
+    F[StakedBackstopFund<br/>USDC and staked SCR]
+    RS[ReserveSale]
+    RE[Reserve]
     R[Uniswap v3 router]
     CL[Chainlink feed]
   end
@@ -46,6 +51,10 @@ flowchart LR
   end
   D -- requestDeposit / requestWithdraw / claim --> V
   T -- open / close / payOff / partPay --> DK
+  ST -- stake / requestUnstake / unstake / claim --> F
+  B -- buy --> RS
+  RS -- USDC --> RE
+  RS -- stakeFor --> F
   K -- settle after due date --> DK
   K -- cutoff weekly --> V
   DK -- lend / repay / writeOff / assertHealthy --> V
@@ -57,10 +66,19 @@ flowchart LR
   DK -- receiveShare --> F
   S -. reads events and views .-> V
   S -. reads events and views .-> DK
+  S -. reads views .-> F
+  S -. reads views .-> RS
   FE -. reads and sends wallet transactions .-> V
   FE -. reads and sends wallet transactions .-> DK
+  FE -. reads and sends wallet transactions .-> F
+  FE -. reads and sends wallet transactions .-> RS
   FE -. points only .-> S
 ```
+
+The frontend reads everything it shows from the contracts and sends every transaction
+itself, through one data layer (`frontend/app/app/data.js`) that names each read. The server
+is a convenience: the frontend asks it for points and nothing else, and hides them when it is
+unreachable.
 
 ### Where the money goes
 
@@ -142,6 +160,41 @@ on Arbitrum One, the Uniswap pool, a contract multisig) and stop if one is wrong
 the chain. After both scripts, the deployer opens the SCR pool and adds the protocol's
 liquidity, and the multisig accepts ownership of every contract through the time-lock.
 
+### Deployed on Arbitrum One
+
+Every contract below is verified on Arbiscan; each link opens its source.
+
+SCR side
+
+| Contract | Address |
+| --- | --- |
+| Token (`SacredTokenDummy`, SRD) | [`0x65660a41C634cDD8246c3a6f9816d35D2a29df21`](https://arbiscan.io/address/0x65660a41C634cDD8246c3a6f9816d35D2a29df21#code) |
+| Minter (`SacredMinter`) | [`0xdc36Cb2E3be465aC31D06745283cD3420BB52F03`](https://arbiscan.io/address/0xdc36Cb2E3be465aC31D06745283cD3420BB52F03#code) |
+| Pool hook (`TaxHook`) | [`0xcE431e351252ba84aFDAFa556887e20524FA2dCD`](https://arbiscan.io/address/0xcE431e351252ba84aFDAFa556887e20524FA2dCD#code) |
+| Liquidity manager (`LiquidityManager`) | [`0x42E3735DF423fD006E10A3d97B9C83438d828193`](https://arbiscan.io/address/0x42E3735DF423fD006E10A3d97B9C83438d828193#code) |
+| Liquidity reserve (`Reserve`) | [`0xe8d09aB2342b1DfA7BE38b3Af5929D55D054C7b3`](https://arbiscan.io/address/0xe8d09aB2342b1DfA7BE38b3Af5929D55D054C7b3#code) |
+| Staking fund (`StakedBackstopFund`) | [`0x29E61dB6f53b4bCA6B9F838b3452c9054d8A446c`](https://arbiscan.io/address/0x29E61dB6f53b4bCA6B9F838b3452c9054d8A446c#code) |
+| Fee splitter (`FeeSplitter`) | [`0xCBf479Cd35325d69236c26400ec06B764A38a98a`](https://arbiscan.io/address/0xCBf479Cd35325d69236c26400ec06B764A38a98a#code) |
+| Reserve sale (`ReserveSale`) | [`0x158181DCC72FEF6870AA6460b14f826A3A4bA6e5`](https://arbiscan.io/address/0x158181DCC72FEF6870AA6460b14f826A3A4bA6e5#code) |
+| Address registry (`AddressRegistry`) | [`0x92c9ce1a970E1CEc443018FB121A3b5015138a96`](https://arbiscan.io/address/0x92c9ce1a970E1CEc443018FB121A3b5015138a96#code) |
+| Time-lock (`TimelockController`) | [`0xe408f23305cAc5719880597D36a811854A01d0c9`](https://arbiscan.io/address/0xe408f23305cAc5719880597D36a811854A01d0c9#code) |
+
+BTC bucket (WBTC, 3x max)
+
+| Contract | Address |
+| --- | --- |
+| Vault | [`0xbbB8891463EB7ac9DF3d81947491A733a1C3a916`](https://arbiscan.io/address/0xbbB8891463EB7ac9DF3d81947491A733a1C3a916#code) |
+| Desk | [`0x527ca589937A35504A5535fa1A89a0C8d42c667b`](https://arbiscan.io/address/0x527ca589937A35504A5535fa1A89a0C8d42c667b#code) |
+| Oracle | [`0xd49Be92294e17db719625766142655346c60543D`](https://arbiscan.io/address/0xd49Be92294e17db719625766142655346c60543D#code) |
+
+ETH bucket (WETH, 2x max)
+
+| Contract | Address |
+| --- | --- |
+| Vault | [`0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37`](https://arbiscan.io/address/0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37#code) |
+| Desk | [`0x054738143B3126D943f97b4572bcDa155A9Af71d`](https://arbiscan.io/address/0x054738143B3126D943f97b4572bcDa155A9Af71d#code) |
+| Oracle | [`0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F`](https://arbiscan.io/address/0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F#code) |
+
 ### The rules the code keeps (and where they are tested)
 
 | Rule | How | Test |
@@ -205,9 +258,11 @@ liquidity, and the multisig accepts ownership of every contract through the time
 | `SacredSystem.t.sol` | Foundry unit + fuzz + integration | Minter, liquidity manager, fee splitter, reserve, reserve sale and staking fund, wired together with the real `Vault`; both currency orders | 138 passed |
 | `DeployToken.t.sol` | Foundry | The SCR deploy script: mined hook address, wiring, ownership hand-over, a trade on the deployed pool | 5 passed |
 | `ArbitrumFork.t.sol` | Foundry fork of Arbitrum One | Both deploy scripts as run; a 3x BTC ticket opened and closed on the real Uniswap v3 pool at the real Chainlink price; the SCR pool, reserve sale and a shortfall sale on the real Uniswap v4 `PoolManager` | 5 passed (2026-10-04, public RPC) |
+| `DeployLocal.t.sol` | Foundry | The local deployment script: the whole system on one chain, wired, with the pool open | 4 passed |
 | `TicketMath.t.sol` `check_*` | Halmos symbolic execution | Eight properties of the arithmetic for all inputs in stated ranges | **2 proved, 6 not proved** (solver timed out at 180 s each, twice) |
-| `server/tests` | pytest | Keeper logic, points, indexer, API, and one end to end run against anvil | 16 passed |
-| `frontend/lib/math.test.js` | vitest | The frontend's arithmetic matches the contract to the unit | 11 passed |
+| `server/tests` | pytest | Keeper logic, points, indexer, API, and one end to end run against anvil: deposit, cut-off, a ticket settled by the keeper, a profitable close feeding the fund, a stake, a reserve sale | 18 passed |
+| `frontend/lib/*.test.js` | vitest | The frontend's ticket, staking and sale arithmetic matches the contracts to the unit | 20 passed |
+| `frontend/e2e/` | Playwright, headless Chromium | The four user flows through the real page against anvil, with the real keeper settling and the real API serving points: a depositor in and out across two cut-offs; a trader opening, part-paying, closing in profit, paying off, and being settled by the keeper; a staker earning and leaving after the cooldown; an SCR buyer paying the reserve and receiving a stake | 4 passed, twice in a row |
 
 What was **not** done:
 
@@ -224,8 +279,11 @@ What was **not** done:
   fork of Arbitrum One and is skipped unless `ARBITRUM_RPC_URL` is set. Every other
   suite mocks swaps and feeds. The fork test covers the WBTC bucket only, at the
   chain's state on the day it is run.
-- **The frontend was built and its arithmetic tested, but it was not driven in a
-  browser with a wallet.**
+- **No real wallet extension.** The browser flows install a small EIP-1193 provider on
+  `window.ethereum` (`frontend/e2e/wallet.mjs`) that answers the account and chain questions
+  itself, estimates gas with headroom as a wallet would, and forwards everything else to
+  anvil, which signs for its unlocked accounts. The app's injected-wallet path is the real
+  one; only the signing is stubbed. MetaMask itself was not driven.
 - **No audit.**
 
 Run everything:
@@ -247,7 +305,9 @@ cd ../server && uv venv --python 3.12 .venv && uv pip install --python .venv/bin
 .venv/bin/python -m pytest
 
 # frontend
-cd ../frontend && npm install && npm test && npm run build
+cd ../frontend && npm install && npx playwright install chromium
+npm test && npm run build
+npm run test:e2e        # boots anvil, deploys, starts the keeper, the API and Next, drives the page
 ```
 
 Run it locally:
@@ -260,6 +320,15 @@ cd server && KEEPER_KEY=<anvil key> .venv/bin/python -m destiny.keeper          
 cd server && .venv/bin/uvicorn --factory destiny.api:app_from_env               # terminal 3
 cd frontend && npm run dev                        # terminal 4
 ```
+
+The local deployment is the whole system: mocks for USDC, WBTC, the feed and the spot
+market, a real Uniswap v4 `PoolManager`, the SCR side with the pool open, and a BTC term
+bucket on the staking fund and the reserve. The deployer (anvil's first account, fixed in the
+script so a `.env` written for a live chain can never leak in) is admin, manager, treasury,
+guardian, distributor and reserve operator, holds 1,000,000 USDC and the genesis SCR, and
+must deposit into the bucket before anyone else can: the manager has to hold at least 5% of
+it. The app connects to any injected wallet on chain 31337; point it at the node with
+`NEXT_PUBLIC_RPC_URL` if it is not on port 8545.
 
 ## 6. Assumptions
 
@@ -286,9 +355,9 @@ cd frontend && npm run dev                        # terminal 4
   token, minter, pool hook, liquidity manager, reserve, reserve sale, fee splitter and
   the staking fund (`StakedBackstopFund`) are tested together against a real Uniswap v4
   `PoolManager` and the real `Vault`. The bucket deploy script wires a bucket to the
-  staking fund and the reserve when it is given them. The `Desk` unit tests and the
-  local deploy script still use version one of the fund (`BackstopFund`), which holds
-  USDC only.
+  staking fund and the reserve when it is given them, and the local deploy script
+  deploys the whole system that way. The `Desk` unit tests still use version one of the
+  fund (`BackstopFund`), which holds USDC only.
 - **The token and hook are adapted from Standard Reserve's verified contracts** on
   Robinhood Chain (MIT). The token is theirs with names changed, so it still carries a
   launch wallet cap of 1.2 million SCR that the design does not mention. The hook is
@@ -357,7 +426,9 @@ sacred/
   contracts/   src/ (Vault, Desk, Oracle, BackstopFund, StakedBackstopFund, Reserve,
                TicketMath, token/, mocks), test/, script/
   server/      destiny/ (chain, keeper, indexer, points, api), tests/
-  frontend/    app/ (page, providers), lib/ (math, contracts), abi/
+  frontend/    app/ (landing page; app/ with data.js and one panel per role: OrderForm,
+               Tickets, Earn, Stake, Sale), lib/ (math, scr, errors, api, contracts),
+               e2e/ (harness, test wallet, one flow per role), abi/
   abi/         contract ABIs for the server
   deployments/ local.json, written by the local deploy script
   export_abi.py

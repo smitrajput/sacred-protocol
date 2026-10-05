@@ -1,55 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { formatUnits, maxUint256 } from "viem";
-import { useReadContracts } from "wagmi";
+import { formatUnits } from "viem";
 import { coinSymbol, preview, usdc, vault } from "../../lib/contracts";
 import { formatUsdc, parseUsdc } from "../../lib/math";
 import shared from "../shared/shared.module.css";
 import styles from "./app.module.css";
+import { approve, call, unlessAllowed, useBucket, useDepositor, useWallet } from "./data";
 import { formatMoment } from "./format";
+import Stat from "./Stat";
 import useAction from "./useAction";
-
-const REFRESH = { refetchInterval: 8_000 };
 
 export default function Earn({ address, sample }) {
   const { run, busy, error } = useAction();
   const [amount, setAmount] = useState("");
   const [shares, setShares] = useState("");
-  const onChain = !preview && !!address;
+  const bucket = useBucket(sample);
+  const me = useDepositor(address, sample);
+  const wallet = useWallet(address);
 
-  // The bucket's figures, then the depositor's own. In preview, the sample bucket.
-  const { data: bucket } = useReadContracts({
-    contracts: [
-      { ...vault, functionName: "idle" },
-      { ...vault, functionName: "lent" },
-      { ...vault, functionName: "reserve" },
-      { ...vault, functionName: "lastPrice" },
-      { ...vault, functionName: "nextCutoff" },
-    ],
-    query: { enabled: !preview, ...REFRESH },
-  });
-  const { data: own } = useReadContracts({
-    contracts: [
-      { ...vault, functionName: "balanceOf", args: [address] },
-      { ...vault, functionName: "depositOf", args: [address] },
-      { ...vault, functionName: "withdrawOf", args: [address] },
-      { ...usdc, functionName: "allowance", args: [address, vault.address] },
-    ],
-    query: { enabled: onChain, ...REFRESH },
-  });
-  const [idle, lent, reserve, price, nextCutoff] = preview
-    ? [sample.bucket.idle, sample.bucket.lent, sample.bucket.reserve, sample.bucket.lastPrice, sample.bucket.nextCutoff]
-    : (bucket || []).map((d) => d.result);
-  const [myShares, myDeposit, myWithdraw, allowance] = preview
-    ? [sample.bucket.myShares, [sample.bucket.myDeposit], [sample.bucket.myWithdraw], 0n]
-    : (own || []).map((d) => d.result);
-
-  const total = (idle ?? 0n) + (lent ?? 0n);
+  const total = (bucket.idle ?? 0n) + (bucket.lent ?? 0n);
   const assets = parseUsdc(amount);
   const sharesIn = parseUsdc(shares);
-  const approve = { ...usdc, functionName: "approve", args: [vault.address, maxUint256] };
-  const canAct = onChain && !busy;
+  const canAct = !preview && !!address && !busy;
   const hint = preview
     ? "Deposits switch on once the contracts are deployed."
     : !address
@@ -65,11 +38,11 @@ export default function Earn({ address, sample }) {
 
       <dl className={styles.stats}>
         <Stat label="In the bucket">{formatUsdc(total)} USDC</Stat>
-        <Stat label="Financed">{total ? Number((lent * 10_000n) / total) / 100 : 0}%</Stat>
-        <Stat label="Loss reserve">{formatUsdc(reserve ?? 0n)} USDC</Stat>
-        <Stat label="Share price">{price ? Number(formatUnits(price, 18)).toFixed(6) : "1.000000"}</Stat>
-        <Stat label="Next cut-off">{nextCutoff ? formatMoment(nextCutoff) : "..."}</Stat>
-        <Stat label="Your shares">{formatUsdc(myShares ?? 0n)}</Stat>
+        <Stat label="Financed">{total ? Number((bucket.lent * 10_000n) / total) / 100 : 0}%</Stat>
+        <Stat label="Loss reserve">{formatUsdc(bucket.reserve ?? 0n)} USDC</Stat>
+        <Stat label="Share price">{bucket.lastPrice ? Number(formatUnits(bucket.lastPrice, 18)).toFixed(6) : "1.000000"}</Stat>
+        <Stat label="Next cut-off">{bucket.nextCutoff ? formatMoment(bucket.nextCutoff) : "..."}</Stat>
+        <Stat label="Your shares">{formatUsdc(me.shares ?? 0n)}</Stat>
       </dl>
 
       <p className={`${shared.note} ${styles.spaced}`}>
@@ -87,7 +60,9 @@ export default function Earn({ address, sample }) {
             <button
               className={shared.inkBtn}
               disabled={!canAct || !assets}
-              onClick={() => run(...(allowance >= assets ? [] : [approve]), { ...vault, functionName: "requestDeposit", args: [assets] })}
+              onClick={() =>
+                run(...unlessAllowed(wallet.usdcForVault, assets, approve(usdc, vault)), call(vault, "requestDeposit", assets))
+              }
             >
               Request deposit
             </button>
@@ -102,7 +77,7 @@ export default function Earn({ address, sample }) {
             <button
               className={`${shared.inkBtn} ${shared.inkBtnGhost}`}
               disabled={!canAct || !sharesIn}
-              onClick={() => run({ ...vault, functionName: "requestWithdraw", args: [sharesIn] })}
+              onClick={() => run(call(vault, "requestWithdraw", sharesIn))}
             >
               Request withdrawal
             </button>
@@ -112,19 +87,19 @@ export default function Earn({ address, sample }) {
 
       <div className={styles.actions}>
         <span className={shared.hint}>
-          Queued deposit: {formatUsdc(myDeposit?.[0] ?? 0n)} USDC. Queued withdrawal: {formatUsdc(myWithdraw?.[0] ?? 0n)} shares.
+          Queued deposit: {formatUsdc(me.queuedDeposit ?? 0n)} USDC. Queued withdrawal: {formatUsdc(me.queuedWithdraw ?? 0n)} shares.
         </span>
         <button
           className={`${shared.inkBtn} ${shared.inkBtnGhost}`}
           disabled={!canAct}
-          onClick={() => run({ ...vault, functionName: "claimDeposit", args: [address] })}
+          onClick={() => run(call(vault, "claimDeposit", address))}
         >
           Claim shares
         </button>
         <button
           className={`${shared.inkBtn} ${shared.inkBtnGhost}`}
           disabled={!canAct}
-          onClick={() => run({ ...vault, functionName: "claimWithdraw", args: [address] })}
+          onClick={() => run(call(vault, "claimWithdraw", address))}
         >
           Claim USDC
         </button>
@@ -132,14 +107,5 @@ export default function Earn({ address, sample }) {
       {hint && <p className={`${shared.hint} ${styles.spaced}`}>{hint}</p>}
       {error && <p className={shared.warn}>{error}</p>}
     </section>
-  );
-}
-
-function Stat({ label, children }) {
-  return (
-    <div className={styles.stat}>
-      <dt>{label}</dt>
-      <dd>{children}</dd>
-    </div>
   );
 }

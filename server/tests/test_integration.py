@@ -1,5 +1,6 @@
 """End to end against a local anvil node: deploy, deposit, cut-off, open a ticket,
-let it fall due, and have the keeper settle it. Skipped when Foundry is not installed."""
+let it fall due, and have the keeper settle it; then a profitable close that feeds
+the staking fund, a stake, and a reserve sale. Skipped when Foundry is not installed."""
 import json
 import os
 import pathlib
@@ -21,7 +22,9 @@ FOUNDRY = pathlib.Path.home() / ".foundry" / "bin"
 os.environ["PATH"] = f"{FOUNDRY}:{os.environ['PATH']}"
 KEY = "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"  # anvil's first test key
 RPC = "http://127.0.0.1:8546"
+DEPLOYMENT = ROOT / "deployments" / "pytest.json"
 USDC = 10**6
+SCR = 10**18
 
 pytestmark = pytest.mark.skipif(shutil.which("anvil") is None, reason="Foundry (anvil) is not installed")
 
@@ -38,10 +41,12 @@ def node():
         subprocess.run(
             ["forge", "script", "script/DeployLocal.s.sol", "--rpc-url", RPC, "--broadcast"],
             cwd=ROOT / "contracts", check=True, capture_output=True,
+            env={**os.environ, "DEPLOYMENT_OUT": f"../deployments/{DEPLOYMENT.name}"},
         )
         yield w3
     finally:
         anvil.terminate()
+        DEPLOYMENT.unlink(missing_ok=True)
 
 
 def travel(w3, seconds):
@@ -49,20 +54,23 @@ def travel(w3, seconds):
     w3.provider.make_request("evm_mine", [])
 
 
-def test_full_term_mode_lifecycle(node, tmp_path):
+def test_full_lifecycle(node, tmp_path):
     w3 = node
-    addresses = json.loads((ROOT / "deployments" / "local.json").read_text())
+    addresses = json.loads(DEPLOYMENT.read_text())
     config = Config(rpc_url=RPC, addresses=addresses, keeper_key=KEY, db_path=str(tmp_path / "e2e.sqlite"), poll_seconds=1)
     chain = Chain(config)
     me = chain.account.address
-    usdc = w3.eth.contract(address=addresses["usdc"], abi=load_abi("MockERC20"))
+    erc20 = lambda key: w3.eth.contract(address=addresses[key], abi=load_abi("MockERC20"))
+    usdc, scr = erc20("usdc"), erc20("token")
+    feed = w3.eth.contract(address=addresses["feed"], abi=load_abi("MockFeed"))
+    router = w3.eth.contract(address=addresses["router"], abi=load_abi("MockRouter"))
 
     def send(fn):
         return chain._send(fn)
 
-    # Deposit 100,000 USDC and wait for the weekly cut-off.
-    send(usdc.functions.approve(addresses["vault"], 2**256 - 1))
-    send(usdc.functions.approve(addresses["desk"], 2**256 - 1))
+    # ── Depositor: 100,000 USDC in, processed at the weekly cut-off ──
+    for spender in ("vault", "desk", "sale"):
+        send(usdc.functions.approve(addresses[spender], 2**256 - 1))
     send(chain.vault.functions.requestDeposit(100_000 * USDC))
     assert tick(chain) == []  # nothing is due yet
     travel(w3, 7 * 86_400)
@@ -70,7 +78,7 @@ def test_full_term_mode_lifecycle(node, tmp_path):
     send(chain.vault.functions.claimDeposit(me))
     assert chain.vault.functions.balanceOf(me).call() == 100_000 * USDC
 
-    # Open the design's example ticket: 1,000 down on BTC at 3x for 14 days.
+    # ── Trader: the design's example ticket, 1,000 down on BTC at 3x for 14 days ──
     send(chain.desk.functions.open(1_000 * USDC, 30_000, 14 * 86_400, 0))
     ticket = chain.ticket(1)
     assert (ticket.status, ticket.financed, ticket.markup) == ("live", 2_000 * USDC, 8_438_356)
@@ -96,3 +104,37 @@ def test_full_term_mode_lifecycle(node, tmp_path):
     points = all_points(indexer.events())[me.lower()]
     assert round(points["trading"], 6) == 8.438356
     assert points["depositing"] > 0
+
+    # ── A profitable close: BTC up 20%, 30% of the profit reaches the staking fund ──
+    assert chain.backstop()["usdcHeld"] == 0
+    send(chain.desk.functions.open(1_000 * USDC, 30_000, 14 * 86_400, 0))
+    send(feed.functions.set(72_000 * 10**8))
+    send(router.functions.setPrice(72_000 * USDC))
+    send(chain.desk.functions.close(2, 0))
+    assert chain.ticket(2).status == "closed"
+    fund = chain.backstop()
+    assert fund["usdcHeld"] > 0 and fund["available"] > 0
+    assert chain.reserve_sale()["reserveAssets"] > 0, "15% of the share went to the reserve"
+
+    # ── Staker: SCR in, a share of the fund out, and a 14 day cooldown to leave ──
+    send(scr.functions.approve(addresses["fund"], 2**256 - 1))
+    send(chain.fund.functions.stake(10_000 * SCR))
+    assert chain.backstop()["totalStaked"] == 10_000 * SCR
+    travel(w3, 86_400)
+    assert chain.fund.functions.earned(me).call() > 0
+    send(chain.fund.functions.requestUnstake(10_000 * SCR))
+    travel(w3, 14 * 86_400)
+    send(chain.fund.functions.unstake())
+    assert chain.backstop()["totalStaked"] == 0
+
+    # ── SCR buyer: new SCR for USDC, every USDC to the reserve, delivered staked ──
+    sale = chain.reserve_sale()
+    assert sale["open"] and sale["reserveAssets"] < sale["reserveTarget"]
+    reserve_before = sale["reserveAssets"]
+    send(chain.sale.functions.buy(1_000 * SCR, 2**256 - 1))
+    assert chain.fund.functions.stakeOf(me).call() == 1_000 * SCR
+    assert chain.reserve_sale()["reserveAssets"] - reserve_before == 1_000 * sale["price"]  # 1,000 whole SCR
+
+    # The API serves all of it.
+    assert indexer.sync(chain) > 0
+    assert {e["name"] for e in indexer.events()} >= {"Staked", "Unstaked", "Received", "Sold", "Cutoff", "Ended"}

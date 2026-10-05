@@ -81,7 +81,9 @@ abstract contract Preflight is Script {
             return existing;
         }
         address multisig = vm.envAddress("MULTISIG");
-        if (block.chainid == ARBITRUM_ONE && multisig.code.length == 0) revert MultisigMustBeAContract(multisig);
+        if (block.chainid == ARBITRUM_ONE && multisig.code.length == 0 && !vm.envOr("ALLOW_EOA_MULTISIG", false)) {
+            revert MultisigMustBeAContract(multisig);
+        }
         address[] memory roles = new address[](1);
         roles[0] = multisig;
         return address(new TimelockController(TIMELOCK_DELAY, roles, roles, address(0)));

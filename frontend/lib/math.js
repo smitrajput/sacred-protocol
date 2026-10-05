@@ -55,15 +55,19 @@ export function formatAmount(units, decimals, digits = 2) {
   const rounded = (abs + scale / 2n) / scale;
   const whole = rounded / 10n ** BigInt(digits);
   const frac = (rounded % 10n ** BigInt(digits)).toString().padStart(digits, "0");
-  return `${negative ? "-" : ""}${whole.toLocaleString("en-US")}.${frac}`;
+  return `${negative ? "-" : ""}${whole.toLocaleString("en-US")}${digits > 0 ? `.${frac}` : ""}`;
 }
 
 export const formatUsdc = (units, digits = 2) => formatAmount(units, 6, digits);
 
-export function parseUsdc(text) {
+// A typed amount as token units, or null if it is not a plain decimal with at most `decimals` places.
+export function parseAmount(text, decimals) {
   const clean = String(text).trim().replace(/,/g, "");
   if (!/^\d*\.?\d*$/.test(clean) || clean === "" || clean === ".") return null;
   const [whole, frac = ""] = clean.split(".");
-  if (frac.length > 6) return null;
-  return BigInt(whole || "0") * 1_000_000n + BigInt(frac.padEnd(6, "0"));
+  if (frac.length > decimals) return null;
+  return BigInt(whole || "0") * 10n ** BigInt(decimals) + BigInt(frac.padEnd(decimals, "0") || "0");
 }
+
+export const parseUsdc = (text) => parseAmount(text, 6);
+export const parseScr = (text) => parseAmount(text, 18);

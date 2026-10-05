@@ -1,2 +1,8 @@
 .vercel
 .env*
+
+# Playwright
+/test-results/
+/playwright-report/
+/e2e/.run.json
+/e2e/.logs/

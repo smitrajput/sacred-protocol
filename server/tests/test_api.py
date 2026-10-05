@@ -19,6 +19,19 @@ def test_health_and_bucket(tmp_path):
     assert c.get("/bucket").json()["nav"] == 100_000
 
 
+def test_fund_and_sale_figures(tmp_path):
+    c, _ = client(tmp_path)
+    assert c.get("/fund").json()["totalStaked"] == 10_000 * 10**18
+    assert c.get("/sale").json()["open"] is True
+
+
+def test_fund_and_sale_are_404_without_the_token_side(tmp_path):
+    c, _ = client(tmp_path, FakeChain(token_side=False))
+    assert c.get("/fund").status_code == 404
+    assert c.get("/sale").status_code == 404
+    assert c.get("/bucket").status_code == 200
+
+
 def test_tickets_can_be_filtered_by_owner(tmp_path):
     chain = FakeChain()
     chain.add_ticket(1, due=1_500, owner="0xAAA")

@@ -10,6 +10,8 @@ STATUS = ["none", "live", "closed", "paid_off", "settled", "settled_short"]
 EVENTS = {
     "desk": ["Opened", "Paid", "Ended"],
     "vault": ["DepositRequested", "DepositClaimed", "WithdrawRequested", "WithdrawClaimed", "Cutoff"],
+    "fund": ["Staked", "Unstaked", "Claimed", "Received", "Covered"],
+    "sale": ["Sold"],
 }
 
 
@@ -33,8 +35,16 @@ class Chain:
     def __init__(self, config: Config):
         self.w3 = Web3(Web3.HTTPProvider(config.rpc_url))
         a = config.addresses
-        self.vault = self.w3.eth.contract(address=a["vault"], abi=load_abi("Vault"))
-        self.desk = self.w3.eth.contract(address=a["desk"], abi=load_abi("Desk"))
+        contract = lambda key, abi: self.w3.eth.contract(address=a[key], abi=load_abi(abi))
+        self.vault = contract("vault", "Vault")
+        self.desk = contract("desk", "Desk")
+        self.usdc = contract("usdc", "MockERC20")  # any ERC-20 ABI will do for balances
+        # The SCR side is optional: a bucket may run on the USDC-only fund instead.
+        self.token_side = "sale" in a
+        self.fund = contract("fund", "StakedBackstopFund") if self.token_side else None
+        self.sale = contract("sale", "ReserveSale") if self.token_side else None
+        self.reserve = contract("reserve", "Reserve") if self.token_side else None
+        self.token = contract("token", "MockERC20") if self.token_side else None
         self.account = self.w3.eth.account.from_key(config.keeper_key) if config.keeper_key else None
 
     # ── reads ──
@@ -79,17 +89,42 @@ class Chain:
             "liveTickets": self.desk.functions.liveCount().call(),
         }
 
+    def backstop(self) -> dict | None:
+        """The staking fund: what is staked, what it can pay, what streams to stakers."""
+        if not self.token_side:
+            return None
+        f = self.fund.functions
+        return {
+            "totalStaked": f.totalStaked().call(), "totalShares": f.totalShares().call(),
+            "available": f.available().call(), "treasuryAccrued": f.treasuryAccrued().call(),
+            "periodFinish": f.periodFinish().call(), "usdcHeld": self.usdc.functions.balanceOf(self.fund.address).call(),
+        }
+
+    def reserve_sale(self) -> dict | None:
+        """The reserve sale and the reserve it fills."""
+        if not self.token_side:
+            return None
+        s, r = self.sale.functions, self.reserve.functions
+        return {
+            "open": s.isOpen().call(), "paused": s.paused().call(), "price": s.price().call(),
+            "marketPrice": s.marketPrice().call(), "reserveValuePerToken": s.reserveValuePerToken().call(),
+            "remainingThisPeriod": s.remainingThisPeriod().call(), "reserveAssets": r.totalAssets().call(),
+            "reserveTarget": r.target().call(), "scrSupply": self.token.functions.totalSupply().call(),
+        }
+
     def events(self, from_block: int, to_block: int) -> list[dict]:
         """Decoded logs of every event the indexer cares about, oldest first."""
         out = []
         for key, names in EVENTS.items():
             contract = getattr(self, key)
+            if contract is None:
+                continue
             for name in names:
                 for log in getattr(contract.events, name)().get_logs(from_block=from_block, to_block=to_block):
                     out.append({"block": log["blockNumber"], "index": log["logIndex"], "name": name, "args": dict(log["args"])})
         return sorted(out, key=lambda e: (e["block"], e["index"]))
 
-    # ── writes (the keeper's three jobs) ──
+    # ── writes (the keeper's jobs) ──
 
     def _send(self, fn) -> str:
         if self.account is None:

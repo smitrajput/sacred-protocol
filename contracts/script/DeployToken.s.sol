@@ -71,7 +71,7 @@ contract DeployToken is Preflight {
     ReserveSale public sale;
     address public timelock;
 
-    function run() external {
+    function run() external virtual {
         uint256 pk = vm.envUint("PRIVATE_KEY");
         _requireContract("POOL_MANAGER", vm.envAddress("POOL_MANAGER"));
         _requireDecimals("USDC", vm.envAddress("USDC"), 6);

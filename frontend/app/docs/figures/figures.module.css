@@ -1,0 +1,224 @@
+/*
+  Diagrams in the docs: hand-drawn SVG laid on a sheet of paper, hairlines and ink, the seal red
+  for the one quantity a figure is about. Coordinates live in the figure modules; the colours
+  and type live here. On a phone a figure scrolls sideways rather than squashing, like a table.
+*/
+
+.figure {
+  margin: 1.75rem 0 2.25rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  background: var(--paper);
+  color: var(--paper-ink);
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--font-sans);
+  font-size: 12px;
+}
+
+.caption {
+  margin: 1rem 0 0;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--paper-mute);
+  text-wrap: pretty;
+}
+
+/* ---- Boxes ---- */
+
+.paper {
+  fill: #fffefb;
+  stroke: var(--paper-edge);
+}
+
+.accent {
+  fill: #fffefb;
+  stroke: var(--accent);
+}
+
+.mute {
+  fill: var(--paper-rule);
+  stroke: var(--paper-edge);
+}
+
+.ghost {
+  fill: none;
+  stroke: var(--paper-edge);
+  stroke-dasharray: 3 3;
+}
+
+.offchain {
+  fill: #fffefb;
+  stroke: var(--paper-mute);
+  stroke-dasharray: 3 3;
+}
+
+/* ---- Type ---- */
+
+.title {
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--paper-ink);
+}
+
+.big {
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--paper-ink);
+}
+
+.sub {
+  font-size: 11px;
+  fill: var(--paper-mute);
+}
+
+.body {
+  font-size: 11px;
+  fill: var(--paper-ink);
+}
+
+/* Labels sit on lines: the paper-coloured stroke behind the glyphs knocks the line out. */
+.label,
+.labelMute,
+.labelAccent {
+  font-size: 11px;
+  fill: var(--paper-ink);
+  paint-order: stroke;
+  stroke: var(--paper);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.labelMute {
+  fill: var(--paper-mute);
+}
+
+.labelAccent {
+  fill: var(--accent);
+}
+
+.num {
+  font-size: 11px;
+  font-weight: 700;
+  fill: var(--accent);
+}
+
+/* ---- Lines ---- */
+
+.line {
+  fill: none;
+  stroke: var(--paper-ink);
+  stroke-width: 1.25;
+}
+
+.dashed {
+  stroke-dasharray: 3 3;
+}
+
+.accentLine {
+  stroke: var(--accent);
+}
+
+.head {
+  fill: var(--paper-ink);
+}
+
+.headAccent {
+  fill: var(--accent);
+}
+
+.rule {
+  stroke: var(--paper-rule);
+}
+
+.guide {
+  fill: none;
+  stroke: var(--paper-edge);
+  stroke-dasharray: 2 3;
+}
+
+.hatch {
+  stroke: var(--paper-ink);
+  stroke-width: 1;
+}
+
+.hatchAccent {
+  stroke: var(--accent);
+  stroke-width: 1;
+}
+
+/* ---- Bars ---- */
+
+.barMute {
+  fill: var(--paper-rule);
+  stroke: var(--paper-edge);
+}
+
+.barPaper {
+  fill: #fffefb;
+  stroke: var(--paper-ink);
+}
+
+.barHatch {
+  fill: url(#fig-hatch);
+  stroke: var(--paper-ink);
+}
+
+.barAccent {
+  fill: var(--accent);
+  stroke: var(--accent);
+}
+
+.barShort {
+  fill: url(#fig-hatch-accent);
+  stroke: var(--accent);
+}
+
+/* ---- Glyphs for the strip: people, buckets, coins and cash ---- */
+
+.glyph > circle,
+.glyph > path,
+.glyph > ellipse {
+  fill: none;
+  stroke: var(--paper-ink);
+  stroke-width: 1.25;
+}
+
+.coin {
+  fill: var(--paper-rule);
+  stroke: var(--paper-ink);
+  stroke-width: 1.25;
+}
+
+.coinText {
+  font-size: 7px;
+  font-weight: 700;
+  fill: var(--paper-ink);
+}
+
+.cash {
+  fill: #fffefb;
+  stroke: var(--paper-ink);
+  stroke-width: 1.25;
+}
+
+.cashAccent {
+  stroke: var(--accent);
+}
+
+.cashText {
+  font-size: 10px;
+  font-weight: 700;
+  fill: var(--paper-ink);
+}
+
+.cashTextAccent {
+  fill: var(--accent);
+}

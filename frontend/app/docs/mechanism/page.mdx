@@ -1,8 +1,12 @@
+import { Anatomy, Endings, Outcomes, Strip } from "../figures/mechanism";
+
 export const metadata = { title: "Mechanism" };
 
 # Mechanism
 
 One ticket is one credit sale of one coin to one trader, with the coin pledged back. Here is one from opening to its end, with every number. The running example throughout these docs: 1,000 USDC down on BTC at 3x for 14 days, at a yearly rate of 11%.
+
+<Strip />
 
 ## Four parties, three contracts
 
@@ -35,6 +39,8 @@ The order of steps 2 and 3 is a Shariah requirement: the vault must own the coin
 
 ## What a ticket records
 
+<Anatomy />
+
 | Field | Example | Note |
 | --- | --- | --- |
 | Cost | 3,000.00 | What the vault paid, swap fees included |
@@ -48,6 +54,8 @@ Nothing changes after opening except the balance, which can only go down. The ma
 
 ## How a ticket ends
 
+<Endings />
+
 | | Who | When | What happens |
 | --- | --- | --- | --- |
 | **Close** | The trader | Any time | The ticket sells the coin on the market. The bucket receives the settlement amount and the trader receives the rest |
@@ -60,6 +68,8 @@ A trader who closes or pays off early is not charged for the unused days: waived
 Every sale of a pledged coin is on the open market, never to the vault; is protected by a floor of the price-feed value less 1%; repays whoever triggered it a small fixed cost and nothing more; and carries no late penalty.
 
 ## Held to the due date
+
+<Outcomes />
 
 | BTC move | Coin sells for | Bucket receives | Trader receives | Trader's result | Bucket's result |
 | --- | --- | --- | --- | --- | --- |
@@ -103,4 +113,4 @@ The evergreen ticket removes the deadline: the markup for a full year is fixed a
 - No charge exists other than the markup and the repayment of actual costs.
 - Every exit works without any server run by the manager.
 
-Each is a line of code with a named test behind it; the list is on the [contracts page](/docs/contracts).
+Each is a line of code with a named test behind it; the list is on the [contracts page](/docs/contracts), and the [architecture page](/docs/architecture) shows the pieces that keep them.

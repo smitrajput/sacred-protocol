@@ -2,7 +2,7 @@ export const metadata = { title: "Contracts and code" };
 
 # Contracts and code
 
-Two contracts per bucket, a few shared ones, and a server that can be switched off. Immutable, no proxies. Every contract is deployed on Arbitrum One and verified on Arbiscan; nothing is audited.
+Every contract is deployed on Arbitrum One and verified on Arbiscan; nothing is audited. The pieces, who calls whom and where the money goes are drawn on the [architecture page](/docs/architecture). This page is the reference: addresses, the rules the code keeps with the test behind each, every dial and its limit, the test suites, and how to run it all on one machine.
 
 ## Addresses
 
@@ -36,21 +36,6 @@ ETH bucket (WETH, 2x max)
 | Vault | [`0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37`](https://arbiscan.io/address/0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37#code) |
 | Desk | [`0x054738143B3126D943f97b4572bcDa155A9Af71d`](https://arbiscan.io/address/0x054738143B3126D943f97b4572bcDa155A9Af71d#code) |
 | Oracle | [`0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F`](https://arbiscan.io/address/0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F#code) |
-
-## The pieces
-
-| | Lines | Role |
-| --- | --- | --- |
-| `Vault` | ~300 | One bucket: shares, queues, the weekly cut-off, the loss reserve, lending to the desk. Knows nothing about coins or prices |
-| `Desk` | ~330 | Tickets: open, close, pay off, part pay, settle. Holds the pledged coins. Knows nothing about shares |
-| `TicketMath` | ~50 | Pure arithmetic: cost, markup, earned markup, settlement, the payment split, the profit share |
-| `Oracle` | ~50 | Chainlink coin/USD with staleness and L2 sequencer checks |
-| `StakedBackstopFund` | ~230 | SCR staking with cooldown, a 90-day USDC stream, shortfall cover from USDC then a capped sale of staked SCR |
-| `Reserve`, `ReserveSale` | ~190 | The liquidity reserve, and the sale of new SCR into it, delivered staked |
-| Token, `TaxHook`, minter, liquidity manager, fee splitter, registry | ~600 | SCR, its hooked Uniswap v4 pool, its fee and its liquidity. Token and hook adapted from Standard Reserve's verified contracts (MIT) |
-| Server | Python | A keeper that settles and runs the cut-off; an indexer; a read-only API serving points. Every exit works with it off |
-
-Who calls whom: depositors call the vault (`requestDeposit`, `requestWithdraw`, `claim`); traders call the desk (`open`, `close`, `payOff`, `partPay`); stakers call the fund; SCR buyers call the reserve sale; anyone calls `settle` after a due date and `cutoff` once a week. The desk calls the vault to `lend`, `repay` and `writeOff`, the oracle for value, and the Uniswap v3 router to swap. The vault calls the fund for `cover` inside `try/catch`, so a failing backstop cannot block a settlement.
 
 Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new tickets and new deposits, and cannot unpause. Exits are never pausable by anyone.
 

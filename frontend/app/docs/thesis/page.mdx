@@ -2,29 +2,33 @@ export const metadata = { title: "Thesis" };
 
 # Thesis
 
-Two billion people are told that the two biggest things in DeFi are forbidden to them. Sacred is built on the observation that the prohibition is on the *structure*, not the *outcome*, and that a different structure gives the same outcome with fewer of the parts that hurt.
+Two billion people are told that among the two biggest things in DeFi, yield and leverage, are forbidden to them. Sacred is built on the observation that the prohibition is on the *structure* and its *risks*, not the *outcome*, and that a different structure with better risk tradeoffs gives similar or better outcomes with fewer downsides.
 
 ## The market that is locked out
 
 - **Leverage.** Perps and margin run on interest, funding payments and selling what you do not own. In 2006 the Muslim World League's Fiqh Council ruled against margin trading on four grounds: fees for delay, a loan tied to a sale, selling what is not owned, and excessive risk.
-- **Yield.** Stablecoin yield comes from lending at interest. That is riba.
+- **Yield.** Majority stablecoin yield in DeFi comes from lending at interest. That is textbook-definition riba.
 
-So a Muslim trader sits out or trades against their own faith, and a Muslim saver holds idle stablecoins. Both are large groups. Both have no product. The whole of Islamic DeFi held under 50 million dollars in mid-2026; the largest halal protocol tracked by DefiLlama holds 4 million. The demand is unproven on chain, and that is the bet: a market this size with this many people in it has never been offered a product that actually fits.
+So a Muslim trader sits out or trades against their own faith, and a Muslim saver holds idle stablecoins. Both are large groups. Both have no product. The whole of Islamic DeFi held under 50 million dollars in mid-2026; the largest halal protocol tracked by DefiLlama holds 4 million. The demand is unproven on chain, and that is the bet: a market this size with this many people in it has never been offered a product that is conducive to their values.
 
-## The one new primitive
+## The novel primitive
 
-Do not lend. Sell.
+Custodied selling, over lending.
 
-A vault buys a real coin and sells it to the trader at cost plus a fixed markup, paid later. The coin stays pledged until the balance is paid. This is murabaha, the contract behind 55 to 80% of all Islamic bank financing, applied to a crypto spot market, with a pledge (rahn) and a profit-sharing vault (mudarabah) around it. All three are contracts every Sunni school accepts in principle.
+There are 2 sides to this mechanism. Stablecoin depositors on one side i.e. supply side, and leverage traders on the other i.e. demand side.
+
+Stablecoin deposits on the supply side are done in a profit-sharing vault which has a mudarabah structure (an islamic finance structure with a capital supplier and a manager, where they share the profits when the manager makes money, but in case of losses only the supplier bears it). 
+
+And on the demand side, the trader deposits a down payment for a commodity-like asset they want leveraged exposure to, then the desk (technically a vault too) buys that asset from the market and sells it to the trader at cost plus a fixed markup, paid later, but keeps its custody (hence a desk) until the balance is paid. This is murabaha, the cost-plus sale Islamic banks already use to finance a home or a car, applied to a crypto spot market. The desk theoretically buys the asset, sells it to the trader and takes it back as a pledge (rahn) in one transaction, as a security for the unpaid amount owed by the trader to the desk (onchain this will only be the vault making a swap from USDC to ETH for instance). Mudarabah, murabaha and rahn are standard Islamic finance contracts in practice by major Islamic banks since decades.
 
 What makes it a *better* product and not merely a permitted one:
 
 | A perp | A ticket |
 | --- | --- |
-| Funding rate floats with the crowd | Markup fixed at opening; the whole cost is known before you commit |
-| Liquidation price; closed in full when it hits | Term mode has no liquidation price. Nothing is sold before the due date |
-| Can owe more than the margin in a gap | Never owes more than the pledged coin. Worst case is the down payment |
-| Yield to LPs is a share of trader losses | Yield to depositors is the markup, paid whether traders win or lose |
+| Funding paid every hour, set by how crowded one side is. The total cost is unknown until you close | Markup fixed at opening; the whole cost is known before you commit. No counterparty is needed, so a crowded market costs nothing extra |
+| Liquidation price. At 10x, a 9% wick closes the position in full, even if the price recovers an hour later | Term mode has no liquidation price. Price drops do not close a ticket before its due date |
+| A contract against another trader; no asset is owned. In cross margin, one position's loss can take the whole account | The trader owns the actual asset, bought on the spot market and pledged. Each ticket stands alone; the most it can lose is its down payment |
+| Perp vaults (HLP, GLP, JLP) earn by trading against traders: their losses, spreads and liquidations | Depositors earn the markup whichever way the price moves. They lose only if the asset sells for less than what the trader still owes, and that gap is bigger than the loss reserve, backstop fund and staked SCR together |
 
 The desk is the one piece that is new. Nothing like it exists on chain. Everything else in the plan composes around it.
 

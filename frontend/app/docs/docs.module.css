@@ -172,8 +172,15 @@
 
 /* ---- Main ---- */
 
+/* Prose keeps a 72ch measure; figures take the whole column. */
 .main {
   min-width: 0;
+  max-width: 900px;
+}
+
+.prose > :not(figure),
+.pager,
+.foot {
   max-width: 72ch;
 }
 
@@ -350,29 +357,7 @@
   }
 }
 
-/* ---- Callouts and cards, used from MDX and the overview ---- */
-
-.status {
-  display: grid;
-  gap: 0.5rem;
-  margin: 0 0 2rem;
-  padding: 1.1rem 1.25rem;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius);
-  background: var(--ground-raised);
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-.status b {
-  color: var(--gold-bright);
-  font-weight: 700;
-}
-
-.status p {
-  margin: 0;
-}
+/* ---- Cards and the page map on the overview ---- */
 
 .cards {
   display: grid;

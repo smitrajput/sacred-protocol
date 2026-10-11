@@ -26,6 +26,7 @@ export const sections = [
   {
     title: "Under the hood",
     pages: [
+      { slug: "architecture", title: "Technical architecture", blurb: "The stack, the pieces, who calls whom, where every USDC goes, a ticket's states, and the design choices." },
       { slug: "contracts", title: "Contracts and code", blurb: "Verified Arbitrum One addresses, the rules each contract keeps, every dial, and how to run it all." },
       { slug: "glossary", title: "Glossary", blurb: "The words, used the same way everywhere." },
     ],

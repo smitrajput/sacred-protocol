@@ -3,6 +3,8 @@
 
 export const links = {
   app: "/app",
+  docs: "/docs",
+  waitlist: "#waitlist",
   lightpaper: "/sacred-lightpaper.pdf",
 };
 
@@ -10,11 +12,26 @@ export const links = {
 export const exampleCoin = "ETH";
 
 export const nav = [
+  { label: "Numbers", href: "#numbers" },
   { label: "How it works", href: "#how" },
   { label: "Safety", href: "#safety" },
   { label: "Shariah", href: "#shariah" },
-  { label: "Lightpaper", href: links.lightpaper },
+  { label: "Docs", href: links.docs },
 ];
+
+// The running example held to its due date: 1,000 USDC down at 3x for 14 days at 11% a year.
+// Cost 3,000, markup 8.44, balance 2,008.44. From the design document's worked examples.
+export const ledger = {
+  columns: ["Coin move", "Coin sells for", "Bucket receives", "Trader receives", "Trader's result", "Bucket's result"],
+  rows: [
+    { move: "+20%", sold: "3,600.00", bucket: "2,008.44", trader: "1,591.56", result: "+59.2%", bucketResult: "+8.44" },
+    { move: "+10%", sold: "3,300.00", bucket: "2,008.44", trader: "1,291.56", result: "+29.2%", bucketResult: "+8.44" },
+    { move: "0%", sold: "3,000.00", bucket: "2,008.44", trader: "991.56", result: "−0.8%", bucketResult: "+8.44" },
+    { move: "−10%", sold: "2,700.00", bucket: "2,008.44", trader: "691.56", result: "−30.8%", bucketResult: "+8.44" },
+    { move: "−30%", sold: "2,100.00", bucket: "2,008.44", trader: "91.56", result: "−90.8%", bucketResult: "+8.44" },
+    { move: "−40%", sold: "1,800.00", bucket: "1,800.00", trader: "0.00", result: "−100%", bucketResult: "−200.00" },
+  ],
+};
 
 export const steps = [
   "The vault buys the coin on the spot market with depositors' USDC.",

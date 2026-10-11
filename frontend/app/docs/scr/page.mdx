@@ -1,0 +1,62 @@
+export const metadata = { title: "SCR" };
+
+# SCR: holders, stakers, reserve buyers
+
+SCR is the protocol token. Staked SCR stands behind shortfalls, sales of SCR fund a USDC liquidity reserve, and one SCR/USDC pool gives it a market. Depositors' yield does not depend on it.
+
+**Status.** Deployed on Arbitrum One under a placeholder name (`SacredTokenDummy`, ticker `SRD`) so the whole system could be tested as one. No airdrop, no listing, no protocol-owned stake. The token launches only after the vault has run on points for 6 to 12 months and has real fees. Everything numeric here is suggested, not confirmed, and none of it has been seen by a board.
+
+| Part | Holds | Money in | Money out |
+| --- | --- | --- | --- |
+| **Backstop fund** | Staked SCR and USDC | 30% of traders' profit | Shortfalls, a stream to stakers, the management fee |
+| **Liquidity reserve** | USDC | Reserve sales, pool fees, part of the fee | Deposits into buckets short of cash |
+| **Pool** | SCR and USDC, owned by the protocol | Swap fees | Fees to the reserve, then to the fund |
+
+## If you stake
+
+- Anyone can stake. Leaving takes a **14-day cooldown followed by a 7-day window**, as long as the longest term ticket, so nobody can run ahead of a loss. Shares in cooldown still earn and can still be sold for a shortfall. Staked SCR cannot be transferred.
+- You are paid **in USDC** from the traders' profit share, streamed over 90 days. There are no SCR emissions and no rebase. The fund's income is trade profit only; in a falling market it receives little or nothing.
+- When a bucket's loss reserve cannot cover a shortfall, the fund pays from its USDC first. If that is not enough, staked SCR is sold in the pool, **up to 30% of the stake per event, stopping 10% below the pool's average price**. Whatever is still uncovered falls on that bucket's depositors.
+- One fund covers every bucket; buckets still share nothing with each other. The protocol stakes some of its own SCR.
+
+The simulation's view: a shortfall sale at that cap raises only about 5% of the pool's USDC per event, so the real backstop is the fund's USDC. The proposal keeps staked SCR as the last layer, sized at zero in solvency tests, has the fund hold USDC to 8% of the financed amount before paying stakers, and pays stakers the excess only, about 8% of deposits a year in simulation, little until a buffer is refilled after a loss. A staker's reward and whether staked SCR may be sold for a shortfall are rulings for the board; the founder's position is that stakers are loss-bearing partners, not paid guarantors.
+
+## If you buy in the reserve sale
+
+The reserve sells new SCR for USDC and delivers it **staked**, so the cooldown applies. This is how the liquidity reserve that backs withdrawals is built.
+
+- **Price.** The higher of the pool's average price less a discount (4% today), and the reserve value per token (the reserve's USDC divided by supply).
+- **Open only while the reserve is below its target**, and capped per period at 0.05% of supply a week, so the 10% set aside lasts about four years.
+- **Sales stop by themselves** when SCR trades below the reserve value per token. In a bear market nobody buys, so the reserve must be built beforehand; the proposal seeds it from the raise.
+- **Pool fee on your way out**: 1% on buys, 3% on sells, in USDC, with a 5% ceiling fixed in code. The fund's own shortfall sales are exempt.
+
+Two attacks the review found, and the fixes in the proposal: the 30-minute average could be depressed for the cost of the sell tax, so the price moves to a 24-hour average floored at 90% of the pool's 7-day low; and a 10% discount ceiling would let a holder sell liquid SCR and buy it back staked for a 6.7% gain per cycle, so the ceiling is fixed at the sell tax plus one point. Idle reserve cash never earns interest; it may go into tokenised sukuk later. It is not called a bond.
+
+## If you hold
+
+The pool is one SCR/USDC pool on Uniswap v4, owned by the protocol: 4% of supply plus USDC from the raise, never withdrawn. Anyone can open another pool without the fee, so this income leaks and the design does not depend on it. Of a trader's profit, 70% stays with the trader and 30% goes to the fund; of what the fund receives, 20% goes to the treasury and 15% to the reserve, the rest to stakers. Pool fees go 20% to the treasury, then to the reserve until its target, then to the fund. Markup is not in this picture: all of it goes to depositors.
+
+## Supply and allocation
+
+One billion SCR, fixed. No emissions beyond it. Community-side allocations total 52%, insiders 38%, the treasury 10%.
+
+| Allocation | Share | Unlock |
+| --- | --- | --- |
+| Airdrops, in seasons | 25% | 10% at launch, 15% over later seasons, delivered staked |
+| Community incentives and grants | 10% | Streamed over 5 years |
+| Reserve sales | 10% | Sold only at or above reserve value per token |
+| Pool liquidity | 4% | At launch, never withdrawn |
+| Protocol's own backstop stake | 3% | Staked permanently; can be sold for shortfalls |
+| Team, co-founders, hires, advisors | 20% | 1-year cliff, then 3 years linear |
+| Investors, angel round to Series A | 18% | Same lock as the team |
+| Treasury and development | 10% | Streamed over 5 years |
+
+Unused investor tokens roll into the treasury. The treasury stream, not an unlock, carries the early years: at a 20 million token valuation, 2% a year is about 400,000. A token issued from a UAE entity falls under Dubai's virtual-asset rules, which may constrain the airdrop and the sales.
+
+## Points before the token
+
+Traders earn one point per USDC of markup paid. Depositors earn one point per USDC per day deposited, counted at each weekly cut-off. Volume earns nothing, so farming points means paying depositors. Points are a discretionary gift, not a promised return; they are computed from on-chain events by the open indexer, so anyone can check their own. Airdrops arrive as staked SCR, which builds the backstop from day one.
+
+## Constraints any token here inherits
+
+No guaranteed return to anyone, in any form. No fee for a guarantee: a backstop must be donated, mutual, or true loss-sharing capital. No senior and junior claims inside one pool. No charge can be added to a ticket. Rewards must be discretionary gifts or a real share of profit, never a stipulated return on a debt. The token itself needs screening.

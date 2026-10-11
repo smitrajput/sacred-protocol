@@ -57,9 +57,10 @@
   font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.45;
+  border: 1px solid var(--paper-edge);
   box-shadow:
-    0 28px 56px -20px rgba(3, 20, 15, 0.6),
-    0 2px 6px rgba(3, 20, 15, 0.25);
+    0 1px 2px rgba(45, 35, 15, 0.08),
+    0 18px 40px -18px rgba(45, 35, 15, 0.28);
 }
 
 .head {
@@ -103,7 +104,7 @@
   padding: 0 0.75rem;
   border: 1px solid var(--paper-edge);
   border-radius: var(--radius);
-  background: #fff;
+  background: #fffefb;
   color: var(--paper-ink);
   font-weight: 700;
   font-size: 1.05rem;
@@ -195,7 +196,7 @@
 }
 
 .inkBtn:hover {
-  background: #2a3d36;
+  background: #3a362e;
 }
 
 .inkBtn:active {
@@ -214,7 +215,7 @@
 }
 
 .inkBtnGhost:hover {
-  background: #eef2ef;
+  background: var(--paper-rule);
 }
 
 /* ---- Receipt rows ---- */

@@ -33,7 +33,7 @@ const mono = Libertinus_Mono({
 const description = "Halal leverage for traders. Real yield for depositors. No interest anywhere.";
 
 export const metadata = {
-  metadataBase: new URL("https://sacred-protocol.vercel.app"),
+  metadataBase: new URL("https://sacred.markets"),
   title: { default: "Sacred", template: "%s | Sacred" },
   description,
   openGraph: { title: "Sacred", description, type: "website", siteName: "Sacred" },

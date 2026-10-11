@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { maxUint256 } from "viem";
 import { useBlock, useReadContracts } from "wagmi";
 import { fetchApi } from "../../lib/api";
-import { coinSymbol, desk, fund, oracle, preview, reserve, sale, scr, usdc, vault } from "../../lib/contracts";
+import { coinDecimals, coinSymbol, desk, fund, oracle, preview, reserve, sale, scr, usdc, vault } from "../../lib/contracts";
 import { DESK_DEFAULTS, MAX_LEVERAGE_BPS } from "../../lib/defaults";
 
 // Every read the app makes, by name. Each hook returns a plain object whose fields are undefined
@@ -76,6 +76,12 @@ export function useDeskParams() {
     },
     { sample: { ...DESK_DEFAULTS, maxLeverageBps: MAX_LEVERAGE_BPS[coinSymbol] } },
   );
+}
+
+// The feed's price of one whole coin, in USDC units: what the Desk will actually pay.
+export function useFeedPrice() {
+  const { value } = useReads({ value: call(oracle, "value", 10n ** BigInt(coinDecimals)) });
+  return value;
 }
 
 // The coin the feed says `cost` buys. The trader's price limit is a little below it.

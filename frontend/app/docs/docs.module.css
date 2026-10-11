@@ -1,0 +1,531 @@
+/*
+  The docs under /docs: a bar, a sticky table of contents, and prose. Tokens come from
+  app/globals.css; buttons from app/shared/shared.module.css. Same desk as the landing page.
+*/
+
+.shell {
+  max-width: 1180px;
+  margin-inline: auto;
+  padding: 0 clamp(1rem, 4vw, 2.5rem) 5rem;
+}
+
+/* ---- Bar ---- */
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: 4.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.brand {
+  font: 600 1.5rem / 1 var(--font-serif);
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.barDocs {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--ink-3);
+}
+
+.barDocs::before {
+  content: "/";
+  margin-right: 0.75rem;
+  color: var(--rule-strong);
+}
+
+.barDocs a {
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.barRight {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-left: auto;
+}
+
+.barLink {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+
+.barLink:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 519px) {
+  .barLink {
+    display: none;
+  }
+}
+
+/* ---- Columns ---- */
+
+.columns {
+  display: grid;
+  gap: 2rem;
+  padding-top: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  .columns {
+    grid-template-columns: 15rem minmax(0, 1fr);
+    gap: 4rem;
+    padding-top: 3rem;
+  }
+}
+
+/* ---- Side: the table of contents ---- */
+
+.side {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+}
+
+.sideToggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 2.75rem;
+  padding: 0 1rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--ground-raised);
+  color: var(--ink);
+  font: 700 0.95rem / 1 var(--font-sans);
+  cursor: pointer;
+}
+
+.sideList {
+  display: none;
+  padding-top: 1rem;
+}
+
+.sideList[data-open] {
+  display: block;
+}
+
+@media (min-width: 900px) {
+  .sideToggle {
+    display: none;
+  }
+  .sideList,
+  .sideList[data-open] {
+    display: block;
+    position: sticky;
+    top: 2rem;
+    padding-top: 0;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+}
+
+.sideGroup + .sideGroup {
+  margin-top: 1.5rem;
+}
+
+.sideTitle {
+  margin: 0 0 0.5rem;
+  font: 700 0.75rem / 1 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.side ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.side li a {
+  display: block;
+  padding: 0.4rem 0.75rem;
+  margin-left: -0.75rem;
+  border-radius: var(--radius);
+  color: var(--ink-2);
+  text-decoration: none;
+  transition:
+    color 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out);
+}
+
+.side li a:hover {
+  color: var(--ink);
+  background: var(--ground-raised);
+}
+
+.side li a[aria-current="page"] {
+  color: var(--gold-bright);
+  background: var(--ground-raised);
+}
+
+/* ---- Main ---- */
+
+.main {
+  min-width: 0;
+  max-width: 72ch;
+}
+
+.foot {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+/* ---- Prose: the MDX page ---- */
+
+.prose {
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h1 {
+  margin: 0 0 1.25rem;
+  font: 600 clamp(2rem, 1.4rem + 2.4vw, 3rem) / 1.1 var(--font-serif);
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.prose h2 {
+  margin: 3rem 0 1rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--rule);
+  font: 600 1.6rem / 1.25 var(--font-serif);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.prose h3 {
+  margin: 2rem 0 0.75rem;
+  font: 600 1.2rem / 1.3 var(--font-serif);
+  color: var(--ink);
+}
+
+.prose p {
+  margin: 0 0 1.1rem;
+}
+
+.prose h1 + p,
+.lead {
+  font-size: 1.25rem;
+  color: var(--ink-2);
+}
+
+.prose strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.prose em {
+  color: var(--ink);
+}
+
+.prose a {
+  color: var(--gold-bright);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 0.2s var(--ease-out);
+}
+
+.prose a:hover {
+  text-decoration-color: var(--gold-bright);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 1.25rem;
+  padding-left: 1.4rem;
+}
+
+.prose li {
+  margin-bottom: 0.45rem;
+}
+
+.prose li::marker {
+  color: var(--gold);
+}
+
+.prose blockquote {
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  border-left: 2px solid var(--gold);
+  background: var(--ground-raised);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.prose code {
+  font: 0.875em / 1.4 var(--font-mono);
+  color: var(--gold-bright);
+  word-break: break-word;
+}
+
+.prose pre {
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--ground-raised);
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.prose pre code {
+  color: var(--ink);
+  font-size: inherit;
+}
+
+.prose hr {
+  margin: 2.5rem 0;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.prose table {
+  width: 100%;
+  margin: 0 0 1.5rem;
+  border-collapse: collapse;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.prose th {
+  padding: 0 1rem 0.6rem 0;
+  text-align: left;
+  font-weight: 400;
+  color: var(--ink-3);
+  border-bottom: 1px solid var(--rule-strong);
+  vertical-align: bottom;
+}
+
+.prose td {
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: top;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose td:first-child {
+  color: var(--ink);
+}
+
+.prose th:last-child,
+.prose td:last-child {
+  padding-right: 0;
+}
+
+/* Wide tables scroll rather than squash on a phone. */
+@media (max-width: 599px) {
+  .prose table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* ---- Callouts and cards, used from MDX and the overview ---- */
+
+.status {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 2rem;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--ground-raised);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.status b {
+  color: var(--gold-bright);
+  font-weight: 700;
+}
+
+.status p {
+  margin: 0;
+}
+
+.cards {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1.5rem 0 2.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.card {
+  display: block;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--ink-2);
+  transition:
+    border-color 0.25s var(--ease-out),
+    background-color 0.25s var(--ease-out);
+}
+
+.card:hover {
+  border-color: var(--rule-strong);
+  background: var(--ground-raised);
+}
+
+/* Cards and the page map sit inside the prose, which underlines links; these are not that. */
+.prose .card,
+.prose .map a {
+  text-decoration: none;
+}
+
+.prose .card {
+  color: var(--ink-2);
+}
+
+.prose .map a {
+  color: var(--ink);
+}
+
+.prose .map a:hover {
+  color: var(--gold-bright);
+}
+
+.card b {
+  display: block;
+  margin-bottom: 0.3rem;
+  font: 600 1.15rem / 1.3 var(--font-serif);
+  color: var(--ink);
+}
+
+.card span {
+  font-family: var(--font-sans);
+  font-size: 0.925rem;
+  line-height: 1.45;
+}
+
+.card small {
+  display: block;
+  margin-bottom: 0.4rem;
+  font: 700 0.72rem / 1 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.map {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+}
+
+.map li {
+  display: grid;
+  gap: 0.15rem 1.5rem;
+  padding: 0.85rem 0;
+  border-top: 1px solid var(--rule);
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .map li {
+    grid-template-columns: 12rem minmax(0, 1fr);
+  }
+}
+
+.map li:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.map a {
+  font: 600 1.05rem / 1.4 var(--font-serif);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.map a:hover {
+  color: var(--gold-bright);
+}
+
+.map span {
+  font-family: var(--font-sans);
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* ---- Pager ---- */
+
+.pager {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 3.5rem;
+}
+
+.pagerLink {
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: var(--ink);
+  transition:
+    border-color 0.25s var(--ease-out),
+    background-color 0.25s var(--ease-out);
+}
+
+.pagerLink:hover {
+  border-color: var(--rule-strong);
+  background: var(--ground-raised);
+}
+
+.pagerLink small {
+  font: 700 0.72rem / 1 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.pagerLink span {
+  font: 600 1.05rem / 1.3 var(--font-serif);
+}
+
+.pagerNext {
+  text-align: right;
+}

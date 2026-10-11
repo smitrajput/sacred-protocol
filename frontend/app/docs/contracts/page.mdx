@@ -1,0 +1,124 @@
+export const metadata = { title: "Contracts and code" };
+
+# Contracts and code
+
+Two contracts per bucket, a few shared ones, and a server that can be switched off. Immutable, no proxies. Every contract is deployed on Arbitrum One and verified on Arbiscan; nothing is audited.
+
+## Addresses
+
+SCR side
+
+| Contract | Address |
+| --- | --- |
+| Token (`SacredTokenDummy`, SRD) | [`0x65660a41C634cDD8246c3a6f9816d35D2a29df21`](https://arbiscan.io/address/0x65660a41C634cDD8246c3a6f9816d35D2a29df21#code) |
+| Minter | [`0xdc36Cb2E3be465aC31D06745283cD3420BB52F03`](https://arbiscan.io/address/0xdc36Cb2E3be465aC31D06745283cD3420BB52F03#code) |
+| Pool hook (`TaxHook`) | [`0xcE431e351252ba84aFDAFa556887e20524FA2dCD`](https://arbiscan.io/address/0xcE431e351252ba84aFDAFa556887e20524FA2dCD#code) |
+| Liquidity manager | [`0x42E3735DF423fD006E10A3d97B9C83438d828193`](https://arbiscan.io/address/0x42E3735DF423fD006E10A3d97B9C83438d828193#code) |
+| Liquidity reserve | [`0xe8d09aB2342b1DfA7BE38b3Af5929D55D054C7b3`](https://arbiscan.io/address/0xe8d09aB2342b1DfA7BE38b3Af5929D55D054C7b3#code) |
+| Staking fund (`StakedBackstopFund`) | [`0x29E61dB6f53b4bCA6B9F838b3452c9054d8A446c`](https://arbiscan.io/address/0x29E61dB6f53b4bCA6B9F838b3452c9054d8A446c#code) |
+| Fee splitter | [`0xCBf479Cd35325d69236c26400ec06B764A38a98a`](https://arbiscan.io/address/0xCBf479Cd35325d69236c26400ec06B764A38a98a#code) |
+| Reserve sale | [`0x158181DCC72FEF6870AA6460b14f826A3A4bA6e5`](https://arbiscan.io/address/0x158181DCC72FEF6870AA6460b14f826A3A4bA6e5#code) |
+| Address registry | [`0x92c9ce1a970E1CEc443018FB121A3b5015138a96`](https://arbiscan.io/address/0x92c9ce1a970E1CEc443018FB121A3b5015138a96#code) |
+| Time-lock | [`0xe408f23305cAc5719880597D36a811854A01d0c9`](https://arbiscan.io/address/0xe408f23305cAc5719880597D36a811854A01d0c9#code) |
+
+BTC bucket (WBTC, 3x max)
+
+| Contract | Address |
+| --- | --- |
+| Vault | [`0xbbB8891463EB7ac9DF3d81947491A733a1C3a916`](https://arbiscan.io/address/0xbbB8891463EB7ac9DF3d81947491A733a1C3a916#code) |
+| Desk | [`0x527ca589937A35504A5535fa1A89a0C8d42c667b`](https://arbiscan.io/address/0x527ca589937A35504A5535fa1A89a0C8d42c667b#code) |
+| Oracle | [`0xd49Be92294e17db719625766142655346c60543D`](https://arbiscan.io/address/0xd49Be92294e17db719625766142655346c60543D#code) |
+
+ETH bucket (WETH, 2x max)
+
+| Contract | Address |
+| --- | --- |
+| Vault | [`0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37`](https://arbiscan.io/address/0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37#code) |
+| Desk | [`0x054738143B3126D943f97b4572bcDa155A9Af71d`](https://arbiscan.io/address/0x054738143B3126D943f97b4572bcDa155A9Af71d#code) |
+| Oracle | [`0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F`](https://arbiscan.io/address/0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F#code) |
+
+## The pieces
+
+| | Lines | Role |
+| --- | --- | --- |
+| `Vault` | ~300 | One bucket: shares, queues, the weekly cut-off, the loss reserve, lending to the desk. Knows nothing about coins or prices |
+| `Desk` | ~330 | Tickets: open, close, pay off, part pay, settle. Holds the pledged coins. Knows nothing about shares |
+| `TicketMath` | ~50 | Pure arithmetic: cost, markup, earned markup, settlement, the payment split, the profit share |
+| `Oracle` | ~50 | Chainlink coin/USD with staleness and L2 sequencer checks |
+| `StakedBackstopFund` | ~230 | SCR staking with cooldown, a 90-day USDC stream, shortfall cover from USDC then a capped sale of staked SCR |
+| `Reserve`, `ReserveSale` | ~190 | The liquidity reserve, and the sale of new SCR into it, delivered staked |
+| Token, `TaxHook`, minter, liquidity manager, fee splitter, registry | ~600 | SCR, its hooked Uniswap v4 pool, its fee and its liquidity. Token and hook adapted from Standard Reserve's verified contracts (MIT) |
+| Server | Python | A keeper that settles and runs the cut-off; an indexer; a read-only API serving points. Every exit works with it off |
+
+Who calls whom: depositors call the vault (`requestDeposit`, `requestWithdraw`, `claim`); traders call the desk (`open`, `close`, `payOff`, `partPay`); stakers call the fund; SCR buyers call the reserve sale; anyone calls `settle` after a due date and `cutoff` once a week. The desk calls the vault to `lend`, `repay` and `writeOff`, the oracle for value, and the Uniswap v3 router to swap. The vault calls the fund for `cover` inside `try/catch`, so a failing backstop cannot block a settlement.
+
+Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new tickets and new deposits, and cannot unpause. Exits are never pausable by anyone.
+
+## The rules the code keeps, and where each is tested
+
+| Rule | How | Test |
+| --- | --- | --- |
+| The vault owns the coin before it sells it | `open` lends the full cost and swaps before it records the sale or takes the down payment | `test_open_recordsTheDesignExample` |
+| A balance never increases | No function adds to `financed` or `markup`, or subtracts from `repaid` | `invariant_aBalanceNeverIncreases` |
+| The vault never receives more than the settlement amount | `_payVault` pays `settlementAmount` on close and pay off, `min(net, balance)` on settlement | `invariant_vaultNeverReceivesMoreThanTheBalance` |
+| The trader never owes more than the pledged coin | `settle` never pulls from the trader; a short sale closes the debt | `invariant_settlementNeverChargesTheTrader` |
+| Only the trader can sell before the due date | `settle` reverts until the due date; there is no other sale path | `test_noOneCanSellBeforeDueExceptTheTrader` |
+| A pledged coin leaves only to its owner or the market | `payOff` and `_swap` are the only coin transfers | `invariant_deskHoldsOnlyPledgesAndOwedSurpluses` |
+| Exits cannot be paused | Only `open` and `requestDeposit` check the pause flag | `test_deposit_pausedByGuardian_withdrawalsStillWork` |
+| Shares cannot be transferred | `transfer`, `transferFrom` and `approve` always revert | `test_shares_cannotBeTransferredOrApproved` |
+| Every USDC is counted exactly once | Four counters; the vault never reads its own balance, so donations cannot move the share price | `invariant_vaultIsFullyBacked` |
+| The admin cannot leave coded limits or touch live tickets | Bounds in every setter; ticket terms are stored at opening | `test_admin_cannotExceedHardLimits` |
+
+## Every dial
+
+The time-lock can move a dial for future business, never past its limit, never for a live ticket.
+
+| Dial | At launch | Limit in code |
+| --- | --- | --- |
+| Base rate | 10% a year | Base plus surcharge at most 50% |
+| Surcharge, above 2x | 1% a year | |
+| Leverage ceiling | BTC 3x, ETH 2x | Fixed per bucket at deployment; can only be lowered |
+| Term | 7 or 14 days | 1 to 30 days |
+| Ticket size | 100,000 USDC | |
+| Minimum down payment | 100 USDC | At most 10,000 |
+| Live tickets per desk | 200 | At most 500 |
+| Sale tolerance against Chainlink | 1% | At most 5% |
+| Keeper fee | 1 USDC | At most 20 |
+| Profit share | 30% to the fund | Fixed |
+| Cut-off period | 7 days | Fixed |
+| Utilisation cap | 85% | At most 95% |
+| Reserve slice of markup | 10% | At most 50% |
+| Reserve target | 5% of the bucket | At most 20% |
+| Manager minimum | 5% of the bucket | At most 20% |
+| Fund: treasury share, reserve share, stream, cooldown, window | 20%, 15%, 90 days, 14 days, 7 days | Fixed |
+| Fund: shortfall sale cap and discount | 30% of stake, 10% below average | At most 30% each |
+| Liquidity reserve target | 10% of registered buckets | At most 50% |
+
+## Tests
+
+| Suite | What it covers | Result |
+| --- | --- | --- |
+| `Desk.t.sol`, `Vault.t.sol` | Every function, every revert, the worked examples, a fuzzed full lifecycle (1,000 runs) | 68 passed |
+| `Invariant.t.sol` | Nine system invariants under random deposits, withdrawals, cut-offs, tickets, prices and time (64 × 120) | 9 passed |
+| `TaxHook.t.sol`, `SacredSystem.t.sol` | The pool fee for all swap shapes; the whole SCR side wired to the real vault on a real Uniswap v4 `PoolManager` | 184 passed |
+| `ArbitrumFork.t.sol` | Both deploy scripts; a 3x BTC ticket on the real Uniswap v3 pool at the real Chainlink price; a shortfall sale on the real `PoolManager` | 5 passed |
+| Halmos `check_*` | Eight arithmetic properties for all inputs in stated ranges | 2 proved, 6 timed out |
+| `server/tests` | Keeper, points, indexer, API, one end-to-end run against anvil | 18 passed |
+| `frontend/lib`, `frontend/e2e` | Arithmetic to the unit; four browser flows with a real keeper and API | 24 passed |
+
+Not done: no audit; no full formal verification of the stateful contracts; the fork test covers the WBTC bucket only; MetaMask itself was not driven.
+
+## Run it
+
+```sh
+anvil                                                                           # 1
+cd contracts && forge script script/DeployLocal.s.sol --rpc-url http://127.0.0.1:8545 --broadcast
+cd .. && python3 export_abi.py
+cd server && KEEPER_KEY=<anvil key> .venv/bin/python -m destiny.keeper          # 2
+cd server && .venv/bin/uvicorn --factory destiny.api:app_from_env               # 3
+cd frontend && npm run dev                                                      # 4
+```
+
+The local deployment is the whole system with mocks for USDC, WBTC, the feed and the spot market, and a real `PoolManager`. The deployer holds 1,000,000 USDC and the genesis SCR, and must deposit 5% into the bucket before anyone else can. Tests: `forge test` in `contracts/` (libraries cloned per the README), `pytest` in `server/`, `npm test && npm run test:e2e` in `frontend/`.
+
+Points are computed from events alone, so anyone can reproduce them: traders from `Paid` events, depositors from shares held at each `Cutoff` at that cut-off's price.

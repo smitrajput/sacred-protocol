@@ -41,8 +41,8 @@ export default function Safety() {
               <tbody>
                 {backtests.rows.map((row) => (
                   <tr key={row[0]}>
-                    {row.map((cell) => (
-                      <td key={cell}>{cell}</td>
+                    {row.map((cell, i) => (
+                      <td key={i}>{cell}</td>
                     ))}
                   </tr>
                 ))}

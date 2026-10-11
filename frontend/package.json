@@ -2,17 +2,22 @@
   "name": "sacred-frontend",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^15.5.27",
     "@tanstack/react-query": "^5.59.0",
+    "@upstash/redis": "^1.39.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "remark-gfm": "^4.0.1",
     "viem": "^2.21.0",
     "wagmi": "^2.12.0"
   },

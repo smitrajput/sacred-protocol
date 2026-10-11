@@ -1,0 +1,91 @@
+/* The hero's drawing: hairlines that draw themselves in turn. */
+
+.rosette {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(980px, 150vw);
+  z-index: -2; /* under the dark pool behind the words */
+  height: auto;
+  translate: -50% -50%;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.rosette path,
+.rosette circle {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 0.34; /* about one pixel at full size; the drawing scales, so the lines do too */
+  stroke-opacity: 0.22;
+}
+
+.star {
+  stroke-opacity: 0.42;
+}
+
+.faint path {
+  stroke-opacity: 0.16;
+  stroke-dasharray: 1 3;
+}
+
+.ring path {
+  stroke-opacity: 0.28;
+}
+
+.ring .major {
+  stroke-opacity: 0.55;
+}
+
+.rosette .node {
+  fill: var(--gold);
+  stroke: none;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rosette > g > circle,
+  .rosette > g > path {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 2.6s var(--ease-out) forwards;
+    animation-delay: calc(0.35s + var(--i, 0) * 0.16s);
+  }
+
+  .faint path {
+    opacity: 0;
+    animation: appear 2s ease forwards;
+    animation-delay: calc(var(--i, 0) * 0.05s);
+  }
+
+  .ring {
+    transform-origin: 0 0;
+    opacity: 0;
+    animation:
+      appear 2.4s ease 1.2s forwards,
+      turn 600s linear infinite;
+  }
+
+  .rosette .node {
+    opacity: 0;
+    animation: appear 1.2s ease 1.8s forwards;
+  }
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes turn {
+  to {
+    rotate: 360deg;
+  }
+}

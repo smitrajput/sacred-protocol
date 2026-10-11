@@ -1,0 +1,106 @@
+export const metadata = { title: "Mechanism" };
+
+# Mechanism
+
+One ticket is one credit sale of one coin to one trader, with the coin pledged back. Here is one from opening to its end, with every number. The running example throughout these docs: 1,000 USDC down on BTC at 3x for 14 days, at a yearly rate of 11%.
+
+## Four parties, three contracts
+
+| Party | Puts in | Gets |
+| --- | --- | --- |
+| **Depositors** | USDC, into a bucket they choose | The markup income; they bear the bucket's losses |
+| **Manager** | Its work, plus a minimum deposit in each bucket | No share of the markup in version one; a management fee from the backstop fund |
+| **Trader** | A down payment now and the balance by the due date | The coin, with 70% of any profit and a loss capped at the down payment |
+| **Spot market** | Nothing | Where the vault buys coins and where pledged coins are sold |
+
+| Contract | Between | In one line |
+| --- | --- | --- |
+| **Mudarabah** | Depositors and the manager | Depositors fund the bucket, the manager runs it, profit is split by a fixed ratio, loss falls on capital |
+| **Murabaha** | The vault and the trader | The vault sells a coin it owns at cost plus a fixed markup, payable by a fixed date |
+| **Rahn** | The trader and the vault | The trader pledges that coin back as security for the balance |
+
+A Shariah board sits outside the flow: it approves the contract wording and the limits.
+
+## Opening
+
+The trader picks the coin, the down payment, the leverage, the term, and the highest all-in price per coin they will accept. Everything below happens in one transaction.
+
+1. **Checks.** The bucket is open, leverage and term are within limits, and the bucket has enough idle USDC after queued withdrawals and the utilisation cap.
+2. **The vault buys.** The bucket spends its own USDC, equal to the down payment times the leverage, on the spot market. The coin arrives at the vault, which now owns it. The amount spent is the cost.
+3. **The vault sells.** The coin is sold to the trader at cost plus markup. The down payment moves to the bucket as the first part of the price. The rest is recorded as the balance.
+4. **The pledge.** The coin moves into the ticket, pledged to the bucket.
+5. **Price check.** If the sale price per coin is above the trader's limit, the whole transaction is undone and no funds move.
+
+The order of steps 2 and 3 is a Shariah requirement: the vault must own the coin before it sells it. The ticket records cost and markup separately, because a murabaha seller must disclose the cost.
+
+## What a ticket records
+
+| Field | Example | Note |
+| --- | --- | --- |
+| Cost | 3,000.00 | What the vault paid, swap fees included |
+| Down payment | 1,000.00 | Paid at opening |
+| Markup | 8.44 | 2,000 × 11% × 14 ÷ 365. Fixed at opening |
+| Balance | 2,008.44 | Cost plus markup, minus the down payment |
+| Due | 14 days from opening | Fixed at opening |
+| Status | Live | Live, closed, paid off, settled, or settled short |
+
+Nothing changes after opening except the balance, which can only go down. The markup is the only charge. There is no opening, closing or late fee, and no funding.
+
+## How a ticket ends
+
+| | Who | When | What happens |
+| --- | --- | --- | --- |
+| **Close** | The trader | Any time | The ticket sells the coin on the market. The bucket receives the settlement amount and the trader receives the rest |
+| **Pay off** | The trader | Any time | The trader pays the settlement amount in USDC. The coin is released to the trader's wallet |
+| **Part payment** | The trader | Any time | Any amount reduces the balance. The coin stays pledged |
+| **Settlement** | Anyone | After the due date | The coin is sold. The bucket receives the balance and the trader the surplus. If the sale falls short, the bucket takes the proceeds and the debt is closed |
+
+A trader who closes or pays off early is not charged for the unused days: waived amount = markup × days left ÷ term. A minimum of one day is always earned. The waiver is vault policy, not a term of the sale, which is one of the rulings on the [Shariah page](/docs/shariah).
+
+Every sale of a pledged coin is on the open market, never to the vault; is protected by a floor of the price-feed value less 1%; repays whoever triggered it a small fixed cost and nothing more; and carries no late penalty.
+
+## Held to the due date
+
+| BTC move | Coin sells for | Bucket receives | Trader receives | Trader's result | Bucket's result |
+| --- | --- | --- | --- | --- | --- |
+| +20% | 3,600 | 2,008.44 | 1,591.56 | +59.2% | +8.44 |
+| +10% | 3,300 | 2,008.44 | 1,291.56 | +29.2% | +8.44 |
+| 0% | 3,000 | 2,008.44 | 991.56 | −0.8% | +8.44 |
+| −10% | 2,700 | 2,008.44 | 691.56 | −30.8% | +8.44 |
+| −30% | 2,100 | 2,008.44 | 91.56 | −90.8% | +8.44 |
+| −40% | 1,800 | 1,800.00 | 0 | −100% | −200.00 |
+
+The bucket never earns more than the markup. Its profile is many small gains and a rare larger loss. The trader's loss stops at the down payment: in the last row the trader owes nothing more, and the bucket's 200 shortfall is absorbed in the order on the [risk page](/docs/risk). These results are before the trader's profit share: in the +20% row the profit is 591.56, so 177.47 goes to the backstop fund and the trader keeps 1,414.09, a gain of 41.4%.
+
+Closed early, on day 5 with BTC up 10%: waived markup 8.44 × 9 ÷ 14 = 5.43, settlement amount 2,003.01, the trader takes 1,296.99, a gain of 29.7%. The bucket earns 3.01 for five days.
+
+## Three modes, one ticket
+
+The only difference between modes is whether the vault may sell the pledged coin before the due date.
+
+| | Term | Margin | Evergreen |
+| --- | --- | --- | --- |
+| **Status** | Built, deployed | In the same code, off until the board rules | Recommended, not confirmed |
+| **Length** | 7 or 14 days | Up to 30 days | 365 days, pay only for days held |
+| **Leverage** | BTC 3x, ETH 2x | Up to 10x by design; the simulation argues for 5x | BTC 3x, ETH 2x |
+| **Early sale** | Never | Part sold if cover falls to 105% (110% proposed) | Part sold if cover falls to 110% |
+| **Who carries a crash** | The vault | Mostly the trader | Mostly the trader |
+
+Cover is the coin's value divided by what the trader owes today. In margin mode only enough coin is sold to restore cover; the trader keeps the rest of the position, and can avoid a sale by part-paying or adding coin. A 10x perp on Hyperliquid is liquidated in full at about a 9% fall; a 10x margin ticket sells half at 5.5% and leaves the trader's equity intact.
+
+The evergreen ticket removes the deadline: the markup for a full year is fixed at opening, the trader is charged only for the days used, and a far-away trigger (a 27% fall at BTC 3x on opening) protects the vault in place of a near due date.
+
+## The rules that never bend
+
+- The vault owns the coin before it sells it.
+- A ticket's balance never increases. Its sale price, markup and due date never change.
+- A pledged coin leaves a ticket only to the trader after full payment, or to the market. It is never sold to the vault, lent, staked or reused.
+- A bucket never receives more than the settlement amount. Everything above goes to the trader, less the profit share.
+- A trader never owes more than the pledged coin fetches.
+- In term mode, only the trader's own action sells the coin before the due date.
+- Buckets never share cash, shares, reserves or losses.
+- Closing, paying off, settling and withdrawing can never be paused.
+- No charge exists other than the markup and the repayment of actual costs.
+- Every exit works without any server run by the manager.
+
+Each is a line of code with a named test behind it; the list is on the [contracts page](/docs/contracts).

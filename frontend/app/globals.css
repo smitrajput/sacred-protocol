@@ -1,40 +1,49 @@
 /*
   Site-wide tokens and base styles.
 
-  The landing page is the deep-green "desk"; the ticket on it is white "paper". The colours come
-  from the lightpaper (deep green 0F5C4A, gold rule B8892B, ink 16241F), adjusted for a dark ground.
-  The app under /app has its own light theme, scoped under .app in app/app/app.css.
+  The site is set like a merchant's term sheet: warm paper, ink, hairlines, and one seal-red
+  accent for the single action on a screen and the one number that matters. No shadows carry
+  depth; rules do. The ticket is a whiter sheet laid on the paper.
+
+  Token names: --ground is the page, --paper the sheet. --gold and --gold-bright are kept as
+  aliases of the accent so older components keep working.
 */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  /* The desk */
-  --ground: #0b2f27;
-  --ground-raised: #10413a;
-  --rule: #1f4d42;
-  --rule-strong: #2f6457;
+  /* The page */
+  --ground: #f4f0e7;
+  --ground-raised: #ebe5d7;
+  --rule: #dcd5c4;
+  --rule-strong: #c4b9a2;
 
-  /* Text on the desk */
-  --ink: #ecf2ee;
-  --ink-2: #aec1b8;
-  --ink-3: #809790;
+  /* Text on the page */
+  --ink: #1b1915;
+  --ink-2: #4b473f;
+  --ink-3: #78736a;
 
-  /* The one accent: the lightpaper's gold rule, brightened for a dark ground */
-  --gold: #d6ab52;
-  --gold-bright: #e6c070;
+  /* The one accent: seal red. Used for the primary action, the emphasised word, and little else. */
+  --accent: #b5321f;
+  --accent-deep: #8e2517;
+  --gold: var(--accent);
+  --gold-bright: var(--accent-deep);
 
-  /* Paper: the ticket */
-  --paper: #fbfcfa;
-  --paper-ink: #16241f;
-  --paper-mute: #5c6b66;
-  --paper-rule: #d9e2dd;
-  --paper-edge: #b9c7c0;
-  --paper-warn: #9b3d2e;
+  /* Figures that go up or down are coloured as text only, never as fills */
+  --up: #1f6a3a;
+  --down: #a3301f;
 
-  --radius: 6px;
+  /* The sheet: the ticket and the forms */
+  --paper: #fdfbf6;
+  --paper-ink: #1b1915;
+  --paper-mute: #6b665c;
+  --paper-rule: #e8e2d4;
+  --paper-edge: #c9c0ab;
+  --paper-warn: #a3301f;
+
+  --radius: 3px;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --measure: 62ch;
+  --measure: 64ch;
 }
 
 * {
@@ -57,9 +66,10 @@ body {
   background: var(--ground);
   color: var(--ink);
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-size: 1.125rem;
+  font-size: 1.0625rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: "kern", "liga";
 }
 
 h1,
@@ -71,6 +81,7 @@ p {
 
 a {
   color: inherit;
+  text-underline-offset: 0.18em;
 }
 
 button,
@@ -84,11 +95,11 @@ svg {
 }
 
 ::selection {
-  background: var(--gold);
-  color: var(--ground);
+  background: var(--accent);
+  color: var(--paper);
 }
 
 :focus-visible {
-  outline: 2px solid var(--gold);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }

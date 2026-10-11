@@ -1,0 +1,55 @@
+export const metadata = { title: "Thesis" };
+
+# Thesis
+
+Two billion people are told that the two biggest things in DeFi are forbidden to them. Sacred is built on the observation that the prohibition is on the *structure*, not the *outcome*, and that a different structure gives the same outcome with fewer of the parts that hurt.
+
+## The market that is locked out
+
+- **Leverage.** Perps and margin run on interest, funding payments and selling what you do not own. In 2006 the Muslim World League's Fiqh Council ruled against margin trading on four grounds: fees for delay, a loan tied to a sale, selling what is not owned, and excessive risk.
+- **Yield.** Stablecoin yield comes from lending at interest. That is riba.
+
+So a Muslim trader sits out or trades against their own faith, and a Muslim saver holds idle stablecoins. Both are large groups. Both have no product. The whole of Islamic DeFi held under 50 million dollars in mid-2026; the largest halal protocol tracked by DefiLlama holds 4 million. The demand is unproven on chain, and that is the bet: a market this size with this many people in it has never been offered a product that actually fits.
+
+## The one new primitive
+
+Do not lend. Sell.
+
+A vault buys a real coin and sells it to the trader at cost plus a fixed markup, paid later. The coin stays pledged until the balance is paid. This is murabaha, the contract behind 55 to 80% of all Islamic bank financing, applied to a crypto spot market, with a pledge (rahn) and a profit-sharing vault (mudarabah) around it. All three are contracts every Sunni school accepts in principle.
+
+What makes it a *better* product and not merely a permitted one:
+
+| A perp | A ticket |
+| --- | --- |
+| Funding rate floats with the crowd | Markup fixed at opening; the whole cost is known before you commit |
+| Liquidation price; closed in full when it hits | Term mode has no liquidation price. Nothing is sold before the due date |
+| Can owe more than the margin in a gap | Never owes more than the pledged coin. Worst case is the down payment |
+| Yield to LPs is a share of trader losses | Yield to depositors is the markup, paid whether traders win or lose |
+
+The desk is the one piece that is new. Nothing like it exists on chain. Everything else in the plan composes around it.
+
+## What it grows into
+
+Sacred is one vault routing stablecoins to halal yield sleeves. The desk is the first sleeve and the only one that had to be invented.
+
+| Phase | Horizon | What | Gate |
+| --- | --- | --- | --- |
+| **1. The desk** | Now to 6 months | Term mode on BTC and ETH, a screened LP sleeve, the app, points | Board rulings on the open points; an audit; the first allow-listed cohort trading on Arbitrum One |
+| **2. Halal Earn** | 6 to 18 months | The vault shell routing to tokenised sukuk, the desk and screened LP. Margin and evergreen modes. Shariah-compliant tokenised stocks up to 5x. B2B distribution through wallets and neobanks | Rulings on forced sale; real fees for 6 to 12 months; SCR launch |
+| **3. Beyond** | Later | Payment float, own issuance, institutions, a neobank | Phase 2 live and its reserve sized through a bear market |
+
+## Why the economics can work
+
+A mechanism-design simulation over Binance prices from 2018 to 2026, with 1,000 bootstrapped five-year paths, found that the built version pays depositors about 5% and charges traders about five times the market price of leverage, and that a redesign of the splits and a capacity rule takes depositors to a 9% target payout in 99.7% of simulated months, bull and bear, with traders paying 17 to 25% of exposure a year: inside what perp venues collect per dollar of open interest. Total fees run at about 23% of deposits a year; the protocol keeps 4.8%. The whole analysis, with what it does not fix, is on the [economics page](/docs/economics).
+
+The revenue question is then a demand question. 500k a month in total fees needs about 26 million of deposits on a cycle average. On the multiples comparable protocols trade at (2 to 24 times fees, 6 to 30 times revenue), a 6 million valuation needs 200k to 1 million of yearly protocol revenue, which the proposal earns on 4 to 21 million of deposits.
+
+## Why now
+
+- **Stablecoins and tokenised assets are on chain at scale**, so the thing being sold is real, liquid and provable, which is exactly what murabaha requires.
+- **A 2026 Islamic DeFi field with under 50 million in it** and no leverage product at all.
+- **The code is done.** Term mode is deployed on Arbitrum One with 279 Foundry tests, invariants, a fork test and browser flows. The open work is the board, the audit and the cohort, not the build.
+
+## What this is not
+
+Not certified: no Shariah board has reviewed the design, and the design's own estimate for the term-mode package at 3x is 40 to 50% odds of approval, with fallbacks for each ruling. Not audited. Not a promise of any yield: a mudarabah cannot promise a return, only target a payout and smooth it. Every number on these pages is a proposal, a backtest or a simulation, and the [risk page](/docs/risk) says what the simulations cannot capture.

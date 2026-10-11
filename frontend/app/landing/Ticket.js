@@ -45,7 +45,7 @@ export default function Ticket({ coin, price }) {
   return (
     <div className={`${shared.paper} ${styles.enter}`}>
       <div className={shared.head}>
-        <h2 className={shared.title}>A term ticket</h2>
+        <h3 className={shared.title}>A term ticket</h3>
         <span className={shared.sub}>{price ? `${coin} at ${formatPrice(price)} USDC` : `${coin}, paid in USDC`}</span>
       </div>
 

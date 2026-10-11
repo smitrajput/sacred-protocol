@@ -10,16 +10,17 @@ export default function Status() {
         <div>
           <h2 className={styles.h2}>Where it stands.</h2>
           <p className={styles.lead}>
-            Term mode is built end to end: the vault, the desk, the price reader and the backstop fund in Solidity,
-            a keeper and read API, and the app behind this button. Nothing is deployed, audited or certified.
+            Term mode is built end to end and deployed on Arbitrum One behind an allow-list: the vault, the desk, the
+            price reader and the backstop fund in Solidity, a keeper and read API, and the app behind this button.
+            Nothing is audited or certified.
           </p>
           <div className={styles.ctas}>
             <Link href={links.app} className={`${shared.btn} ${shared.btnPrimary}`}>
               Launch app
             </Link>
-            <a href={links.lightpaper} className={`${shared.btn} ${shared.btnGhost}`}>
-              Read the lightpaper
-            </a>
+            <Link href={`${links.docs}/status`} className={`${shared.btn} ${shared.btnGhost}`}>
+              Status and roadmap
+            </Link>
           </div>
         </div>
 

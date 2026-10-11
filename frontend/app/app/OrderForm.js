@@ -9,7 +9,7 @@ import Row from "../shared/Row";
 import Segmented from "../shared/Segmented";
 import shared from "../shared/shared.module.css";
 import styles from "./app.module.css";
-import { approve, call, unlessAllowed, useDeskParams, useFairQuantity, useWallet } from "./data";
+import { approve, call, unlessAllowed, useDeskParams, useFairQuantity, useFeedPrice, useWallet } from "./data";
 import useAction from "./useAction";
 
 const TERMS = [
@@ -17,7 +17,10 @@ const TERMS = [
   { label: "14 days", value: 14 },
 ];
 
-export default function OrderForm({ address, spotPrice }) {
+export default function OrderForm({ address, spotPrice: marketPrice }) {
+  // Once the contracts are live, show the price the Desk fills at (the feed), not the market's.
+  const feedPrice = useFeedPrice();
+  const spotPrice = preview ? marketPrice : feedPrice !== undefined ? Number(feedPrice) / 1e6 : null;
   const { run, busy, error } = useAction();
   const [down, setDown] = useState("1000");
   const [chosenLeverage, setLeverageBps] = useState(20_000n);

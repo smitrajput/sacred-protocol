@@ -1,0 +1,56 @@
+export const metadata = { title: "Depositors" };
+
+# Depositors
+
+Your USDC buys a coin that a trader has committed to pay for. The markup the trader pays is your yield. You earn it whether the trader wins or loses, and nothing is promised.
+
+## Buckets
+
+One bucket per coin and mode: BTC term and ETH term at launch. Each bucket stands alone with its own USDC, shares, loss reserve and limits. A loss in one bucket never touches another. You pick a bucket, and with it the coin and the risk.
+
+Each bucket is a mudarabah: you provide capital, the manager runs the desk, profit is shared by a fixed ratio, and loss falls on capital. In version one the manager takes no share of the markup. The proposed economics give it 10%; see [economics](/docs/economics).
+
+The manager must hold at least 5% of every bucket as an ordinary depositor, and cannot withdraw below it. Its deposit earns and loses like yours.
+
+## Where the yield comes from
+
+Traders pay a fixed markup for buying a coin on deferred payment. In version one all of it goes to depositors, less the slice that builds the loss reserve. One week in a bucket of 100,000 USDC with 80,000 financed at 11% a year and no shortfalls:
+
+| | USDC |
+| --- | --- |
+| Markup earned in the week: 80,000 × 11% × 7 ÷ 365 | 168.77 |
+| Of which to the loss reserve, at 10% | 16.88 |
+| Added to the share price | 151.89 |
+
+That is 0.15% for the week, about 7.9% a year before shortfalls, at suggested values. Idle USDC earns nothing at launch.
+
+## The share price
+
+Computed once a week at the cut-off: idle USDC, plus each live ticket at the lower of its settlement amount and its coin's market value from the price feed, divided by the shares. The feed is used only for this valuation; no price ever triggers the sale of a term ticket. A loss lowers the share price for every holder in proportion.
+
+## Deposits and withdrawals
+
+- **Request any time.** A deposit request parks USDC in a queue; a withdrawal request locks shares in a queue.
+- **Processed at the next cut-off**, at that cut-off's share price. Queued USDC is not at risk and earns nothing until then. Queued shares keep earning and losing until redeemed.
+- **Withdrawals rank ahead of new tickets.** The desk may not open a ticket with cash that queued withdrawals need.
+- **If cash is short**, every withdrawal is paid in the same proportion and the unredeemed shares go back to you to request again. The longest term ticket runs 14 days, so cash returns within two or three cut-offs. The liquidity reserve deposits into a bucket that is short for its queue.
+
+A depositor who sees a crash can queue a withdrawal, but it is priced at the cut-off with the loss already marked, so a loss is shared, not dodged. The proposed version two adds instant withdrawals against idle cash while no ticket's cover is thin, and marks expected shortfall on thin-cover tickets so that leaving early gains nothing.
+
+## Shares cannot be traded
+
+A bucket mostly holds debts owed by traders, and a debt may not be traded at anything other than face value. Shares cannot be transferred or approved; the code reverts. The only way out is to withdraw at the share price.
+
+## What can be lost
+
+If a coin sells for less than its balance at settlement, the gap is absorbed in order: the trader's down payment, then the bucket's loss reserve, then the backstop fund, then depositors through the share price. A depositor who leaves gives up any claim on the reserve; it stays for those who remain.
+
+The backtests put the average loss for 14-day BTC 3x tickets at 1.0% of the amount financed a year, worst year 5.1% (2020), against markup of about 11%. ETH at 2x showed no loss in any year. The full tables, the Monte Carlo and their limits are on the [risk page](/docs/risk).
+
+## Points
+
+One point per USDC per day deposited, counted at each weekly cut-off. Volume earns nothing, so farming points means paying depositors. Points are a discretionary gift and promise nothing. Any airdrop arrives as staked SCR. See [SCR](/docs/scr).
+
+## At launch
+
+Deposits are allow-listed and capped at 1 million USDC, raised in steps. [Join the waitlist](/#waitlist) for the first cohort.

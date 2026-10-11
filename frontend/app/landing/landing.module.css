@@ -120,10 +120,10 @@
   }
 }
 
-/* ---- Hero: one statement, centred, filling most of the first screen ---- */
+/* ---- Hero: one statement, centred, filling the first screen ---- */
 
 .hero {
-  min-height: calc(88svh - 4.25rem);
+  min-height: calc(100svh - 4.25rem);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -196,119 +196,7 @@
   }
 }
 
-/* ---- The worked ticket, beside its explanation ---- */
-
-.tryTicket {
-  display: grid;
-  gap: 2.5rem;
-  align-items: start;
-  margin-top: clamp(3.5rem, 7vw, 5.5rem);
-  padding-top: clamp(3rem, 6vw, 4.5rem);
-  border-top: 1px solid var(--rule);
-}
-
-@media (min-width: 960px) {
-  .tryTicket {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-    gap: 4.5rem;
-  }
-  .tryTicket > :first-child {
-    position: sticky;
-    top: 2rem;
-  }
-}
-
-/* ---- The ledger: one example held to its due date, every outcome ---- */
-
-.ledger {
-  width: 100%;
-  margin-top: 2.5rem;
-  border-collapse: collapse;
-  font-family: var(--font-sans);
-  font-size: 0.975rem;
-}
-
-.ledger th {
-  padding: 0 1.25rem 0.75rem 0;
-  text-align: right;
-  font-weight: 400;
-  font-size: 0.85rem;
-  color: var(--ink-3);
-  border-bottom: 1px solid var(--rule-strong);
-  white-space: nowrap;
-}
-
-.ledger th:first-child,
-.ledger td:first-child {
-  text-align: left;
-}
-
-.ledger th:last-child,
-.ledger td:last-child {
-  padding-right: 0;
-}
-
-.ledger td {
-  padding: 0.9rem 1.25rem 0.9rem 0;
-  text-align: right;
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-
-.ledger td:first-child {
-  font: 600 1.1rem / 1.3 var(--font-serif);
-  color: var(--ink);
-}
-
-.ledger .up {
-  color: var(--up);
-}
-
-.ledger .down {
-  color: var(--down);
-}
-
-.ledger tr:last-child td {
-  background: color-mix(in srgb, var(--accent) 7%, transparent);
-}
-
-@media (max-width: 719px) {
-  .ledgerScroll {
-    overflow-x: auto;
-    margin-inline: calc(-1 * clamp(1rem, 4vw, 2.5rem));
-    padding-inline: clamp(1rem, 4vw, 2.5rem);
-  }
-}
-
-.ledgerNotes {
-  display: grid;
-  gap: 1.25rem;
-  margin-top: 2rem;
-}
-
-@media (min-width: 768px) {
-  .ledgerNotes {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 2.5rem;
-  }
-}
-
-.ledgerNotes p {
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-
-.ledgerNotes b {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-/* ---- How it works: the four steps beside the three contracts ---- */
+/* ---- Steps and contracts (Leverage and Shariah) ---- */
 
 .how {
   display: grid;
@@ -356,6 +244,7 @@
 
 .contractRow {
   display: grid;
+  align-content: start;
   gap: 0.2rem;
   padding-block: 1.1rem;
   border-bottom: 1px solid var(--rule);
@@ -376,55 +265,6 @@
   text-wrap: pretty;
 }
 
-/* ---- Rules: numbered clauses, each with its test ---- */
-
-.clauses {
-  margin-top: 3rem;
-  border-top: 1px solid var(--rule);
-}
-
-.clause {
-  display: grid;
-  gap: 0.5rem 2rem;
-  padding-block: 1.5rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-@media (min-width: 860px) {
-  .clause {
-    grid-template-columns: 3.5rem minmax(0, 1fr) minmax(0, 1fr);
-  }
-}
-
-.clauseNo {
-  font-family: var(--font-mono);
-  font-size: 0.9rem;
-  color: var(--ink-3);
-  padding-top: 0.35rem;
-}
-
-.ruleText {
-  font: 400 clamp(1.2rem, 1rem + 0.8vw, 1.5rem) / 1.3 var(--font-serif);
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
-
-.ruleProof {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-
-.ruleProof code {
-  display: block;
-  margin-top: 0.5rem;
-  font: 0.8rem / 1.4 var(--font-mono);
-  color: var(--ink-3);
-  word-break: break-all;
-}
-
 /* ---- Safety: the loss order beside the backtests ---- */
 
 .safetyGrid {
@@ -442,7 +282,7 @@
 
 .layers {
   list-style: none;
-  margin: 1.5rem 0 0;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 3px;
@@ -453,12 +293,11 @@
 .layer {
   display: grid;
   grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: 1rem;
-  align-items: baseline;
+  gap: 0 1rem;
+  align-items: start;
   padding: 1rem 1.25rem;
   border-radius: var(--radius);
   background: color-mix(in srgb, var(--accent) var(--tint), transparent);
-  font-size: 1.0625rem;
 }
 
 .layer:nth-child(1) {
@@ -468,16 +307,20 @@
   --tint: 15%;
 }
 .layer:nth-child(3) {
-  --tint: 9%;
+  --tint: 10%;
 }
 .layer:nth-child(4) {
-  --tint: 4%;
+  --tint: 6%;
+}
+.layer:nth-child(5) {
+  --tint: 3%;
 }
 
 .layer::before {
   counter-increment: layer;
   content: counter(layer);
-  font: 400 1.4rem / 1 var(--font-serif);
+  grid-row: 1 / 3;
+  font: 400 1.4rem / 1.2 var(--font-serif);
   color: var(--accent-deep);
 }
 
@@ -553,50 +396,6 @@
 
 .caveat em {
   color: var(--ink);
-}
-
-/* ---- Status: words left, the launch plan right ---- */
-
-.status {
-  display: grid;
-  gap: 3rem;
-}
-
-@media (min-width: 960px) {
-  .status {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 5rem;
-    align-items: start;
-  }
-}
-
-.plan {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 1.25rem;
-  counter-reset: plan;
-}
-
-.plan li {
-  display: grid;
-  grid-template-columns: 2rem minmax(0, 1fr);
-  gap: 0.75rem;
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-
-.plan li::before {
-  counter-increment: plan;
-  content: counter(plan) ".";
-  font: 400 1.2rem / 1.5 var(--font-serif);
-  color: var(--accent);
-}
-
-.plan b {
-  color: var(--ink);
-  font-weight: 600;
 }
 
 /* ---- Waitlist: words left, the form on the sheet right ---- */
@@ -689,4 +488,307 @@
 
 .footerLinks a:hover {
   text-decoration: underline;
+}
+
+/* ---- Eyebrow: who a section is for ---- */
+
+.eyebrow {
+  display: block;
+  margin-bottom: 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ---- Why: three columns, one figure each, the problem then the answer ---- */
+
+.why {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 3rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 860px) {
+  .why {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3.5rem;
+  }
+}
+
+.whyCol {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding-top: 1.5rem;
+}
+
+.whyWho {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--ink-3);
+}
+
+.figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.75rem;
+  font: 400 clamp(3.5rem, 2.5rem + 3vw, 5rem) / 1 var(--font-serif);
+  letter-spacing: -0.03em;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.figure span {
+  font: 400 1rem / 1.3 var(--font-sans);
+  letter-spacing: 0;
+  color: var(--ink-2);
+}
+
+.problem,
+.answerText {
+  text-wrap: pretty;
+}
+
+.problem {
+  margin-top: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+}
+
+.answerText {
+  color: var(--ink);
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.problem::before,
+.answerText::before {
+  display: block;
+  margin-bottom: 0.3rem;
+  font: 400 0.75rem / 1 var(--font-sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.problem::before {
+  content: "Today";
+}
+
+.answerText::before {
+  content: "With Sacred";
+  color: var(--accent);
+}
+
+/* ---- Yield: the path of one dollar, then the dials ---- */
+
+.flow {
+  list-style: none;
+  margin: 3rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0;
+  counter-reset: stop;
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 960px) {
+  .flow {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+.stop {
+  position: relative;
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding-block: 1.5rem;
+  border-bottom: 1px solid var(--rule);
+  text-wrap: pretty;
+}
+
+@media (min-width: 960px) {
+  .stop {
+    border-bottom: 0;
+  }
+}
+
+.stop::before {
+  counter-increment: stop;
+  content: counter(stop);
+  font: 400 1.6rem / 1 var(--font-serif);
+  color: var(--accent);
+}
+
+/* On a wide screen an arrow carries the eye from one stop to the next. */
+@media (min-width: 960px) {
+  .stop:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    right: -1.6rem;
+    top: 1.5rem;
+    font: 400 1.4rem / 1 var(--font-serif);
+    color: var(--rule-strong);
+  }
+}
+
+.stopTitle {
+  font: 600 1.15rem / 1.3 var(--font-serif);
+}
+
+.stopText {
+  color: var(--ink-2);
+  font-size: 0.975rem;
+  line-height: 1.5;
+}
+
+.twoUp {
+  display: grid;
+  gap: 3rem;
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding-top: clamp(2.5rem, 5vw, 3.5rem);
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 960px) {
+  .twoUp {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 5rem;
+    align-items: start;
+  }
+}
+
+.dials {
+  margin: 0;
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.dial {
+  display: grid;
+  gap: 0.25rem 2rem;
+  padding-block: 1.1rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+@media (min-width: 600px) {
+  .dial {
+    grid-template-columns: 8rem minmax(0, 1fr);
+  }
+}
+
+.dial dt {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  color: var(--ink-3);
+  padding-top: 0.2rem;
+}
+
+.dial dd {
+  margin: 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.dial b {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---- Leverage: the steps and the two modes beside the live ticket ---- */
+
+.leverage {
+  display: grid;
+  gap: 3rem;
+  margin-top: 3rem;
+}
+
+@media (min-width: 960px) {
+  .leverage {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+    gap: 4.5rem;
+    align-items: start;
+  }
+  .ticketCol {
+    position: sticky;
+    top: 2rem;
+  }
+}
+
+.modes {
+  margin-top: 1.25rem;
+}
+
+.modes td {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  white-space: normal;
+  vertical-align: top;
+  text-wrap: pretty;
+}
+
+.modes td:first-child {
+  font: 400 0.85rem / 1.5 var(--font-sans);
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+/* ---- Shariah: the three contracts across ---- */
+
+.contractGrid {
+  display: grid;
+  gap: 0;
+  margin-top: 3rem;
+  border-top: 1px solid var(--rule);
+}
+
+@media (min-width: 768px) {
+  .contractGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 3rem;
+  }
+  .contractGrid .contractRow {
+    border-bottom: 0;
+    padding-top: 1.5rem;
+  }
+}
+
+/* A table whose cells are sentences, not figures. */
+.prose td {
+  font-family: var(--font-sans);
+  font-size: 0.925rem;
+  line-height: 1.5;
+  vertical-align: top;
+  text-wrap: pretty;
+}
+
+.prose td:first-child {
+  font: 600 1rem / 1.4 var(--font-serif);
+}
+
+/* ---- Safety: each layer named and defined ---- */
+
+.layerName {
+  display: block;
+  font: 600 1.1rem / 1.3 var(--font-serif);
+  color: var(--ink);
+}
+
+.layerWhat {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-sans);
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+  text-wrap: pretty;
 }

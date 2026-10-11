@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { DESK_DEFAULTS, MAX_LEVERAGE_BPS, leverageLabel, leverageOptions } from "../../lib/defaults";
+import { MAX_LEVERAGE_BPS, leverageLabel, leverageOptions } from "../../lib/defaults";
 import { exitPreview, formatAmount, formatUsdc, parseUsdc, quantityAt, quote } from "../../lib/math";
 import { formatPrice, priceToUnits } from "../../lib/price";
 import Row from "../shared/Row";
@@ -18,8 +18,9 @@ const MOVE_RANGE = 60; // the price slider runs from -60% to +60%
 
 // A worked ticket the visitor can change. Every figure is computed by lib/math.js, the same
 // arithmetic the app uses, so the demonstration and the product cannot disagree. `price` is
-// the coin's spot price in USD, or null when it could not be fetched.
-export default function Ticket({ coin, price }) {
+// the coin's spot price in USD, or null when it could not be fetched. `params` is the rate
+// card: the Desk's fields plus profitShareBps.
+export default function Ticket({ coin, price, params }) {
   const id = useId();
   const leverages = leverageOptions(MAX_LEVERAGE_BPS[coin]);
   const [down, setDown] = useState("1000");
@@ -28,12 +29,12 @@ export default function Ticket({ coin, price }) {
   const [movePct, setMovePct] = useState(20);
 
   const downPayment = parseUsdc(down);
-  const valid = downPayment !== null && downPayment >= DESK_DEFAULTS.minDownPayment;
-  const q = valid ? quote({ downPayment, leverageBps, termDays, ...DESK_DEFAULTS }) : null;
+  const valid = downPayment !== null && downPayment >= params.minDownPayment;
+  const q = valid ? quote({ downPayment, leverageBps, termDays, ...params }) : null;
 
   // Held to the due date the whole markup is earned, so the balance is what the coin must cover.
   const coinValue = q ? (q.cost * BigInt(10_000 + movePct * 100)) / 10_000n : 0n;
-  const exit = q ? exitPreview({ coinValue, settlementAmount: q.balance, paidIn: downPayment }) : null;
+  const exit = q ? exitPreview({ coinValue, settlementAmount: q.balance, paidIn: downPayment, shareBps: params.profitShareBps }) : null;
 
   const priceUnits = price ? priceToUnits(price) : null;
   const quantity = q && priceUnits ? quantityAt(q.cost, priceUnits, COIN_DECIMALS) : null;
@@ -103,19 +104,27 @@ export default function Ticket({ coin, price }) {
             aria-valuetext={movedBy}
           />
         </label>
-        {q && <Outcome coinValue={coinValue} balance={q.balance} downPayment={downPayment} exit={exit} />}
+        {q && (
+          <Outcome
+            coinValue={coinValue}
+            balance={q.balance}
+            downPayment={downPayment}
+            exit={exit}
+            sharePct={Number(params.profitShareBps) / 100}
+          />
+        )}
       </div>
 
       <p className={`${shared.note} ${styles.footnote}`}>
-        Rates are the contract&rsquo;s proposed defaults and the design is not yet reviewed by a Shariah board.
-        Nothing here is a quote or a promise.
+        Rates are the proposed launch parameters, before swap costs. The design is not yet reviewed by a Shariah
+        board. Nothing here is a quote or a promise.
       </p>
     </div>
   );
 }
 
 // What the trader walks away with, in the three cases the contract distinguishes.
-function Outcome({ coinValue, balance, downPayment, exit }) {
+function Outcome({ coinValue, balance, downPayment, exit, sharePct }) {
   const sold = formatUsdc(coinValue);
 
   if (!exit.canClose) {
@@ -142,7 +151,7 @@ function Outcome({ coinValue, balance, downPayment, exit }) {
     <p className={styles.result}>
       The coin sells for <b>{sold}</b>. You take home <b>{formatUsdc(exit.toTrader)}</b>, a gain of{" "}
       <b>{formatUsdc(exit.toTrader - downPayment)}</b> on your down payment. The backstop fund receives{" "}
-      <b>{formatUsdc(exit.toFund)}</b>, 30% of the profit.
+      <b>{formatUsdc(exit.toFund)}</b>, {sharePct}% of the profit.
     </p>
   );
 }

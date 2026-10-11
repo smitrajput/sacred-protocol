@@ -36,10 +36,10 @@ export function quote({ downPayment, leverageBps, termDays, baseRateBps, surchar
 }
 
 // What the trader would walk away with if the coin were sold for `coinValue` now.
-export function exitPreview({ coinValue, settlementAmount, paidIn }) {
+export function exitPreview({ coinValue, settlementAmount, paidIn, shareBps = PROFIT_SHARE_BPS }) {
   if (coinValue < settlementAmount) return { canClose: false, toTrader: 0n, toFund: 0n, profit: 0n };
   const surplus = coinValue - settlementAmount;
-  const toFund = profitShare(surplus, paidIn);
+  const toFund = profitShare(surplus, paidIn, shareBps);
   return { canClose: true, toTrader: surplus - toFund, toFund, profit: surplus > paidIn ? surplus - paidIn : 0n };
 }
 

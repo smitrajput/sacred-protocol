@@ -48,11 +48,11 @@ export default function Waitlist() {
     <section id="waitlist" className={styles.section}>
       <div className={`${styles.wrap} ${styles.waitlist}`}>
         <div>
-          <h2 className={styles.h2}>A seat when the desk opens.</h2>
+          <h2 className={styles.h2}>Want in early?</h2>
           <p className={styles.lead}>
-            Launch is allow-listed: a first cohort of depositors and traders, deposits capped at 1 million USDC. Leave
-            your email and we will write when the list opens. Add a wallet if you trade; seats go by record, not by
-            following.
+            I&rsquo;m opening the desk to a small first cohort of depositors and traders, with deposits capped at 1
+            million USDC. Leave your email and I&rsquo;ll write when the list opens. Add a wallet if you trade; seats
+            go by record, not by follower count.
           </p>
           <p className={`${styles.small} ${styles.afterList}`}>
             Points start on day one for everyone on the list who deposits or trades. They are a discretionary gift and

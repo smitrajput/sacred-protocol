@@ -586,7 +586,7 @@
   color: var(--accent);
 }
 
-/* ---- Yield: the path of one dollar, then the dials ---- */
+/* ---- Yield: the path of one dollar ---- */
 
 .flow {
   list-style: none;
@@ -648,60 +648,6 @@
   color: var(--ink-2);
   font-size: 0.975rem;
   line-height: 1.5;
-}
-
-.twoUp {
-  display: grid;
-  gap: 3rem;
-  margin-top: clamp(3rem, 6vw, 4.5rem);
-  padding-top: clamp(2.5rem, 5vw, 3.5rem);
-  border-top: 1px solid var(--rule);
-}
-
-@media (min-width: 960px) {
-  .twoUp {
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: 5rem;
-    align-items: start;
-  }
-}
-
-.dials {
-  margin: 0;
-  display: grid;
-  gap: 0;
-  border-top: 1px solid var(--rule);
-}
-
-.dial {
-  display: grid;
-  gap: 0.25rem 2rem;
-  padding-block: 1.1rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-@media (min-width: 600px) {
-  .dial {
-    grid-template-columns: 8rem minmax(0, 1fr);
-  }
-}
-
-.dial dt {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  color: var(--ink-3);
-  padding-top: 0.2rem;
-}
-
-.dial dd {
-  margin: 0;
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-
-.dial b {
-  font-weight: 600;
-  color: var(--ink);
 }
 
 /* ---- Leverage: the steps and the two modes beside the live position ---- */

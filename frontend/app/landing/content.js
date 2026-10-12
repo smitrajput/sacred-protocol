@@ -95,29 +95,6 @@ export const flow = [
   },
 ];
 
-export const dials = [
-  {
-    name: "Markup",
-    value: "15.5% a year",
-    note: "while the vault is under 85% financed, rising to 30% at the 92% cap. Plus 1.5% on 3x term positions.",
-  },
-  {
-    name: "Payout",
-    value: `${proposed.targetPayout} a year, target`,
-    note: "Months above it fill a payout reserve, up to 6% of deposits. Months below it draw on the reserve.",
-  },
-  {
-    name: "Deposits",
-    value: "Admitted on demand",
-    note: "New deposits only while more than 85% of the vault is financed, at most 5% growth a week. Idle USDC is returned if utilisation stays under 70% for 28 days.",
-  },
-  {
-    name: "Withdrawals",
-    value: "Instant",
-    note: "against idle cash while no position's cover is under 110%. Otherwise a weekly queue, in time order.",
-  },
-];
-
 // ---- Leverage: how a position works, from the trader's side ----
 
 export const traderSteps = [

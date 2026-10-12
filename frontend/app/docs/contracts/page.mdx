@@ -2,7 +2,7 @@ export const metadata = { title: "Contracts and code" };
 
 # Contracts and code
 
-Every contract is deployed on Arbitrum One and verified on Arbiscan; nothing is audited. The pieces, who calls whom and where the money goes are drawn on the [architecture page](/docs/architecture). This page is the reference: addresses, the rules the code keeps with the test behind each, every dial and its limit, the test suites, and how to run it all on one machine.
+Find below the earlier version of the system deployed on Arbitrum One and verified on Arbiscan, the latest ones to be deployed on Ethereum, Arbitrum One and Monad; nothing is audited. The pieces, who calls whom and where the money goes are drawn on the [architecture page](/docs/architecture). This page is the reference: addresses, the rules the code keeps with the test behind each, every dial and its limit, the test suites, and how to run it all on one machine.
 
 ## Addresses
 
@@ -21,7 +21,7 @@ SCR side
 | Address registry | [`0x92c9ce1a970E1CEc443018FB121A3b5015138a96`](https://arbiscan.io/address/0x92c9ce1a970E1CEc443018FB121A3b5015138a96#code) |
 | Time-lock | [`0xe408f23305cAc5719880597D36a811854A01d0c9`](https://arbiscan.io/address/0xe408f23305cAc5719880597D36a811854A01d0c9#code) |
 
-BTC bucket (WBTC, 3x max)
+BTC desk and its vault (WBTC, 3x max)
 
 | Contract | Address |
 | --- | --- |
@@ -29,13 +29,15 @@ BTC bucket (WBTC, 3x max)
 | Desk | [`0x527ca589937A35504A5535fa1A89a0C8d42c667b`](https://arbiscan.io/address/0x527ca589937A35504A5535fa1A89a0C8d42c667b#code) |
 | Oracle | [`0xd49Be92294e17db719625766142655346c60543D`](https://arbiscan.io/address/0xd49Be92294e17db719625766142655346c60543D#code) |
 
-ETH bucket (WETH, 2x max)
+ETH desk and its vault (WETH, 2x max)
 
 | Contract | Address |
 | --- | --- |
 | Vault | [`0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37`](https://arbiscan.io/address/0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37#code) |
 | Desk | [`0x054738143B3126D943f97b4572bcDa155A9Af71d`](https://arbiscan.io/address/0x054738143B3126D943f97b4572bcDa155A9Af71d#code) |
 | Oracle | [`0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F`](https://arbiscan.io/address/0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F#code) |
+
+The deployed version is the first design's: a vault paired with each desk, so two vaults exist. The design is now one vault lending to every desk, with a loss reserve and a capital cap per desk ([architecture](/docs/architecture)). That rewrite ships with the launch re-cut, and these addresses change with it.
 
 Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new positions and new deposits, and cannot unpause. Exits are never pausable by anyone.
 
@@ -62,7 +64,7 @@ The time-lock can move a dial for future business, never past its limit, never f
 | --- | --- | --- | --- |
 | Base rate | 10% a year | 15.5% a year up to 85% utilisation, rising to 30% at the 92% cap (new code) | Base plus surcharge at most 50% |
 | Surcharge, above 2x | 1% a year | 1.5% on term positions, 0.5% on margin positions | |
-| Leverage ceiling | BTC 3x, ETH 2x | Term unchanged; margin 3x to 5x | Fixed per bucket at deployment; can only be lowered |
+| Leverage ceiling | BTC 3x, ETH 2x | Term unchanged; margin 3x to 5x | Fixed per desk at deployment; can only be lowered |
 | Term | 7 or 14 days | 7 or 14 days; up to 30 in margin mode | 1 to 30 days |
 | Position size | 100,000 USDC | 100,000 USDC | |
 | Minimum down payment | 100 USDC | 100 USDC | At most 10,000 |
@@ -75,12 +77,14 @@ The time-lock can move a dial for future business, never past its limit, never f
 | Cut-off period | 7 days | 7 days; instant withdrawals against idle cash while no position's cover is under 110% (new code) | Fixed |
 | Utilisation cap | 85% | 92%, with deposits admitted only above 85% and returned under 70% for 28 days (new code) | At most 95% |
 | Reserve slice of markup | 10% | 5% | At most 50% |
-| Reserve target | 5% of the bucket | 3% of the bucket | At most 20% |
-| Manager minimum | 5% of the bucket | 5% of the bucket | At most 20% |
+| Reserve target | 5% of the vault | 3% of what the desk has financed, kept per desk (new code) | At most 20% |
+| Manager minimum | 5% of the vault | 5% of the vault | At most 20% |
+| Desk cap | None: one vault per desk | 60% of the vault's capital per desk (new code) | |
+| Stablecoins accepted | USDC | USDC and USDT, swapped to USDC on arrival (new code) | A board-screened list |
 | Fund: treasury share, reserve share, stream, cooldown, window | 20%, 15%, 90 days, 14 days, 7 days | 30%, 10% until the reserve's target, 90 days, 14 days, 7 days; an 8% USDC buffer before stakers are paid (new code) | Fixed |
 | Fund: shortfall sale cap and discount | 30% of stake, 10% below average | 30% of stake, 10% below average | At most 30% each |
 | Reserve sale: discount, ceiling, price | 4%, 10%, 30-minute average floored at reserve cash per token | 4%, sell tax plus one point, 24-hour average floored at 90% of the 7-day low (new code) | |
-| Liquidity reserve target | 10% of registered buckets | 10% of registered buckets | At most 50% |
+| Liquidity reserve target | 10% of registered vaults | 10% of the vault | At most 50% |
 
 ## Tests
 
@@ -94,7 +98,7 @@ The time-lock can move a dial for future business, never past its limit, never f
 | `server/tests` | Keeper, points, indexer, API, one end-to-end run against anvil | 18 passed |
 | `frontend/lib`, `frontend/e2e` | Arithmetic to the unit; four browser flows with a real keeper and API | 24 passed |
 
-Not done: no audit; no full formal verification of the stateful contracts; the fork test covers the WBTC bucket only; MetaMask itself was not driven.
+Not done: no audit; no full formal verification of the stateful contracts; the fork test covers the WBTC desk only; MetaMask itself was not driven.
 
 ## Run it
 
@@ -107,6 +111,6 @@ cd server && .venv/bin/uvicorn --factory destiny.api:app_from_env               
 cd frontend && npm run dev                                                      # 4
 ```
 
-The local deployment is the whole system with mocks for USDC, WBTC, the feed and the spot market, and a real `PoolManager`. The deployer holds 1,000,000 USDC and the genesis SCR, and must deposit 5% into the bucket before anyone else can. Tests: `forge test` in `contracts/` (libraries cloned per the README), `pytest` in `server/`, `npm test && npm run test:e2e` in `frontend/`.
+The local deployment is the whole system with mocks for USDC, WBTC, the feed and the spot market, and a real `PoolManager`. The deployer holds 1,000,000 USDC and the genesis SCR, and must deposit 5% into the vault before anyone else can. Tests: `forge test` in `contracts/` (libraries cloned per the README), `pytest` in `server/`, `npm test && npm run test:e2e` in `frontend/`.
 
 Points are computed from events alone, so anyone can reproduce them: traders from `Paid` events, depositors from shares held at each `Cutoff` at that cut-off's price.

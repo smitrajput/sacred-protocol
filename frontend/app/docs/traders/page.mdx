@@ -8,17 +8,17 @@ You buy a real crypto asset, BTC or ETH, from the vault with a down payment and 
 
 The markup, and only the markup. For 1,000 USDC down on BTC at 3x for 14 days at 17% a year: 2,000 × 17% × 14 ÷ 365 = 13.04 USDC. No opening fee, closing fee, late fee or funding. Minimum down payment 100 USDC.
 
-The rate is 15.5% a year while the bucket is at or under 85% financed, rising in a straight line to 30% at the 92% cap, plus a gap premium of 1.5% on 3x term positions and 0.5% on margin positions. It is fixed at opening for the whole term. You are charged only for the days used: close on day 5 of 14 and you pay 4.66, not 13.04. One day's markup is always earned.
+The rate is 15.5% a year while the vault is at or under 85% financed, rising in a straight line to 30% at the 92% cap, plus a gap premium of 1.5% on 3x term positions and 0.5% on margin positions. It is fixed at opening for the whole term. You are charged only for the days used: close on day 5 of 14 and you pay 4.66, not 13.04. One day's markup is always earned.
 
 All in, rolling positions through a year costs about 22% of exposure: the markup, plus the profit share below. That is inside what dYdX, Hyperliquid and GMX collect per dollar of open interest across a cycle, and about five times perp funding in a bear market. See [economics](/docs/economics).
 
 ## Leverage
 
-Leverage is the asset's cost divided by your down payment. Ceilings are fixed in each bucket's code: **BTC up to 3x, ETH up to 2x** in term mode at launch, 3x to 5x in margin mode once the board rules. The app offers 1.5x, 2x, 2.5x and 3x up to the ceiling. These are proposals to the Shariah board.
+Leverage is the asset's cost divided by your down payment. Ceilings are fixed in each desk's code: **BTC up to 3x, ETH up to 2x** in term mode at launch, 3x to 5x in margin mode once the board rules. The app offers 1.5x, 2x, 2.5x and 3x up to the ceiling. These are proposals to the Shariah board.
 
 ## Opening
 
-In one transaction the vault lends the desk the full cost, the desk buys the asset on Uniswap, records the sale to you at cost plus markup, and takes your down payment. The asset is pledged in your position. You set a limit on the all-in price per asset; the desk also checks the pool against Chainlink and reverts if it is off by more than the tolerance (0.3% to 0.5%, as the pool allows). Opening needs the bucket to hold idle cash equal to the full cost. A paused bucket stops new positions only; it can never stop you leaving.
+In one transaction the vault lends the desk the full cost, the desk buys the asset on Uniswap, records the sale to you at cost plus markup, and takes your down payment. The asset is pledged in your position. You set a limit on the all-in price per asset; the desk also checks the pool against Chainlink and reverts if it is off by more than the tolerance (0.3% to 0.5%, as the pool allows). Opening needs the vault to hold idle cash equal to the full cost, inside the desk's share of it. A paused desk stops new positions only; it can never stop you leaving.
 
 ## Ending a position
 
@@ -29,7 +29,7 @@ In one transaction the vault lends the desk the full cost, the desk buys the ass
 | **Part pay** | You | Any time | Any amount reduces the balance; the asset stays pledged |
 | **Settle** | Anyone | After the due date | The desk sells the asset at the Chainlink-floored market price; the vault takes what it is owed and credits you the surplus to claim |
 
-If you are in profit, you keep 90% and 10% of your *net* profit goes to the backstop fund that stands behind the vault. Net means a loss on an earlier position of yours in the same bucket is carried forward for 90 days and set against later gains before anything is shared. Profit is measured at the price feed, so the share cannot be moved by the sale price. The share is on profit only; the markup is separate. On a pay-off the asset is valued at the feed and the share is paid in USDC with the balance, so paying off and selling elsewhere does not avoid it.
+If you are in profit, you keep 90% and 10% of your *net* profit goes to the backstop fund that stands behind the vault. Net means a loss on an earlier position of yours on the same desk is carried forward for 90 days and set against later gains before anything is shared. Profit is measured at the price feed, so the share cannot be moved by the sale price. The share is on profit only; the markup is separate. On a pay-off the asset is valued at the feed and the share is paid in USDC with the balance, so paying off and selling elsewhere does not avoid it.
 
 ## The worst case
 
@@ -61,7 +61,7 @@ The evergreen position fixes a full year's markup at opening (2,000 × 17% = 340
 
 ## How many positions
 
-As many as you like. There is no limit on the number of live positions per wallet or per bucket; the limits are on position size and on the bucket's exposure against the depth of the spot pool it sells into.
+As many as you like. There is no limit on the number of live positions per wallet or per desk; the limits are on position size, on the desk's share of the vault's capital, and on its exposure against the depth of the spot pool it sells into.
 
 ## Points
 

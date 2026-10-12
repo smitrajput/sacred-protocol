@@ -12,15 +12,15 @@ One position is one credit sale of one asset to one trader, with the asset pledg
 
 | Party | Puts in | Gets |
 | --- | --- | --- |
-| **Depositors** | USDC, into a bucket they choose | 85% of the markup, paid as a 9% target with the rest held in a payout reserve; they bear the bucket's losses |
-| **Manager** | Its work, plus a minimum deposit in each bucket | 10% of the markup, and half of any surplus above the target once the payout reserve is full |
+| **Depositors** | USDC or USDT, into the one vault | 85% of the markup, paid as a 9% target with the rest held in a payout reserve; they bear whatever loss gets past a desk's reserve and the fund |
+| **Manager** | Its work, plus a minimum deposit in the vault | 10% of the markup, and half of any surplus above the target once the payout reserve is full |
 | **Trader** | A down payment now and the balance by the due date | The asset, with 90% of any net profit and a loss capped at the down payment |
-| **Spot market** | Nothing | Where the vault buys assets and where pledged assets are sold |
+| **Spot market** | Nothing | Where the desks buy assets and where pledged assets are sold |
 
 | Contract | Between | In one line |
 | --- | --- | --- |
-| **Mudarabah** | Depositors and the manager | Depositors fund the bucket, the manager runs it, profit is split by a fixed ratio, loss falls on capital |
-| **Murabaha** | The vault and the trader | The vault sells an asset it owns at cost plus a fixed markup, payable by a fixed date |
+| **Mudarabah** | Depositors and the manager | Depositors fund the vault, the manager runs its desks, profit is split by a fixed ratio, loss falls on capital |
+| **Murabaha** | The vault and the trader | The vault, through the asset's desk, sells an asset it owns at cost plus a fixed markup, payable by a fixed date |
 | **Rahn** | The trader and the vault | The trader pledges that asset back as security for the balance |
 
 A Shariah board sits outside the flow: it approves the contract wording and the limits.
@@ -29,10 +29,10 @@ A Shariah board sits outside the flow: it approves the contract wording and the 
 
 The trader picks the asset, the down payment, the leverage, the term, and the highest all-in price per asset they will accept. Everything below happens in one transaction.
 
-1. **Checks.** The bucket is open, leverage and term are within limits, and the bucket has enough idle USDC after queued withdrawals and the utilisation cap.
-2. **The vault buys.** The bucket spends its own USDC, equal to the down payment times the leverage, on the spot market. The asset arrives at the vault, which now owns it. The amount spent is the cost.
-3. **The vault sells.** The asset is sold to the trader at cost plus markup. The down payment moves to the bucket as the first part of the price. The rest is recorded as the balance.
-4. **The pledge.** The asset moves into the position, pledged to the bucket.
+1. **Checks.** The desk is open, leverage and term are within limits, and the vault has enough idle USDC after queued withdrawals, the utilisation cap and the desk's cap.
+2. **The vault buys.** The desk draws USDC from the vault's idle cash, equal to the down payment times the leverage, and spends it on the spot market. The asset arrives at the desk, and the vault now owns it. The amount spent is the cost.
+3. **The vault sells.** The asset is sold to the trader at cost plus markup. The down payment moves to the vault as the first part of the price. The rest is recorded as the balance.
+4. **The pledge.** The asset moves into the position, pledged to the vault and held by the desk.
 5. **Price check.** If the sale price per asset is above the trader's limit, the whole transaction is undone and no funds move.
 
 The order of steps 2 and 3 is a Shariah requirement: the vault must own the asset before it sells it. The position records cost and markup separately, because a murabaha seller must disclose the cost.
@@ -50,7 +50,7 @@ The order of steps 2 and 3 is a Shariah requirement: the vault must own the asse
 | Due | 14 days from opening | Fixed at opening |
 | Status | Live | Live, closed, paid off, settled, or settled short |
 
-Nothing changes after opening except the balance, which can only go down. The markup is the only charge. There is no opening, closing or late fee, and no funding. The rate itself is set by how full the bucket is when the position opens: 15.5% a year while the bucket is at or under 85% financed, rising in a straight line to 30% at the 92% cap, plus a gap premium of 1.5% on 3x term positions and 0.5% on margin positions for bearing the shortfall risk. Whatever the rate was at opening, it is fixed for the position's life.
+Nothing changes after opening except the balance, which can only go down. The markup is the only charge. There is no opening, closing or late fee, and no funding. The rate itself is set by how full the vault is when the position opens: 15.5% a year while the vault is at or under 85% financed, rising in a straight line to 30% at the 92% cap, plus a gap premium of 1.5% on 3x term positions and 0.5% on margin positions for bearing the shortfall risk. Whatever the rate was at opening, it is fixed for the position's life.
 
 ## How a position ends
 
@@ -64,9 +64,9 @@ Every sale of a pledged asset is on the open market, never to the vault; is prot
 
 <Outcomes />
 
-The bucket never earns more than the markup. Its profile is many small gains and a rare larger loss. The trader's loss stops at the down payment: in the last row the trader owes nothing more, and the bucket's 200 shortfall is absorbed in the order on the [risk page](/docs/risk). These results are before the trader's profit share: in the +20% row the profit is 586.96, so 58.70 goes to the backstop fund and the trader keeps 1,528.26, a gain of 52.8%. The share is 10% of *net* profit: a loss on an earlier position in the same bucket is carried forward for 90 days and set against later gains before anything is shared, and profit is measured at the price feed, not at the sale price.
+The vault never earns more than the markup. Its profile is many small gains and a rare larger loss. The trader's loss stops at the down payment: in the last row the trader owes nothing more, and the vault's 200 shortfall is absorbed in the order on the [risk page](/docs/risk). These results are before the trader's profit share: in the +20% row the profit is 586.96, so 58.70 goes to the backstop fund and the trader keeps 1,528.26, a gain of 52.8%. The share is 10% of *net* profit: a loss on an earlier position on the same desk is carried forward for 90 days and set against later gains before anything is shared, and profit is measured at the price feed, not at the sale price.
 
-Closed early, on day 5 with BTC up 10%: waived markup 13.04 × 9 ÷ 14 = 8.38, settlement amount 2,004.66, the trader takes 1,295.34, a gain of 29.5%. The bucket earns 4.66 for five days.
+Closed early, on day 5 with BTC up 10%: waived markup 13.04 × 9 ÷ 14 = 8.38, settlement amount 2,004.66, the trader takes 1,295.34, a gain of 29.5%. The vault earns 4.66 for five days.
 
 ## Three modes, one position
 
@@ -88,10 +88,10 @@ The evergreen position removes the deadline: the markup for a full year is fixed
 - The vault owns the asset before it sells it.
 - A position's balance owed never increases. Its sale price, markup and due date never change.
 - A pledged asset leaves a position only to the trader after full payment, or to the market. It is never sold to the vault, lent, staked or reused.
-- A bucket never receives more than the settlement amount. Everything above goes to the trader, less the profit share.
+- The vault never receives more than the settlement amount. Everything above goes to the trader, less the profit share.
 - A trader never owes more than the pledged asset fetches.
 - In term mode, only the trader's own action sells the asset before the due date.
-- Buckets never share cash, shares, reserves or losses.
+- Each desk keeps its own loss reserve and its own cap on the vault's capital. No desk holds deposits.
 - Closing, paying off, settling and withdrawing can never be paused.
 - No charge exists other than the markup and the repayment of actual costs.
 - Every exit works without any server run by the manager.

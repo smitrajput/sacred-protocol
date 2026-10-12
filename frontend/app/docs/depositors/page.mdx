@@ -2,55 +2,57 @@ export const metadata = { title: "Depositors" };
 
 # Depositors
 
-Your USDC buys a commodity-like crypto asset, BTC or ETH, that a trader has committed to pay for. The markup the trader pays is your yield, paid as a 9% a year target and steadied by a reserve. You earn it whether the trader wins or loses, and nothing is promised.
+Your stablecoins buy a commodity-like crypto asset like BTC, ETH, SOL, BNB etc that a trader has committed to pay for. The markup the trader pays is your yield, paid as a 9% a year target and steadied by a reserve. You earn it whether the trader wins or loses, and nothing is promised.
 
-## Buckets
+## One vault, many desks
 
-One bucket per asset and mode: BTC term and ETH term at launch. Each bucket stands alone with its own USDC, shares, loss reserve and limits. A loss in one bucket never touches another. You pick a bucket, and with it the asset and the risk.
+There is one vault. It takes USDC and USDT at launch, with more stablecoins added as the board screens them, and it accounts in USDC: a deposit in another listed stablecoin is swapped to USDC on arrival at the market rate, and withdrawals pay USDC. One deposit buys one kind of share, priced once a week, with one 9% target and one payout reserve behind it.
 
-Each bucket is a mudarabah: you provide capital, the manager runs the desk, profit is shared by a fixed ratio, and loss falls on capital. The ratio is 85% of the markup to depositors, 10% to the manager and 5% to the bucket's loss reserve.
+The vault provides its capital to desks, one per asset: a BTC desk and an ETH desk at launch, SOL and BNB later. A desk buys its asset, sells it to traders on credit, holds the pledges and settles. It never holds anyone's deposit. You do not pick a desk: your USDC works wherever a trader needs it, and the markup from every desk flows back to the same share price. No desk may finance more than 60% of the vault's capital, so one asset's failure cannot take the whole vault.
 
-The manager must hold at least 5% of every bucket as an ordinary depositor, and cannot withdraw below it. Its deposit earns and loses like yours.
+The vault is a mudarabah: you provide capital, the manager (i.e. the protocol) runs the desks, profit is shared by a fixed ratio, and loss falls on capital. The ratio is 85% of the markup to depositors, 10% to the manager and 5% to the loss reserve of the desk that earned it.
+
+The manager must hold at least 5% of the vault as an ordinary depositor, and cannot withdraw below it. Its deposit earns and loses like yours.
 
 ## Where the yield comes from
 
-Traders pay a fixed markup for buying an asset on deferred payment. One week in a BTC bucket of 100,000 USDC with 85,000 financed at 17% a year and no shortfalls:
+Traders pay a fixed markup for buying an asset on deferred payment. One week in a vault of 100,000 USDC with 85,000 financed across its desks at 17% a year and no shortfalls:
 
 | | USDC |
 | --- | --- |
 | Markup earned in the week: 85,000 × 17% × 7 ÷ 365 | 277.12 |
 | Of which to the manager, at 10% | 27.71 |
-| Of which to the loss reserve, at 5%, until it holds 3% of the bucket | 13.86 |
+| Of which to the desks' loss reserves, at 5%, until each holds 3% of what its desk has financed | 13.86 |
 | The depositors' 85% | 235.55 |
 
 That is 0.24% for the week, about 12.3% a year before shortfalls, at the quoted rate. Idle USDC earns nothing: it sits in the vault, unlent and outside any pool, until a safe on-chain home for it is found.
 
 ## The target and the payout reserve
 
-The payout is a target of 9% a year, not whatever was earned that week. Weeks that earn more than the target put the excess into a payout reserve, held for the bucket's depositors up to 6% of deposits; weeks that earn less draw on it. Once the reserve is full, the surplus above the target is split equally between depositors and the manager. In the simulation on 2018 to 2026 prices the payout held at 9% in 99.6% of months, bull and bear; without the reserve, 29% of months fell under it. The smoothing is the accepted Islamic practice (IFSB GN-3) and is disclosed here and in the contract.
+The payout is a target of 9% a year, not whatever was earned that week. Weeks that earn more than the target put the excess into a payout reserve, held for depositors up to 6% of deposits; weeks that earn less draw on it. Once the reserve is full, the surplus above the target is split equally between depositors and the manager. In the simulation of the launch setup, term positions at BTC 3x and ETH 2x on 2018 to 2026 prices, the payout held at 9% or more in every month, bull and bear; without the reserve, one month in ten fell under it. With margin mode added at 3x to 5x, it held in 99.6% of months. The smoothing is the accepted Islamic practice (IFSB GN-3) and is disclosed here and in the contract.
 
-Deposits are tied to demand. New deposits are admitted only while more than 85% of the bucket is financed, at most 5% growth a week, and the rest queue in time order. If utilisation stays under 70% for 28 days, idle USDC is returned to depositors pro rata until the bucket is 85% financed again. This is the rule that holds the target in a bear market: the 9% is earned on money at work, and money with no work is handed back.
+Deposits are tied to demand. New deposits are admitted only while more than 85% of the vault is financed, at most 5% growth a week, and the rest queue in time order. If utilisation stays under 70% for 28 days, idle USDC is returned to depositors pro rata until the vault is 85% financed again. This is the rule that holds the target in a bear market: the 9% is earned on money at work, and money with no work is handed back. In the same simulation without the hand-back, the payout averaged 6.9% and fell under 9% in more than half of months.
 
 ## The share price
 
-Computed once a week at the cut-off: idle USDC, plus each live position at the lower of its settlement amount and its asset's market value from the price feed, less the expected shortfall on any position whose cover is thin, divided by the shares. The feed is used only for this valuation; no price ever triggers the sale of a term position. A loss lowers the share price for every holder in proportion.
+Computed once a week at the cut-off: idle USDC, plus every live position on every desk at the lower of its settlement amount and its asset's market value from the price feed, less the expected shortfall on any position whose cover is thin, divided by the shares. The feed is used only for this valuation; no price ever triggers the sale of a term position. A loss lowers the share price for every holder in proportion.
 
 ## Deposits and withdrawals
 
-- **Deposit any time**, subject to the admission rule above. A deposit request parks USDC in a queue until the bucket admits it; queued USDC is not at risk and earns nothing until then.
+- **Deposit any time**, subject to the admission rule above. A deposit request parks USDC in a queue until the vault admits it; queued USDC is not at risk and earns nothing until then.
 - **Withdraw instantly** against idle cash while no live position's cover is below 110%. Otherwise a withdrawal request locks shares in a queue, processed at the next cut-off at that cut-off's share price, unfilled requests kept in time order. Queued shares keep earning and losing until redeemed.
 - **Withdrawals rank ahead of new positions.** The desk may not open a position with cash that queued withdrawals need.
-- **If cash is short**, the longest term position runs 14 days, so cash returns within two or three cut-offs. The liquidity reserve deposits into a bucket that is short for its queue.
+- **If cash is short**, the longest term position runs 14 days, so cash returns within two or three cut-offs. The liquidity reserve deposits into the vault when it is short for its queue.
 
 A depositor who sees a crash can leave, but the share price already marks the loss and the expected shortfall on thin positions, so a loss is shared, not dodged.
 
 ## Shares cannot be traded
 
-A bucket mostly holds debts owed by traders, and a debt may not be traded at anything other than face value. Shares cannot be transferred or approved; the code reverts. The only way out is to withdraw at the share price.
+The vault mostly holds debts owed by traders, and a debt may not be traded at anything other than face value. Shares cannot be transferred or approved; the code reverts. The only way out is to withdraw at the share price.
 
 ## What can be lost
 
-If an asset sells for less than its balance at settlement, the gap is absorbed in order: the trader's down payment, then the bucket's loss reserve, then the backstop fund's USDC, then staked SCR, then depositors through the share price. A depositor who leaves gives up any claim on the reserve; it stays for those who remain.
+If an asset sells for less than its balance owed at settlement, the gap is absorbed in order: the trader's down payment, then the loss reserve of the desk that sold it, then the backstop fund's USDC, then staked SCR, then every depositor through the one share price. A loss on the BTC desk that gets past the BTC reserve and the fund is shared by all depositors; the 60% cap on any one desk is what limits an asset-specific failure. A depositor who leaves gives up any claim on the reserves; they stay for those who remain.
 
 The backtests put the average loss for 14-day BTC 3x positions at 1.0% of the amount financed a year, worst year 5.1% (2020), against a markup of 17%. ETH at 2x showed no loss in any year. In the whole-system simulation depositors lost principal in 0.02% of years, worst year 0.5%. The full tables, the Monte Carlo and their limits are on the [risk page](/docs/risk).
 

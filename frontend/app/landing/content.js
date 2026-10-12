@@ -28,7 +28,7 @@ export const headline = { yield: "9%", leverage: "5x" };
 // The launch parameters, from the final mechanism. Shaped like the Desk's defaults so the
 // worked position can use the same arithmetic as the app.
 export const proposed = {
-  baseRateBps: 1_550n, // markup 15.5% a year while the bucket is at or under 85% financed
+  baseRateBps: 1_550n, // markup 15.5% a year while the vault is at or under 85% financed
   surchargeBps: 150n, // plus a 1.5% gap premium on 3x term positions
   surchargeAboveBps: 20_000n,
   minDownPayment: 100_000_000n, // 100 USDC
@@ -75,7 +75,7 @@ export const why = {
 export const flow = [
   {
     title: "You deposit",
-    text: "USDC goes into a bucket. One bucket per asset: BTC, ETH. Buckets never share cash or losses.",
+    text: "USDC or USDT goes into one vault. There is no asset to pick: your money works on whichever desk, BTC or ETH, a trader needs.",
   },
   {
     title: "It waits in the vault",
@@ -83,15 +83,15 @@ export const flow = [
   },
   {
     title: "A trader opens a position",
-    text: "The bucket takes USDC from its idle cash, buys the asset on the spot market and sells it to the trader at cost plus a fixed markup. One transaction.",
+    text: "The asset's desk draws USDC from the vault's idle cash, buys the asset on the spot market and sells it to the trader at cost plus a fixed markup. One transaction.",
   },
   {
     title: "The position ends",
-    text: "The trader pays the balance by the due date, or the asset is sold on the market. The bucket gets back what it financed, plus the markup.",
+    text: "The trader pays the balance by the due date, or the asset is sold on the market. The vault gets back what it financed, plus the markup.",
   },
   {
     title: "The markup is split",
-    text: "85% to depositors, 10% to the manager, 5% to the bucket's loss reserve. Nothing else is charged to anyone.",
+    text: "85% to depositors, 10% to the manager, 5% to the desk's loss reserve. Nothing else is charged to anyone.",
   },
 ];
 
@@ -99,7 +99,7 @@ export const dials = [
   {
     name: "Markup",
     value: "15.5% a year",
-    note: "while the bucket is under 85% financed, rising to 30% at the 92% cap. Plus 1.5% on 3x term positions.",
+    note: "while the vault is under 85% financed, rising to 30% at the 92% cap. Plus 1.5% on 3x term positions.",
   },
   {
     name: "Payout",
@@ -109,7 +109,7 @@ export const dials = [
   {
     name: "Deposits",
     value: "Admitted on demand",
-    note: "New deposits only while more than 85% of the bucket is financed, at most 5% growth a week. Idle USDC is returned if utilisation stays under 70% for 28 days.",
+    note: "New deposits only while more than 85% of the vault is financed, at most 5% growth a week. Idle USDC is returned if utilisation stays under 70% for 28 days.",
   },
   {
     name: "Withdrawals",
@@ -122,7 +122,7 @@ export const dials = [
 
 export const traderSteps = [
   "Pick an asset, a down payment, a leverage and a term.",
-  "The bucket buys the asset and sells it to you at cost plus a markup fixed for the whole term. One transaction, and the vault owns the asset before it sells it.",
+  "The desk buys the asset and sells it to you at cost plus a markup fixed for the whole term. One transaction, and the vault owns the asset before it sells it.",
   "The asset sits pledged in your position. Close, pay off or part-pay whenever you like; you pay only for the days used.",
   "At the due date the asset is sold. You get everything above the balance, less 10% of net profit. Below the balance, you lose the down payment and owe nothing more.",
 ];
@@ -173,8 +173,8 @@ export const layers = [
     what: "It is inside the asset's value. The first third of a fall on a 3x position is the trader's.",
   },
   {
-    name: "The bucket's loss reserve",
-    what: "A bucket is one asset's pool of depositors' USDC. 5% of every markup stays in it as a reserve, until the reserve holds 3% of deposits.",
+    name: "The desk's loss reserve",
+    what: "Each desk, one per asset, keeps 5% of every markup it earns as a reserve, until the reserve holds 3% of what it has financed.",
   },
   {
     name: "The backstop fund",
@@ -185,8 +185,8 @@ export const layers = [
     what: "The protocol's token, staked by people who are paid from the fund's excess. Counted as zero when solvency is tested.",
   },
   {
-    name: "The depositors of that bucket",
-    what: "In proportion, through the share price. The manager's own deposit loses with them. No other bucket is touched.",
+    name: "The vault's depositors",
+    what: "In proportion, through the share price. The manager's own deposit loses with them. One vault stands behind every desk, and no desk may finance more than 60% of it.",
   },
 ];
 

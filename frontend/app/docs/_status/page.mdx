@@ -10,11 +10,11 @@ Sacred is at the angel stage. This page says what exists, what does not, what ea
 
 **The SCR side.** The token, its Uniswap v4 pool hook, the liquidity manager, the liquidity reserve, the reserve sale, the fee splitter and the staking fund, built and tested together against a real Uniswap v4 `PoolManager`.
 
-**Margin mode** is in the same position code, switched off until the board rules on forced sale. No margin bucket exists.
+**Margin mode** is in the same position code, switched off until the board rules on forced sale. No margin desk exists.
 
 ## Deployed
 
-Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses on the [contracts page](/docs/contracts). A BTC bucket (3x max) and an ETH bucket (2x max) exist behind an allow-list. The token is on chain under a placeholder name, `SacredTokenDummy` with ticker `SRD`, with no airdrop, no listing and no protocol-owned stake. It is not live in any sense that matters.
+Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses on the [contracts page](/docs/contracts). A BTC desk (3x max) and an ETH desk (2x max) exist behind an allow-list, each paired with its own vault in the deployed shape; the single vault for both is the rewrite before launch. The token is on chain under a placeholder name, `SacredTokenDummy` with ticker `SRD`, with no airdrop, no listing and no protocol-owned stake. It is not live in any sense that matters.
 
 ## Tested
 
@@ -26,12 +26,12 @@ Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses o
 - **No Shariah board ruling.** Ten points plus SCR's go to a board before launch; the [Shariah page](/docs/shariah) lists them with odds and fallbacks.
 - **No open access.** Depositors and traders are allow-listed. Deposits capped at 1 million USDC, raised in steps.
 - **No token.** SCR launches only after the vault has run on points for 6 to 12 months and has real fees.
-- **The launch economics are not yet in the deployed code.** The contracts on Arbitrum One run the first design's dials: a 10% markup plus 1% above 2x, a 30% profit share per position, all markup to depositors, a weekly withdrawal queue. The utilisation curve, the netted 10% profit share, the 85/10/5 split, the 9% target with its payout reserve, the admission and capital-return rules, the instant withdrawals and the fund buffer on the [economics page](/docs/economics) ship with the re-cut before launch, and the profit share is then tuned with launch data.
+- **The launch economics and the single vault are not yet in the deployed code.** The contracts on Arbitrum One pair a vault with each desk and run the first design's dials: a 10% markup plus 1% above 2x, a 30% profit share per position, all markup to depositors, a weekly withdrawal queue. The utilisation curve, the netted 10% profit share, the 85/10/5 split, the 9% target with its payout reserve, the admission and capital-return rules, the instant withdrawals and the fund buffer on the [economics page](/docs/economics) ship with the re-cut before launch, and the profit share is then tuned with launch data.
 
 ## Launch plan
 
 1. **Term mode first.** BTC and ETH, 7 and 14 day positions, BTC 3x and ETH 2x.
-2. **Allow-listed traders and depositors.** Deposits capped at 1 million USDC, raised in steps. The manager's own capital seeds each bucket. [Join the waitlist](/#waitlist).
+2. **Allow-listed traders and depositors.** Deposits capped at 1 million USDC, raised in steps. The manager's own capital seeds the vault. [Join the waitlist](/#waitlist).
 3. **Points from day one.** No token.
 4. **Margin, longer terms and evergreen positions** as rulings arrive and the reserve grows.
 5. **SCR** after 6 to 12 months of real fees.
@@ -48,17 +48,17 @@ Each phase opens only when its gate is met.
 
 ## Open decisions
 
-**For the founder.** Confirm or change every "suggested" dial; the wrapped form of BTC; the cut-off day and hour; the utilisation curve; seed capital, bucket caps and position size limits; whether the position code is fixed for good or upgradable after a delay longer than the longest term.
+**For the founder.** Confirm or change every "suggested" dial; the wrapped form of BTC; the cut-off day and hour; the utilisation curve; seed capital, desk caps and position size limits; whether the position code is fixed for good or upgradable after a delay longer than the longest term.
 
 **For the specification.** One contract per position or one ledger for all (the board may want the former; it would be a new desk). A fallback when a settlement sale cannot meet the floor: retry, then a short auction, never a sale to the vault.
 
-**For the board.** The rulings on the Shariah page; whether profit may be measured against the previous high; who owns the loss reserve if a bucket closes.
+**For the board.** The rulings on the Shariah page; whether profit may be measured against the previous high; who owns a desk's loss reserve if that desk closes.
 
 **For counsel.** How the vault and the desk are classed under the UAE central bank law that names DeFi; whether "leverage" and "financing" can be used in marketing; whether a mutual shortfall fund needs an insurance licence; how Dubai's virtual-asset rules constrain the airdrop and reserve sales.
 
 ## Deferred past launch
 
-- **Buckets on other chains**, starting with the USDC-only backstop fund and their own loss reserve, because a bucket elsewhere cannot call the staking fund in one transaction.
+- **Vaults on other chains**, each with its own desks, starting with the USDC-only backstop fund, because a vault elsewhere cannot call the staking fund in one transaction.
 - **A staker discount on the profit share** and **staker votes on the risk dials**, both waiting on the board's ruling on the stakers' reward.
 - **Yield on idle USDC** through a tokenised sukuk holding. No liquid on-chain Shariah money-market token was found; a 4% wrapper would lift the simulated payout from 9.0% to 9.6%.
 - **Partial close by the trader.** The desk supports full close and part payment.

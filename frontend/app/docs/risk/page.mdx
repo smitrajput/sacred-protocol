@@ -2,18 +2,18 @@ export const metadata = { title: "Risk" };
 
 # Risk
 
-We would rather tell you where the money stops than pretend it never does. In term mode the bucket carries a crash, and its losses arrive in clumps. In margin mode the bucket carries only sudden gaps.
+We would rather tell you where the money stops than pretend it never does. In term mode the vault carries a crash, and its losses arrive in clumps. In margin mode the vault carries only sudden gaps.
 
 ## The order of loss
 
 A term position is never sold before its due date, so there is no liquidation price. If its asset sells for less than the balance at settlement, the gap is absorbed in this order, and it moves down only when the layer above is used up.
 
 1. **The trader's down payment.** It is inside the asset's value: the first third of a fall on a 3x position is the trader's.
-2. **The bucket's loss reserve**, built from 5% of markup until it holds 3% of the bucket.
+2. **The desk's loss reserve.** Each desk keeps its own, built from 5% of its markup until it holds 3% of what the desk has financed.
 3. **The backstop fund's USDC**, fed by 10% of traders' net profit and held to 8% of the financed amount before stakers are paid; then **staked SCR**, sold up to a cap, once the token is live, and counted as zero when solvency is tested.
-4. **The depositors of that bucket**, through the share price, in proportion. The manager's own deposit loses with them.
+4. **Every depositor of the vault**, through the one share price, in proportion. The manager's own deposit loses with them.
 
-Buckets never share losses. A shortfall in BTC cannot reach the ETH bucket. Beyond its deposit the manager loses only its fee.
+Desks share depositors. A shortfall on the BTC desk that gets past the BTC reserve and the fund lowers the share price for everyone, whichever desk their USDC was working on. What limits an asset-specific failure is the cap: no desk may finance more than 60% of the vault's capital. Beyond its deposit the manager loses only its fee.
 
 ## Term mode, 14-day positions, 2020 to 2026
 
@@ -26,7 +26,7 @@ Buckets never share losses. A shortfall in BTC cannot reach the ETH bucket. Beyo
 | ETH 3x | 1.4% | 3.9% | 13.9% | 14% |
 | ETH 4x | 3.2% | 9.3% | 21.9% | 22% |
 
-Costs are a share of the amount financed, against a markup of 15.5% to 17% a year. The last column is a fully used bucket with positions spread evenly, in March 2020. Losses clump: almost all BTC losses fall in 2020 to 2022 and none in 2023 to 2026, so a calm stretch says little. This table is why term mode is 3x for BTC and 2x for ETH, and why 5x needs margin mode.
+Costs are a share of the amount financed, against a markup of 15.5% to 17% a year. The last column is a vault fully used on that one asset, positions spread evenly, in March 2020. Losses clump: almost all BTC losses fall in 2020 to 2022 and none in 2023 to 2026, so a calm stretch says little. This table is why term mode is 3x for BTC and 2x for ETH, and why 5x needs margin mode.
 
 ## Margin and evergreen, with a forced partial sale
 
@@ -69,12 +69,13 @@ The reserve and the fund are built in good times and sized to last through bad o
 
 | Risk | What could happen | What limits it |
 | --- | --- | --- |
-| Contract bug | Loss of deposits or pledged assets | Audits, bucket caps, a seed phase with the manager's own capital. No audit has happened yet |
+| Contract bug | Loss of deposits or pledged assets | Audits, deposit and desk caps, a seed phase with the manager's own capital. No audit has happened yet |
 | Stale or wrong price feed | Cut-off, settlement and opening revert while stale; a wrong price misprices one cut-off | Staleness and sequencer checks; the time-lock can point the desk at a new oracle |
 | Thin market at settlement | The sale reverts below the floor and the position stays live | Retry; position size cap; no auction fallback yet |
 | Sandwiching | Up to the sale tolerance on opens and protocol-triggered sales | The feed floor; the trader's own limit; a 0.3% to 0.5% tolerance; profit measured at feed prices |
-| Wrapped BTC | The wrapper fails or loses its peg | Choice of wrapper; a cap on the BTC bucket |
-| USDC | A freeze or a broken peg hits every bucket | None inside this design |
+| Wrapped BTC | The wrapper fails or loses its peg | Choice of wrapper; the BTC desk's cap, at most 60% of the vault |
+| USDC | A freeze or a broken peg hits the whole vault | None inside this design |
+| Another listed stablecoin | USDT or a later addition depegs between deposit and the swap to USDC | The list is short and board-screened; the vault holds no other stablecoin for long, because deposits are swapped to USDC on arrival |
 | Withdrawal wait | Depositors wait two or three cut-offs when idle cash is short or a position's cover is thin | Instant withdrawals against idle cash otherwise; the utilisation cap; withdrawals rank ahead of new positions; the liquidity reserve |
 | Admin keys | A captured multisig could, after two days, swap in a lying oracle or a hostile fund for future business | Time-lock delay; hard limits; no function moves a pledged asset or a depositor's cash |
 | Regulation | How UAE law classes this product is not settled; a token from a UAE entity falls under Dubai's virtual-asset rules | Legal counsel before launch |
@@ -82,7 +83,7 @@ The reserve and the fund are built in good times and sized to last through bad o
 
 ## Unknown or untested
 
-- Behaviour with hundreds of live positions on a real chain, and many buckets sharing one fund.
+- Behaviour with hundreds of live positions on a real chain, and many desks drawing on one vault and one fund.
 - Economic attacks that combine deposit timing, cut-off timing and price moves. The invariant suite samples these but proves nothing.
-- Anything a professional audit would find. This code has had none.
+- Anything a professional audit would find.
 - A crash worse than March 2020. The past does not bound the future.

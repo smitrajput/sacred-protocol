@@ -4,20 +4,18 @@ export const metadata = { title: "SCR" };
 
 SCR is the protocol token. Staked SCR stands behind shortfalls, sales of SCR fund a USDC liquidity reserve, and one SCR/USDC pool gives it a market. Depositors' yield does not depend on it.
 
-**Status.** Deployed on Arbitrum One under a placeholder name (`SacredTokenDummy`, ticker `SRD`) so the whole system could be tested as one. No airdrop, no listing, no protocol-owned stake. The token launches only after the vault has run on points for 6 to 12 months and has real fees. Everything numeric here is suggested, not confirmed, and none of it has been seen by a board.
-
 | Part | Holds | Money in | Money out |
 | --- | --- | --- | --- |
 | **Backstop fund** | Staked SCR and USDC | 60% of the traders' 10% net-profit share | Shortfalls, then a stream to stakers from whatever exceeds 8% of the financed amount |
-| **Liquidity reserve** | USDC | Reserve sales, pool fees, 10% of the profit share until the reserve is at its target, seed money from the raise | Deposits into buckets short of cash |
+| **Liquidity reserve** | USDC | Reserve sales, pool fees, 10% of the profit share until the reserve is at its target, seed money from the raise | Deposits into the vault when it is short of cash |
 | **Pool** | SCR and USDC, owned by the protocol | Swap fees | Fees to the reserve, then to the fund |
 
 ## If you stake
 
 - Anyone can stake. Leaving takes a **14-day cooldown followed by a 7-day window**, as long as the longest term position, so nobody can run ahead of a loss. Shares in cooldown still earn and can still be sold for a shortfall. Staked SCR cannot be transferred.
 - You are paid **in USDC** from the traders' profit share, streamed over 90 days, and only from what the fund holds above 8% of the amount financed. There are no SCR emissions and no rebase. The fund's income is trade profit only; in a falling market it receives little or nothing, and after a loss it pays nothing until the buffer is refilled.
-- When a bucket's loss reserve cannot cover a shortfall, the fund pays from its USDC first. If that is not enough, staked SCR is sold in the pool, **up to 30% of the stake per event, stopping 10% below the pool's average price**. Whatever is still uncovered falls on that bucket's depositors.
-- One fund covers every bucket; buckets still share nothing with each other. The protocol stakes some of its own SCR.
+- When a desk's loss reserve cannot cover a shortfall, the fund pays from its USDC first. If that is not enough, staked SCR is sold in the pool, **up to 30% of the stake per event, stopping 10% below the pool's average price**. Whatever is still uncovered falls on the vault's depositors.
+- One fund covers every desk, and every desk draws on the one vault. The protocol stakes some of its own SCR.
 
 The simulation's view: a shortfall sale at that cap raises only about 5% of the pool's USDC per event, so the real backstop is the fund's USDC. That is why staked SCR is the last layer, sized at zero in solvency tests, and why stakers are paid the fund's excess only: about 8% of deposits a year in simulation. A staker's reward and whether staked SCR may be sold for a shortfall are rulings for the board; the founder's position is that stakers are loss-bearing partners, not paid guarantors.
 
@@ -34,24 +32,7 @@ Two attacks the review found, and what closes them: a 30-minute average could be
 
 ## If you hold
 
-The pool is one SCR/USDC pool on Uniswap v4, owned by the protocol: 4% of supply plus USDC from the raise, never withdrawn. Anyone can open another pool without the fee, so this income leaks and the design does not depend on it. Of a trader's net profit, 90% stays with the trader and 10% is shared; of that, 30% goes to the treasury, 10% to the reserve until it reaches its target, and the rest to the fund, which pays stakers only what it holds above 8% of the financed amount. Pool fees go 20% to the treasury, then to the reserve until its target, then to the fund. Markup is not in this picture: 85% of it goes to depositors, 10% to the manager and 5% to the bucket's loss reserve.
-
-## Supply and allocation
-
-One billion SCR, fixed. No emissions beyond it. Community-side allocations total 52%, insiders 38%, the treasury 10%.
-
-| Allocation | Share | Unlock |
-| --- | --- | --- |
-| Airdrops, in seasons | 25% | 10% at launch, 15% over later seasons, delivered staked |
-| Community incentives and grants | 10% | Streamed over 5 years |
-| Reserve sales | 10% | Sold only at or above reserve value per token |
-| Pool liquidity | 4% | At launch, never withdrawn |
-| Protocol's own backstop stake | 3% | Staked permanently; can be sold for shortfalls |
-| Team, co-founders, hires, advisors | 20% | 1-year cliff, then 3 years linear |
-| Investors, angel round to Series A | 18% | Same lock as the team |
-| Treasury and development | 10% | Streamed over 5 years |
-
-Unused investor tokens roll into the treasury. The treasury stream, not an unlock, carries the early years: at a 20 million token valuation, 2% a year is about 400,000. A token issued from a UAE entity falls under Dubai's virtual-asset rules, which may constrain the airdrop and the sales.
+The pool is one SCR/USDC pool on Uniswap v4, owned by the protocol: 4% of supply plus USDC from the raise, never withdrawn. Anyone can open another pool without the fee, so this income leaks and the design does not depend on it. Of a trader's net profit, 90% stays with the trader and 10% is shared; of that, 30% goes to the treasury, 10% to the reserve until it reaches its target, and the rest to the fund, which pays stakers only what it holds above 8% of the financed amount. Pool fees go 20% to the treasury, then to the reserve until its target, then to the fund. Markup is not in this picture: 85% of it goes to depositors, 10% to the manager and 5% to the loss reserve of the desk that earned it.
 
 ## Points before the token
 

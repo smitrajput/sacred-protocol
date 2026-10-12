@@ -12,7 +12,7 @@ export function Calls() {
       w={760}
       h={420}
       min={700}
-      label="Depositors call the vault, traders call the desk, stakers call the staking fund, SCR buyers call the reserve sale, and a keeper or anyone calls cut-off on the vault and settle on the desk. The desk lends from and repays the vault, reads the oracle, swaps on the Uniswap v3 router and pays the profit share to the fund; the vault asks the fund for cover; the fund sells staked SCR in the Uniswap v4 pool. The frontend reads every view and sends every transaction through the wallet; the server runs the keeper, an indexer and a read-only API."
+      label="Depositors call the one vault, traders call the desk for their asset, stakers call the staking fund, SCR buyers call the reserve sale, and a keeper or anyone calls cut-off on the vault and settle on the desk. The desk lends from and repays the vault, reads the oracle, swaps on the Uniswap v3 router and pays the profit share to the fund; the vault asks the fund for cover; the fund sells staked SCR in the Uniswap v4 pool. The frontend reads every view and sends every transaction through the wallet; the server runs the keeper, an indexer and a read-only API."
       caption="Who calls whom. Solid boxes are contracts on Arbitrum One; dashed ones run off chain. The frontend talks to every contract directly and asks the server for points only. Every exit works with the server switched off."
     >
       {/* People */}
@@ -23,14 +23,14 @@ export function Calls() {
       <Box x={665} y={10} w={90} h={40} title="SCR buyer" />
 
       {/* Contracts */}
-      <Box x={150} y={120} w={110} h={60} title="Vault" sub={["shares, queues,", "the loss reserve"]} />
-      <Box x={360} y={120} w={130} h={60} title="Desk" sub={["positions and", "the pledged assets"]} />
+      <Box x={150} y={120} w={110} h={60} title="Vault" sub={["one pool: shares,", "queues, cut-off"]} />
+      <Box x={360} y={120} w={130} h={60} title="Desks" sub={["one per asset:", "positions, pledges,", "a loss reserve"]} />
       <Box x={665} y={120} w={90} h={60} title="Reserve sale" sub={["SCR for USDC,", "delivered staked"]} />
 
       <Box x={150} y={250} w={110} h={60} title="Staking fund" sub={["USDC and", "staked SCR"]} />
       <Box x={382} y={250} w={80} h={60} title="Oracle" sub="Chainlink" />
       <Box x={500} y={250} w={100} h={60} title="Uniswap v3" sub="router" />
-      <Box x={665} y={250} w={90} h={60} title="Reserve" sub={["deposits into a", "short bucket"]} />
+      <Box x={665} y={250} w={90} h={60} title="Reserve" sub={["deposits into the", "vault when short"]} />
 
       <Box x={150} y={350} w={110} h={50} title="SCR pool" sub="Uniswap v4" />
 
@@ -71,16 +71,16 @@ export function Money() {
       h={380}
       min={700}
       label="A deposit enters the vault's idle cash at the cut-off. The vault lends the full cost to the desk, which buys the asset on the spot market and holds it pledged. The trader pays the down payment, part payments and pay-offs to the desk. When the asset is sold the desk returns principal and earned markup to the vault, pays 10 percent of any net profit to the backstop fund and the rest to the trader. The vault pays 10 percent of markup to the manager and moves 5 percent into its loss reserve, which covers shortfalls first; the fund covers them second and passes 30 percent of what it receives to the treasury. Withdrawals move idle cash to claimable at the cut-off, and the depositor claims it."
-      caption="Every USDC in a bucket, and the path it takes. Solid arrows are the ordinary flow; dashed ones move only on a shortfall. The vault never reads its own balance: it counts idle cash, the reserve, queued deposits and claimable cash itself, so a donation cannot move the share price."
+      caption="Every USDC in the vault, and the path it takes. There is one vault and one desk per asset; the loss reserve is kept per desk. Solid arrows are the ordinary flow; dashed ones move only on a shortfall. The vault never reads its own balance: it counts idle cash, the reserve, queued deposits and claimable cash itself, so a donation cannot move the share price."
     >
       <Box x={10} y={60} w={90} h={44} title="Depositor" />
 
       <rect x={148} y={36} width={162} height={330} rx="2" className={styles.ghost} />
       <text x={300} y={50} textAnchor="end" className={styles.sub}>
-        Vault, one bucket
+        Vault, one pool
       </text>
       <Box x={160} y={60} w={130} h={50} title="Idle cash" />
-      <Box x={200} y={170} w={90} h={44} title="Loss reserve" />
+      <Box x={200} y={170} w={90} h={44} title="Loss reserve" sub="per desk" />
       <Box x={160} y={300} w={130} h={44} title="Claimable" />
 
       <Box x={380} y={50} w={120} h={115} title="Desk" sub={["holds the", "pledged asset"]} />
@@ -116,7 +116,7 @@ const states = [
   { y: 30, fn: "close", title: "Closed", sub: ["by the trader, any time;", "the asset sold, the surplus paid"] },
   { y: 84, fn: "payOff", title: "Paid off", sub: ["by the trader, any time;", "the asset released to the trader"] },
   { y: 138, fn: "settle", title: "Settled", sub: ["by anyone, after the due date;", "the asset sold, the surplus credited"] },
-  { y: 192, fn: "settle, short", title: "Settled short", sub: ["the sale fell below the balance;", "the bucket absorbs the gap"] },
+  { y: 192, fn: "settle, short", title: "Settled short", sub: ["the sale fell below the balance;", "the vault absorbs the gap"] },
 ];
 
 export function Lifecycle() {
@@ -145,10 +145,10 @@ export function Lifecycle() {
 
 const layers = [
   ["The trader's down payment", "it is inside the asset's value"],
-  ["The bucket's loss reserve", "5% of every markup, up to 3% of the bucket"],
+  ["The desk's loss reserve", "5% of its markup, up to 3% of what it has financed"],
   ["The backstop fund's USDC", "fed by 10% of traders' net profit; holds 8% of the financed amount"],
   ["Staked SCR, sold in the pool", "at most 30% of the stake, 10% under the average"],
-  ["The bucket's depositors", "in proportion, through the share price"],
+  ["Every depositor of the vault", "in proportion, through the one share price"],
 ];
 
 export function LossOrder() {
@@ -157,8 +157,8 @@ export function LossOrder() {
       w={620}
       h={250}
       min={520}
-      label="A shortfall is absorbed in order by the trader's down payment, the bucket's loss reserve, the backstop fund's USDC, staked SCR sold in the pool, and finally the bucket's depositors through the share price."
-      caption="When a pledged asset sells for less than the balance, the gap falls through these layers in order. No other bucket is touched, and a depositor who leaves gives up any claim on the reserve."
+      label="A shortfall is absorbed in order by the trader's down payment, the desk's loss reserve, the backstop fund's USDC, staked SCR sold in the pool, and finally every depositor of the vault through the share price."
+      caption="When a pledged asset sells for less than the balance, the gap falls through these layers in order. Past the desk's reserve and the fund, every depositor shares it, whichever desk their USDC was on. A depositor who leaves gives up any claim on the reserves."
     >
       <Text x={10} y={26} anchor="start" lines="A shortfall" className={styles.big} />
       <Text x={10} y={44} anchor="start" lines={["what one layer", "cannot cover", "falls to the next"]} className={styles.sub} />

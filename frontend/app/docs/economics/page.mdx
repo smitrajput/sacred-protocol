@@ -8,19 +8,19 @@ What traders pay, what depositors earn, what the protocol keeps, and the simulat
 
 | Flow | Size | Goes to |
 | --- | --- | --- |
-| **Markup** | 15.5% a year on the financed amount while the bucket is at or under 85% financed, rising in a straight line to 30% at the 92% cap. Plus a gap premium: 1.5% on 3x term positions, 0.5% on margin positions | 85% to depositors, 10% to the manager, 5% to the bucket's loss reserve until it holds 3% of the bucket |
+| **Markup** | 15.5% a year on the financed amount while the vault is at or under 85% financed, rising in a straight line to 30% at the 92% cap. Plus a gap premium: 1.5% on 3x term positions, 0.5% on margin positions | 85% to depositors, 10% to the manager, 5% to the loss reserve of the desk that earned it, until that reserve holds 3% of what the desk has financed |
 | **Payout** | A 9% a year target. Markup above it fills a payout reserve up to 6% of deposits; months below it draw on the reserve | Once the reserve is full, the surplus is split equally between depositors and the manager |
 | **Profit share** | 10% of a trader's net profit, losses carried forward 90 days, measured at feed prices | 30% treasury, 10% to the liquidity reserve until it reaches its target, the rest to the backstop fund. The fund keeps USDC to 8% of the financed amount and streams only the excess to stakers over 90 days |
 | **Pool fee** | 1% on SCR buys, 3% on sells, in USDC | 20% treasury; the rest to the reserve until its target, then to the fund |
 | **Keeper repayment** | A fee indexed to gas at the time of the call, capped at 20 USDC | Whoever settles, sells or runs the cut-off |
 
-Nothing else is charged. A BTC bucket 85% financed at 17% earns 12.3% a year for depositors before shortfalls: 100,000 USDC earns 277.12 in a week, 27.71 goes to the manager, 13.86 to the loss reserve, 235.55 to depositors. The 9% target is paid, and the rest fills the payout reserve.
+Nothing else is charged. A vault 85% financed at 17% earns 12.3% a year for depositors before shortfalls: 100,000 USDC earns 277.12 in a week, 27.71 goes to the manager, 13.86 to the loss reserve, 235.55 to depositors. The 9% target is paid, and the rest fills the payout reserve.
 
 Deposits follow demand. New deposits are admitted only while utilisation is above 85%, at most 5% growth a week, and idle USDC is returned pro rata if utilisation stays under 70% for 28 days. Without that rule the median month pays 7.0%.
 
 ## What the simulation found
 
-A mechanism-design review treated the founder as the rule-setter and each party as a player with one profitable deviation to close, then simulated the whole system: real positions on Binance one-minute prices from January 2018 to September 2026, a daily model of deposits, rates, reserves and fund on top, and 1,000 bootstrapped six-year paths with the real crash clustering. Leverage demand follows perp funding, so bear demand is about 0.4 of bull demand.
+A mechanism-design review treated the founder as the rule-setter and each party as a player with one profitable deviation to close, then simulated the whole system: real positions on Binance one-minute prices from January 2018 to September 2026, a daily model of deposits, rates, reserves and fund on top, and 1,000 bootstrapped six-year paths with the real crash clustering. Leverage demand follows perp funding, so bear demand is about 0.4 of bull demand. The model carries one pool of deposits financing BTC and ETH positions together under one utilisation cap, which is the one-vault design on these pages.
 
 The first design charged 10% a year plus 1% above 2x, took 30% of each winning position's profit, and paid all the markup to depositors. At its own equilibrium it paid depositors about 5%, charged traders about five times the market price of leverage, and could not offer 5x. The nine findings, largest first, are what the dials above answer:
 
@@ -44,7 +44,7 @@ Eighteen changes in five groups. Each keeps the sale, pledge and partnership; no
 | --- | --- | --- | --- |
 | **Price to traders** | 10% markup plus 1% above 2x; 30% share per position | Markup 15.5% up to 85% utilisation, rising to 30% at the 92% cap, plus a gap premium. Profit share 10% of *net* profit, losses carried forward 90 days. Profit measured at feed prices | The share base falls from 135% to 90% of exposure. All-in cost falls by about 60%, to inside what dYdX, Hyperliquid and GMX collect per dollar of open interest |
 | **Split** | All markup to depositors | 85% depositors, 10% manager, 5% loss reserve. A 9% target payout: profit above it fills a payout reserve up to 6% of deposits, months below draw on it | Protocol income that is paid in bear markets. Smoothing is accepted practice (IFSB GN-3) and must be disclosed |
-| **Capacity** | A static bucket cap | Admit deposits only while utilisation is above 85%, at most 5% a week; return idle USDC pro rata if utilisation stays under 70% for 28 days | The rule that holds 9% in bear markets. Without it the median month pays 7.0% |
+| **Capacity** | A static deposit cap | Admit deposits only while utilisation is above 85%, at most 5% a week; return idle USDC pro rata if utilisation stays under 70% for 28 days | The rule that holds 9% in bear markets. Without it the median month pays 7.0% |
 | **Leverage** | BTC 3x, ETH 2x, term only | Term unchanged. Margin mode 3x to 5x with part of the asset sold at 110% cover, restored to 115%. No limit on position count; limits on size. Keeper fee indexed to gas, two independent keepers | 5x costs 0.12% a year on BTC with a working keeper, 2.3% with an hour's outage on every sale |
 | **Backstop and reserve** | Staked SCR counted as a loss layer | Staked SCR kept as the last layer, sized at zero in solvency tests; the fund holds USDC to 8% of the financed amount before paying stakers. Reserve-sale discount capped at the sell tax plus one point; price off a 24-hour average floored at 90% of the 7-day low; reserve seeded from the raise | Closes findings 6 and 9. An 8% buffer cuts loss years under outage stress from 6% to 1.5% |
 
@@ -84,6 +84,6 @@ One treasury pays for development. Its income is the manager's 10% of markup, pa
 - **Keeper or sequencer outage is the tail.** An hour's outage on every forced sale: depositors lose in 1.5% of years, worst year 7.1%.
 - **Bear-market traders pay about five times the conventional price**, 17% against 3.3% funding. The only verified Islamic margin rate found is about 11% a year, at 2x on equities.
 - **Launch starts with empty buffers.** Seed the 8% fund buffer and the liquidity reserve from the raise, or cap the first positions until they fill.
-- **The launch dials are not yet in the deployed code.** The contracts on Arbitrum One run the first design's dials; the [status page](/docs/status) lists what changes before launch.
+- **The launch dials are not yet in the deployed code.** The contracts on Arbitrum One run the first design's dials; the [contracts page](/docs/contracts) lists each dial's deployed and launch values.
 
 Not modelled: the liquidity reserve and reserve sales, on-chain slippage at size, contract or oracle failure, a USDC or wrapped-BTC event, a crash worse than any since 2018, SCR's price, and traders who do anything other than hold to the due date.

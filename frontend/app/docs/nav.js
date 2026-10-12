@@ -12,13 +12,15 @@ export const sections = [
       { slug: "economics", title: "Economics", blurb: "What traders pay, what depositors earn, what the protocol keeps, and the simulation the dials were cut from." },
       { slug: "risk", title: "Risk", blurb: "The order of loss, nine years of backtests, the Monte Carlo, and what remains at risk." },
       { slug: "shariah", title: "Shariah", blurb: "The contracts and their sources, the 2006 ruling answered, and each open ruling with its odds." },
-      { slug: "status", title: "Status and roadmap", blurb: "What is built and deployed, what is not, the gates for each phase, and the open decisions." },
+      // Status and roadmap is hidden while it is rewritten. Its page lives at app/docs/_status (the
+      // underscore keeps Next from routing it); rename the folder back to status and restore this line:
+      // { slug: "status", title: "Status and roadmap", blurb: "What is built and deployed, what is not, the gates for each phase, and the open decisions." },
     ],
   },
   {
     title: "Your part in it",
     pages: [
-      { slug: "depositors", title: "Depositors", blurb: "Buckets, the 9% target and its reserve, the share price, withdrawals, what can be lost." },
+      { slug: "depositors", title: "Depositors", blurb: "One vault and its desks, the 9% target and its reserve, the share price, withdrawals, what can be lost." },
       { slug: "traders", title: "Traders", blurb: "The cost, the three ways a position ends, the three modes, and what to expect from a forced sale." },
       { slug: "scr", title: "SCR: holders, stakers, reserve buyers", blurb: "The token's three jobs, the reserve sale, the fee splits, the allocation, and the attacks the design closes." },
     ],

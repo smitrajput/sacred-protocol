@@ -22,6 +22,13 @@ down payment now and the rest by a due date, and the asset stays pledged in the 
 and 30% goes to the **BackstopFund**, which pays shortfalls after the bucket's own loss
 reserve. In term mode nobody but the trader can sell the asset before the due date.
 
+**The design has moved on from this shape.** Since October 2026 the design is one vault for
+all stablecoin deposits (USDC and USDT at launch, accounted in USDC), lending to one desk per
+asset, with a loss reserve and a capital cap per desk; the docs at
+[sacred.markets/docs](https://sacred.markets/docs) describe it. The code here still pairs one
+`Vault` with each `Desk`, and "bucket" below means that pair. Merging the vaults is the next
+contract job.
+
 ## 2. Architecture
 
 ### Contracts and who calls whom (data)
@@ -351,6 +358,10 @@ it. The app connects to any injected wallet on chain 31337; point it at the node
 
 ## 7. What differs from the design document
 
+- **One vault per asset, not one vault for all.** The design since October 2026 is a single
+  vault lending to every desk, with the loss reserve and a capital cap kept per desk and
+  USDT accepted beside USDC. The code predates it: each asset has its own `Vault`, its own
+  shares and its own reserve, and nothing caps a desk against the vault.
 - **The SCR side is built and deploys with the buckets, but nothing is live.** The
   token, minter, pool hook, liquidity manager, reserve, reserve sale, fee splitter and
   the staking fund (`StakedBackstopFund`) are tested together against a real Uniswap v4
@@ -436,6 +447,10 @@ sacred/
 
 ## 10. Next steps
 
+- **One vault, many desks.** Merge the per-asset vaults into one: a list of desks with a
+  cap each (60% of capital at launch), `bookValue` summed across desks at the cut-off, the
+  loss reserve moved into the desk, a stablecoin list with USDT swapped to USDC on arrival.
+  Redeploy, since the live vaults cannot be merged in place.
 - **Stablecoin vaults on Robinhood Chain.** Version one, with the token, deploys on
   Arbitrum One. Buckets on Robinhood Chain come next, taking USDG deposits. The token,
   its pool, the reserve and the staking fund stay on Arbitrum One, because the token

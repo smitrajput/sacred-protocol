@@ -27,9 +27,9 @@ export default function Yield() {
           <div>
             <h3 className={styles.h3}>In numbers</h3>
             <p className={`${styles.body} ${styles.afterList}`}>
-              100,000 USDC in a bucket that is 85% financed at 17% a year earns 14,450 of markup. 12,282 of it is the
+              100,000 USDC in a vault that is 85% financed at 17% a year earns 14,450 of markup. 12,282 of it is the
               depositors&rsquo;, a 12.3% return. The {proposed.targetPayout} target is paid out, and the rest fills a
-              payout reserve for the months the desk is quiet, so the payout holds in a bear market too. Once the
+              payout reserve for the months the desks are quiet, so the payout holds in a bear market too. Once the
               reserve is full, the surplus is split equally between depositors and the manager.
             </p>
             <p className={`${styles.small} ${styles.afterList}`}>

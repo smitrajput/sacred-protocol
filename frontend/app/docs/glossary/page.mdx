@@ -8,11 +8,12 @@ These words are used the same way everywhere in Sacred.
 | --- | --- |
 | **Position** | One financed purchase of one asset by one trader. Each position holds its own asset and its own debt |
 | **Asset** | The thing sold: a commodity-like crypto asset, BTC or ETH at launch, bought on the spot market and owned by the vault before it is sold. Never a stablecoin, never a claim on anyone |
-| **Bucket** | A separate pool of USDC in the vault, for one asset and one mode. Buckets never share money or losses |
+| **Vault** | The one pool of depositors' stablecoins, accounted in USDC, with one share price and one payout reserve. It lends to every desk |
+| **Desk** | The vault's arm for one asset, BTC or ETH at launch. It draws USDC from the vault, buys the asset, sells it on credit, holds the pledges, settles, and keeps its own loss reserve. It holds no deposits, and may finance at most 60% of the vault |
 | **Down payment** | The USDC the trader pays when the position opens. The first part of the price, and the trader's maximum loss |
 | **Cost** | What the vault actually paid for the asset, swap fees included |
 | **Markup** | The vault's fixed profit on the sale, set when the position opens. It never grows. 85% of it is the depositors' yield, 10% the manager's, 5% the loss reserve's |
-| **Payout reserve** | Markup earned above the 9% target, held for the bucket's depositors up to 6% of deposits, and drawn on in months below the target |
+| **Payout reserve** | Markup earned above the 9% target, held for depositors up to 6% of deposits, and drawn on in months below the target |
 | **Sale price** | Cost plus markup |
 | **Balance** | Sale price minus the down payment. The trader owes it by the due date. It can only go down |
 | **Financed amount** | Cost minus the down payment: the vault's money at work in the position |
@@ -29,11 +30,11 @@ These words are used the same way everywhere in Sacred.
 | **Margin mode** | Positions up to 30 days with a forced partial sale at low cover. Waits for a board ruling |
 | **Evergreen** | A margin position with a 365-day term, charged only for days held, sold only at 110% cover |
 | **Cut-off** | The weekly moment when vault shares are priced and queued deposits and withdrawals are processed. Withdrawals against idle cash do not wait for it while no position's cover is thin |
-| **Share price** | The value of a bucket divided by its shares, computed at each cut-off |
-| **Loss reserve** | 5% of markup kept in each bucket, outside the share price, until it holds 3% of the bucket. It pays shortfalls first |
+| **Share price** | The value of the vault, every desk's book included, divided by its shares, computed at each cut-off |
+| **Loss reserve** | 5% of a desk's markup kept for that desk, outside the share price, until it holds 3% of what the desk has financed. It pays that desk's shortfalls first |
 | **Profit share** | 10% of a trader's net profit, losses carried forward 90 days, measured at the price feed. Paid to the backstop fund |
 | **Backstop fund** | USDC and staked SCR that pay shortfalls after the loss reserve. Fed by the profit share; holds USDC to 8% of the financed amount before stakers are paid |
-| **Liquidity reserve** | USDC that deposits into a bucket short of cash for its withdrawal queue. Built by selling SCR |
+| **Liquidity reserve** | USDC that deposits into the vault when it is short of cash for its withdrawal queue. Built by selling SCR |
 | **Reserve sale** | The sale of new SCR for USDC into the liquidity reserve, delivered staked |
 | **Keeper** | A server that settles due positions, triggers forced sales and runs the cut-off. Anyone can do all three; it is paid a fee indexed to gas, capped at 20 USDC |
 | **Points** | One per USDC of markup paid, or per USDC per day deposited. A discretionary gift that promises nothing |

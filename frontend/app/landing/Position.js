@@ -132,7 +132,7 @@ function Outcome({ assetValue, balance, downPayment, exit, sharePct }) {
       <p className={styles.result}>
         The asset sells for <b>{sold}</b>, below the balance of <b>{formatUsdc(balance)}</b>.{" "}
         <span className={styles.loss}>You lose your down payment of {formatUsdc(downPayment)}</span> and owe nothing
-        more. The bucket absorbs the remaining <b>{formatUsdc(balance - assetValue)}</b>.
+        more. The vault absorbs the remaining <b>{formatUsdc(balance - assetValue)}</b>.
       </p>
     );
   }

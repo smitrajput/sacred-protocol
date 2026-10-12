@@ -46,7 +46,7 @@ abstract contract Preflight is Script {
     }
 
     /// The feed answers, the answer is positive, and it is no older than the oracle
-    /// will accept. A feed that is already stale would make every ticket revert.
+    /// will accept. A feed that is already stale would make every position revert.
     function _requireLiveFeed(address feed, uint256 maxAge) internal view {
         _requireContract("FEED", feed);
         (, int256 answer,, uint256 updatedAt,) = IAggregatorV3(feed).latestRoundData();

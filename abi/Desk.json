@@ -8,7 +8,7 @@
     "internalType": "contract IERC20"
    },
    {
-    "name": "coin_",
+    "name": "asset_",
     "type": "address",
     "internalType": "contract IERC20"
    },
@@ -163,6 +163,19 @@
  },
  {
   "type": "function",
+  "name": "asset",
+  "inputs": [],
+  "outputs": [
+   {
+    "name": "",
+    "type": "address",
+    "internalType": "contract IERC20"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
   "name": "baseRateBps",
   "inputs": [],
   "outputs": [
@@ -219,19 +232,6 @@
  },
  {
   "type": "function",
-  "name": "coin",
-  "inputs": [],
-  "outputs": [
-   {
-    "name": "",
-    "type": "address",
-    "internalType": "contract IERC20"
-   }
-  ],
-  "stateMutability": "view"
- },
- {
-  "type": "function",
   "name": "fund",
   "inputs": [],
   "outputs": [
@@ -245,7 +245,7 @@
  },
  {
   "type": "function",
-  "name": "getTicket",
+  "name": "getPosition",
   "inputs": [
    {
     "name": "id",
@@ -257,7 +257,7 @@
    {
     "name": "",
     "type": "tuple",
-    "internalType": "struct Desk.Ticket",
+    "internalType": "struct Desk.Position",
     "components": [
      {
       "name": "owner",
@@ -475,7 +475,7 @@
     "internalType": "uint256"
    },
    {
-    "name": "minCoinOut",
+    "name": "minAssetOut",
     "type": "uint256",
     "internalType": "uint256"
    }
@@ -613,6 +613,75 @@
     "name": "",
     "type": "uint24",
     "internalType": "uint24"
+   }
+  ],
+  "stateMutability": "view"
+ },
+ {
+  "type": "function",
+  "name": "positions",
+  "inputs": [
+   {
+    "name": "",
+    "type": "uint256",
+    "internalType": "uint256"
+   }
+  ],
+  "outputs": [
+   {
+    "name": "owner",
+    "type": "address",
+    "internalType": "address"
+   },
+   {
+    "name": "status",
+    "type": "uint8",
+    "internalType": "enum Desk.Status"
+   },
+   {
+    "name": "opened",
+    "type": "uint40",
+    "internalType": "uint40"
+   },
+   {
+    "name": "due",
+    "type": "uint40",
+    "internalType": "uint40"
+   },
+   {
+    "name": "qty",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "cost",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "downPayment",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "financed",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "markup",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "repaid",
+    "type": "uint256",
+    "internalType": "uint256"
+   },
+   {
+    "name": "principalRepaid",
+    "type": "uint256",
+    "internalType": "uint256"
    }
   ],
   "stateMutability": "view"
@@ -905,75 +974,6 @@
  },
  {
   "type": "function",
-  "name": "tickets",
-  "inputs": [
-   {
-    "name": "",
-    "type": "uint256",
-    "internalType": "uint256"
-   }
-  ],
-  "outputs": [
-   {
-    "name": "owner",
-    "type": "address",
-    "internalType": "address"
-   },
-   {
-    "name": "status",
-    "type": "uint8",
-    "internalType": "enum Desk.Status"
-   },
-   {
-    "name": "opened",
-    "type": "uint40",
-    "internalType": "uint40"
-   },
-   {
-    "name": "due",
-    "type": "uint40",
-    "internalType": "uint40"
-   },
-   {
-    "name": "qty",
-    "type": "uint256",
-    "internalType": "uint256"
-   },
-   {
-    "name": "cost",
-    "type": "uint256",
-    "internalType": "uint256"
-   },
-   {
-    "name": "downPayment",
-    "type": "uint256",
-    "internalType": "uint256"
-   },
-   {
-    "name": "financed",
-    "type": "uint256",
-    "internalType": "uint256"
-   },
-   {
-    "name": "markup",
-    "type": "uint256",
-    "internalType": "uint256"
-   },
-   {
-    "name": "repaid",
-    "type": "uint256",
-    "internalType": "uint256"
-   },
-   {
-    "name": "principalRepaid",
-    "type": "uint256",
-    "internalType": "uint256"
-   }
-  ],
-  "stateMutability": "view"
- },
- {
-  "type": "function",
   "name": "totalOwed",
   "inputs": [],
   "outputs": [
@@ -1060,7 +1060,7 @@
     "internalType": "enum Desk.Status"
    },
    {
-    "name": "coinValue",
+    "name": "assetValue",
     "type": "uint256",
     "indexed": false,
     "internalType": "uint256"
@@ -1385,7 +1385,7 @@
  },
  {
   "type": "error",
-  "name": "TooManyTickets",
+  "name": "TooManyPositions",
   "inputs": []
  },
  {

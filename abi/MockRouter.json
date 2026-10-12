@@ -8,7 +8,7 @@
     "internalType": "contract MockERC20"
    },
    {
-    "name": "coin_",
+    "name": "asset_",
     "type": "address",
     "internalType": "contract MockERC20"
    },
@@ -22,7 +22,7 @@
  },
  {
   "type": "function",
-  "name": "coin",
+  "name": "asset",
   "inputs": [],
   "outputs": [
    {

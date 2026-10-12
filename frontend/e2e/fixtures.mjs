@@ -43,5 +43,5 @@ export const panel = (page, title) =>
 // The figure shown under this label inside a panel.
 export const figure = (where, label) => where.locator(`xpath=.//dt[normalize-space()="${label}"]/following-sibling::dd`);
 
-// The block for one ticket.
-export const ticket = (page, id) => page.locator(`[data-ticket="${id}"]`);
+// The block for one position.
+export const position = (page, id) => page.locator(`[data-position="${id}"]`);

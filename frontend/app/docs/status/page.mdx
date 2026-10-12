@@ -6,11 +6,11 @@ Sacred is at the angel stage. This page says what exists, what does not, what ea
 
 ## Built
 
-**Term mode, end to end.** The vault, the desk, the price reader and the backstop fund in Solidity; a keeper that settles due tickets and runs the weekly cut-off; a read API that serves points; and the app at [/app](/app), where traders open, close, pay off and part-pay tickets, depositors deposit and withdraw, stakers stake SCR, and SCR buyers buy from the reserve sale.
+**Term mode, end to end.** The vault, the desk, the price reader and the backstop fund in Solidity; a keeper that settles due positions and runs the weekly cut-off; a read API that serves points; and the app at [/app](/app), where traders open, close, pay off and part-pay positions, depositors deposit and withdraw, stakers stake SCR, and SCR buyers buy from the reserve sale.
 
 **The SCR side.** The token, its Uniswap v4 pool hook, the liquidity manager, the liquidity reserve, the reserve sale, the fee splitter and the staking fund, built and tested together against a real Uniswap v4 `PoolManager`.
 
-**Margin mode** is in the same ticket code, switched off until the board rules on forced sale. No margin bucket exists.
+**Margin mode** is in the same position code, switched off until the board rules on forced sale. No margin bucket exists.
 
 ## Deployed
 
@@ -18,7 +18,7 @@ Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses o
 
 ## Tested
 
-279 Foundry tests across unit, fuzz (1,000 runs), invariant (9 system invariants, 64 runs × 120 calls) and fork suites; 18 server tests including one end-to-end run; 20 frontend arithmetic tests; 4 browser flows driven through the real page with a real keeper and API. The fork test opens and closes a 3x BTC ticket on the real Uniswap v3 pool at the real Chainlink price. Two of eight arithmetic properties are proved by symbolic execution; the solver timed out on the other six, which are covered by fuzzing only.
+279 Foundry tests across unit, fuzz (1,000 runs), invariant (9 system invariants, 64 runs × 120 calls) and fork suites; 18 server tests including one end-to-end run; 20 frontend arithmetic tests; 4 browser flows driven through the real page with a real keeper and API. The fork test opens and closes a 3x BTC position on the real Uniswap v3 pool at the real Chainlink price. Two of eight arithmetic properties are proved by symbolic execution; the solver timed out on the other six, which are covered by fuzzing only.
 
 ## Not done
 
@@ -26,14 +26,14 @@ Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses o
 - **No Shariah board ruling.** Ten points plus SCR's go to a board before launch; the [Shariah page](/docs/shariah) lists them with odds and fallbacks.
 - **No open access.** Depositors and traders are allow-listed. Deposits capped at 1 million USDC, raised in steps.
 - **No token.** SCR launches only after the vault has run on points for 6 to 12 months and has real fees.
-- **The proposed economics are not in the code.** The [economics page](/docs/economics) describes a redesign of the markup rate, the profit share, the payout smoothing and the capacity rules. Version one runs the original dials; the redesign is tuned with launch data.
+- **The launch economics are not yet in the deployed code.** The contracts on Arbitrum One run the first design's dials: a 10% markup plus 1% above 2x, a 30% profit share per position, all markup to depositors, a weekly withdrawal queue. The utilisation curve, the netted 10% profit share, the 85/10/5 split, the 9% target with its payout reserve, the admission and capital-return rules, the instant withdrawals and the fund buffer on the [economics page](/docs/economics) ship with the re-cut before launch, and the profit share is then tuned with launch data.
 
 ## Launch plan
 
-1. **Term mode first.** BTC and ETH, 7 and 14 day tickets, BTC 3x and ETH 2x.
+1. **Term mode first.** BTC and ETH, 7 and 14 day positions, BTC 3x and ETH 2x.
 2. **Allow-listed traders and depositors.** Deposits capped at 1 million USDC, raised in steps. The manager's own capital seeds each bucket. [Join the waitlist](/#waitlist).
 3. **Points from day one.** No token.
-4. **Margin, longer terms and evergreen tickets** as rulings arrive and the reserve grows.
+4. **Margin, longer terms and evergreen positions** as rulings arrive and the reserve grows.
 5. **SCR** after 6 to 12 months of real fees.
 
 ## Roadmap
@@ -42,26 +42,26 @@ Each phase opens only when its gate is met.
 
 | Phase | Horizon | What | Gate |
 | --- | --- | --- | --- |
-| **1. The desk** | Now to 6 months | Term mode on BTC and ETH, a screened LP sleeve, the app, points | Board rulings; an audit; the first allow-listed cohort trading on Arbitrum One |
-| **2. Halal Earn** | 6 to 18 months | One vault shell routing stablecoins to halal sleeves: tokenised sukuk, the desk, screened LP. Margin and evergreen modes. Shariah-compliant tokenised stocks up to 5x. B2B distribution through wallets and neobanks | Rulings on forced sale; real fees for 6 to 12 months; SCR launch |
+| **1. The desk** | Now to 6 months | Term mode on BTC and ETH, the app, points | Board rulings; an audit; the first allow-listed cohort trading on Arbitrum One |
+| **2. Halal Earn** | 6 to 18 months | One vault shell routing stablecoins to halal sleeves: tokenised sukuk and the desk. Margin and evergreen modes. Shariah-compliant tokenised stocks up to 5x. B2B distribution through wallets and neobanks | Rulings on forced sale; real fees for 6 to 12 months; SCR launch |
 | **3. Beyond** | Later | Payment float, own issuance, institutions, a neobank | Phase 2 live and its reserve sized through a bear market |
 
 ## Open decisions
 
-**For the founder.** Confirm or change every "suggested" dial; the wrapped form of BTC; the cut-off day and hour; the utilisation curve; seed capital, bucket caps and ticket size limits; whether the ticket code is fixed for good or upgradable after a delay longer than the longest term.
+**For the founder.** Confirm or change every "suggested" dial; the wrapped form of BTC; the cut-off day and hour; the utilisation curve; seed capital, bucket caps and position size limits; whether the position code is fixed for good or upgradable after a delay longer than the longest term.
 
-**For the specification.** One contract per ticket or one ledger for all (the board may want the former; it would be a new desk). A fallback when a settlement sale cannot meet the floor: retry, then a short auction, never a sale to the vault.
+**For the specification.** One contract per position or one ledger for all (the board may want the former; it would be a new desk). A fallback when a settlement sale cannot meet the floor: retry, then a short auction, never a sale to the vault.
 
 **For the board.** The rulings on the Shariah page; whether profit may be measured against the previous high; who owns the loss reserve if a bucket closes.
 
 **For counsel.** How the vault and the desk are classed under the UAE central bank law that names DeFi; whether "leverage" and "financing" can be used in marketing; whether a mutual shortfall fund needs an insurance licence; how Dubai's virtual-asset rules constrain the airdrop and reserve sales.
 
-## Deferred from version one
+## Deferred past launch
 
 - **Buckets on other chains**, starting with the USDC-only backstop fund and their own loss reserve, because a bucket elsewhere cannot call the staking fund in one transaction.
 - **A staker discount on the profit share** and **staker votes on the risk dials**, both waiting on the board's ruling on the stakers' reward.
 - **Yield on idle USDC** through a tokenised sukuk holding. No liquid on-chain Shariah money-market token was found; a 4% wrapper would lift the simulated payout from 9.0% to 9.6%.
-- **Partial close by the trader.** Version one supports full close and part payment.
+- **Partial close by the trader.** The desk supports full close and part payment.
 
 ## The company and the raise
 

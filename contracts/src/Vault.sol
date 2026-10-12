@@ -16,9 +16,9 @@ interface IBackstopFund {
 }
 
 /// @title Vault
-/// @notice One bucket: a mudarabah pool of USDC for one coin. Depositors queue
+/// @notice One bucket: a mudarabah pool of USDC for one asset. Depositors queue
 ///         deposits and withdrawals, which are processed at a weekly cut-off at one
-///         share price. The desk borrows USDC to buy coins and repays with markup.
+///         share price. The desk borrows USDC to buy assets and repays with markup.
 ///         Shares cannot be transferred. All markup goes to depositors, less a
 ///         slice that builds the loss reserve.
 /// @dev    Every USDC the vault holds is in exactly one of four counters:
@@ -238,8 +238,8 @@ contract Vault is ERC20, Ownable2Step, ReentrancyGuard {
         if (nextCutoff <= block.timestamp) nextCutoff = block.timestamp + PERIOD;
     }
 
-    /// Net asset value: idle cash, live tickets at the lower of settlement amount and
-    /// coin value, plus the reserve up to the shortfalls already visible.
+    /// Net asset value: idle cash, live positions at the lower of settlement amount and
+    /// asset value, plus the reserve up to the shortfalls already visible.
     function navNow() public view returns (uint256) {
         (uint256 book, uint256 shortfall) = desk == address(0) ? (0, 0) : IDeskBook(desk).bookValue();
         return idle + book + (reserve < shortfall ? reserve : shortfall);
@@ -252,7 +252,7 @@ contract Vault is ERC20, Ownable2Step, ReentrancyGuard {
         _;
     }
 
-    /// Send USDC to the desk to buy a coin.
+    /// Send USDC to the desk to buy an asset.
     function lend(uint256 amount) external onlyDesk {
         if (amount > idle) revert InsufficientIdle();
         idle -= amount;
@@ -297,7 +297,7 @@ contract Vault is ERC20, Ownable2Step, ReentrancyGuard {
         emit WrittenOff(principal, fromReserve, fromFund);
     }
 
-    /// Reverts if a new ticket would break the utilisation cap or use cash that
+    /// Reverts if a new position would break the utilisation cap or use cash that
     /// queued withdrawals need. The desk calls this at the end of every opening.
     function assertHealthy() external view {
         if (lent * BPS > utilCapBps * (idle + lent)) revert Unhealthy();

@@ -1,10 +1,12 @@
-// Mirrors contracts/src/TicketMath.sol exactly, in BigInt, so the order form shows the
+// Mirrors contracts/src/PositionMath.sol exactly, in BigInt, so the order form shows the
 // same numbers the contract will record. All amounts are USDC units (6 decimals).
 
 export const BPS = 10_000n;
 export const YEAR = 365n * 86_400n;
 export const DAY = 86_400n;
-export const PROFIT_SHARE_BPS = 3_000n;
+// 10% of net profit at launch. A preview shares on one position's own profit; the 90-day
+// carry-forward of earlier losses, which can only lower the share, is not modelled here.
+export const PROFIT_SHARE_BPS = 1_000n;
 
 export const cost = (downPayment, leverageBps) => (downPayment * leverageBps) / BPS;
 
@@ -26,7 +28,7 @@ export function profitShare(takesOut, paidIn, shareBps = PROFIT_SHARE_BPS) {
   return ((takesOut - paidIn) * shareBps) / BPS;
 }
 
-// What the order form shows before a ticket opens.
+// What the order form shows before a position opens.
 export function quote({ downPayment, leverageBps, termDays, baseRateBps, surchargeBps, surchargeAboveBps }) {
   const rateBps = baseRateBps + (leverageBps > surchargeAboveBps ? surchargeBps : 0n);
   const total = cost(downPayment, leverageBps);
@@ -35,17 +37,17 @@ export function quote({ downPayment, leverageBps, termDays, baseRateBps, surchar
   return { cost: total, financed, markup: fixedMarkup, balance: financed + fixedMarkup, rateBps };
 }
 
-// What the trader would walk away with if the coin were sold for `coinValue` now.
-export function exitPreview({ coinValue, settlementAmount, paidIn, shareBps = PROFIT_SHARE_BPS }) {
-  if (coinValue < settlementAmount) return { canClose: false, toTrader: 0n, toFund: 0n, profit: 0n };
-  const surplus = coinValue - settlementAmount;
+// What the trader would walk away with if the asset were sold for `assetValue` now.
+export function exitPreview({ assetValue, settlementAmount, paidIn, shareBps = PROFIT_SHARE_BPS }) {
+  if (assetValue < settlementAmount) return { canClose: false, toTrader: 0n, toFund: 0n, profit: 0n };
+  const surplus = assetValue - settlementAmount;
   const toFund = profitShare(surplus, paidIn, shareBps);
   return { canClose: true, toTrader: surplus - toFund, toFund, profit: surplus > paidIn ? surplus - paidIn : 0n };
 }
 
 // Mirrors Oracle.quantity and Oracle.value for a price given in USDC units.
-export const quantityAt = (usdcAmount, priceUnits, coinDecimals) => (usdcAmount * 10n ** BigInt(coinDecimals)) / priceUnits;
-export const valueAt = (qty, priceUnits, coinDecimals) => (qty * priceUnits) / 10n ** BigInt(coinDecimals);
+export const quantityAt = (usdcAmount, priceUnits, assetDecimals) => (usdcAmount * 10n ** BigInt(assetDecimals)) / priceUnits;
+export const valueAt = (qty, priceUnits, assetDecimals) => (qty * priceUnits) / 10n ** BigInt(assetDecimals);
 
 // A token amount with `decimals`, rounded half up to `digits` and grouped with commas.
 export function formatAmount(units, decimals, digits = 2) {

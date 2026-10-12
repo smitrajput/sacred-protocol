@@ -55,8 +55,9 @@ export default function Stake({ address, sample, now }) {
 
       <p className={`${shared.note} ${styles.spaced}`}>
         Stakers stand behind shortfalls. After a bucket&apos;s loss reserve and the fund&apos;s USDC, staked SCR is
-        sold, up to 30% at a time. In return, 65% of traders&apos; profit share streams to stakers in USDC over 90
-        days. No emissions, no rebase. Nothing is promised.
+        sold, up to 30% at a time. In return, 60% of traders&apos; profit share goes to the fund, which keeps USDC to 8%
+        of the amount financed and streams the rest to stakers over 90 days. No emissions, no rebase. Nothing is
+        promised.
       </p>
 
       <div className={styles.form}>

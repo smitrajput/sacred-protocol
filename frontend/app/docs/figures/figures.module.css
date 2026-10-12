@@ -181,7 +181,7 @@
   stroke: var(--accent);
 }
 
-/* ---- Glyphs for the strip: people, buckets, coins and cash ---- */
+/* ---- Glyphs for the strip: people, buckets, assets and cash ---- */
 
 .glyph > circle,
 .glyph > path,
@@ -191,13 +191,13 @@
   stroke-width: 1.25;
 }
 
-.coin {
+.asset {
   fill: var(--paper-rule);
   stroke: var(--paper-ink);
   stroke-width: 1.25;
 }
 
-.coinText {
+.assetText {
   font-size: 7px;
   font-weight: 700;
   fill: var(--paper-ink);
@@ -220,5 +220,11 @@
 }
 
 .cashTextAccent {
+  fill: var(--accent);
+}
+
+/* A large figure in the accent: the one number a diagram is about. */
+.numBig {
+  font-weight: 700;
   fill: var(--accent);
 }

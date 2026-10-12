@@ -2,38 +2,38 @@ export const metadata = { title: "Traders" };
 
 # Traders
 
-You buy a real coin from the vault with a down payment and pay the rest by a due date. The price is fixed when you open. In term mode nothing is sold before the due date, whatever the price does.
+You buy a real crypto asset, BTC or ETH, from the vault with a down payment and pay the rest by a due date. The price is fixed when you open. In term mode nothing is sold before the due date, whatever the price does.
 
 ## What you pay
 
-The markup, and only the markup. For 1,000 USDC down on BTC at 3x for 14 days at 11% a year: 2,000 × 11% × 14 ÷ 365 = 8.44 USDC. No opening fee, closing fee, late fee or funding. Minimum down payment 100 USDC.
+The markup, and only the markup. For 1,000 USDC down on BTC at 3x for 14 days at 17% a year: 2,000 × 17% × 14 ÷ 365 = 13.04 USDC. No opening fee, closing fee, late fee or funding. Minimum down payment 100 USDC.
 
-The rate is 10% a year plus 1% on tickets above 2x, fixed at opening for the whole term. You are charged only for the days used: close on day 5 of 14 and you pay 3.01, not 8.44. One day's markup is always earned.
+The rate is 15.5% a year while the bucket is at or under 85% financed, rising in a straight line to 30% at the 92% cap, plus a gap premium of 1.5% on 3x term positions and 0.5% on margin positions. It is fixed at opening for the whole term. You are charged only for the days used: close on day 5 of 14 and you pay 4.66, not 13.04. One day's markup is always earned.
 
-The proposed version two raises the markup rate (to about 16 to 21% depending on how full the vault is) and cuts the profit share from 30% per ticket to 10% of net profit with losses carried forward, which lowers the all-in cost by about 60%. See [economics](/docs/economics).
+All in, rolling positions through a year costs about 22% of exposure: the markup, plus the profit share below. That is inside what dYdX, Hyperliquid and GMX collect per dollar of open interest across a cycle, and about five times perp funding in a bear market. See [economics](/docs/economics).
 
 ## Leverage
 
-Leverage is the coin's cost divided by your down payment. Ceilings are fixed in each bucket's code: **BTC up to 3x, ETH up to 2x** at launch. The app offers 1.5x, 2x, 2.5x and 3x up to the ceiling. These are proposals to the Shariah board.
+Leverage is the asset's cost divided by your down payment. Ceilings are fixed in each bucket's code: **BTC up to 3x, ETH up to 2x** in term mode at launch, 3x to 5x in margin mode once the board rules. The app offers 1.5x, 2x, 2.5x and 3x up to the ceiling. These are proposals to the Shariah board.
 
 ## Opening
 
-In one transaction the vault lends the desk the full cost, the desk buys the coin on Uniswap, records the sale to you at cost plus markup, and takes your down payment. The coin is pledged in your ticket. You set a limit on the all-in price per coin; the desk also checks the pool against Chainlink and reverts if it is off by more than 1%. Opening needs the bucket to hold idle cash equal to the full cost. A paused bucket stops new tickets only; it can never stop you leaving.
+In one transaction the vault lends the desk the full cost, the desk buys the asset on Uniswap, records the sale to you at cost plus markup, and takes your down payment. The asset is pledged in your position. You set a limit on the all-in price per asset; the desk also checks the pool against Chainlink and reverts if it is off by more than the tolerance (0.3% to 0.5%, as the pool allows). Opening needs the bucket to hold idle cash equal to the full cost. A paused bucket stops new positions only; it can never stop you leaving.
 
-## Ending a ticket
+## Ending a position
 
 | | Who | When | What happens |
 | --- | --- | --- | --- |
-| **Close** | You | Any time | The desk sells the coin, pays the vault the balance earned so far, and you keep the surplus. Fails if the sale would not cover the settlement amount |
-| **Pay off** | You | Any time | You pay the balance in USDC and take the coin to your wallet |
-| **Part pay** | You | Any time | Any amount reduces the balance; the coin stays pledged |
-| **Settle** | Anyone | After the due date | The desk sells the coin at the Chainlink-floored market price; the vault takes what it is owed and credits you the surplus to claim |
+| **Close** | You | Any time | The desk sells the asset, pays the vault the balance earned so far, and you keep the surplus. Fails if the sale would not cover the settlement amount |
+| **Pay off** | You | Any time | You pay the balance in USDC and take the asset to your wallet |
+| **Part pay** | You | Any time | Any amount reduces the balance; the asset stays pledged |
+| **Settle** | Anyone | After the due date | The desk sells the asset at the Chainlink-floored market price; the vault takes what it is owed and credits you the surplus to claim |
 
-If you are in profit, you keep 70% and 30% goes to the backstop fund that stands behind the vault. The share is on profit only; the markup is separate. On a pay-off the coin is valued at the feed and the share is paid in USDC with the balance, so paying off and selling elsewhere does not avoid it.
+If you are in profit, you keep 90% and 10% of your *net* profit goes to the backstop fund that stands behind the vault. Net means a loss on an earlier position of yours in the same bucket is carried forward for 90 days and set against later gains before anything is shared. Profit is measured at the price feed, so the share cannot be moved by the sale price. The share is on profit only; the markup is separate. On a pay-off the asset is valued at the feed and the share is paid in USDC with the balance, so paying off and selling elsewhere does not avoid it.
 
 ## The worst case
 
-The coin falls below your balance. You lose the down payment and nothing more. Settlement never pulls from your wallet; a short sale closes the debt. No margin call, no negative balance, no debt collector. After the due date you can still close or pay off until someone settles.
+The asset falls below your balance. You lose the down payment and nothing more. Settlement never pulls from your wallet; a short sale closes the debt. No margin call, no negative balance, no debt collector. After the due date you can still close or pay off until someone settles.
 
 ## Three modes
 
@@ -41,23 +41,27 @@ The coin falls below your balance. You lose the down payment and nothing more. S
 | --- | --- | --- | --- |
 | **Status** | Built, deployed | Off until a board ruling | Recommended, not confirmed |
 | **Length** | 7 or 14 days | Up to 30 days | 365 days, pay for days held |
-| **Leverage** | BTC 3x, ETH 2x | Up to 10x by design; 5x proposed | BTC 3x, ETH 2x |
-| **Early sale of the coin** | Never | Part sold at 105% cover (110% proposed) | Part sold at 110% cover |
-| **Who carries a crash** | The vault | Mostly you | Mostly you |
+| **Leverage** | BTC 3x, ETH 2x | 3x to 5x on BTC and ETH | BTC 3x, ETH 2x |
+| **Early sale of the asset** | Never | Part sold at 110% cover, enough to restore 115% | Part sold at 110% cover |
+| **Who carries a crash** | Your down payment, then the loss reserve, the backstop fund and staked SCR. Depositors only if all four run out ([order of loss](/docs/risk)) | Mostly you | Mostly you |
 
-Cover is the coin's value divided by what you owe. In margin mode a warning level (110%) stops you enlarging the position; at the sale level anyone can trigger a sale of only enough coin to restore cover. You can head it off with a part payment or by adding coin. After a sale the ticket stays live with less coin, a smaller balance and the same due date. Nobody earns a liquidation fee.
+Cover is the asset's value divided by what you owe. In margin mode a warning level (115%) stops you enlarging the position; at the sale level anyone can trigger a sale of only enough asset to restore cover. You can head it off with a part payment or by adding asset. After a sale the position stays live with less asset, a smaller balance and the same due date. Nobody earns a liquidation fee.
 
-What a forced sale looks like at 10x, markup left out:
+What a forced sale looks like at 5x, markup left out:
 
-| | Coin value | Balance | Cover | Your equity |
+| | Asset value | Balance | Cover | Your equity |
 | --- | --- | --- | --- | --- |
-| Opening | 10,000 | 9,000 | 111% | 1,000 |
-| BTC falls 5.5% | 9,450 | 9,000 | 105% | 450 |
-| After a forced sale of 4,500 | 4,950 | 4,500 | 110% | 450 |
+| Opening | 5,000 | 4,000 | 125% | 1,000 |
+| BTC falls 12% | 4,400 | 4,000 | 110% | 400 |
+| After a forced sale of 1,333 | 3,067 | 2,667 | 115% | 400 |
 
-The sale halves the position and leaves your equity unchanged, less sale costs. A 10x perp on Hyperliquid is not liquidated until about a 9% fall, but is then closed in full. Expect forced sales to be common at high leverage: of unmanaged 30-day BTC 5x tickets, about 40% saw at least one partial sale.
+The sale shrinks the position by about a third and leaves your equity unchanged, less sale costs. A 10x perp on Hyperliquid is not liquidated until about a 9% fall, but is then closed in full. Expect forced sales to be common at high leverage: of unmanaged 30-day BTC 5x positions, about 40% saw at least one partial sale.
 
-The evergreen ticket fixes a full year's markup at opening (2,000 × 11% = 220 on the running example), charges only for days used, and sells only at 110% cover: a 27% fall at BTC 3x on opening, rising slowly as markup is earned. No roll-over exists in any mode; staying in means a fresh purchase.
+The evergreen position fixes a full year's markup at opening (2,000 × 17% = 340 on the running example), charges only for days used, and sells only at 110% cover: a 27% fall at BTC 3x on opening, rising slowly as markup is earned. No roll-over exists in any mode; staying in means a fresh purchase.
+
+## How many positions
+
+As many as you like. There is no limit on the number of live positions per wallet or per bucket; the limits are on position size and on the bucket's exposure against the depth of the spot pool it sells into.
 
 ## Points
 

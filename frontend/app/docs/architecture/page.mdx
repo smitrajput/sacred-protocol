@@ -4,18 +4,18 @@ export const metadata = { title: "Technical architecture" };
 
 # Technical architecture
 
-Two contracts per bucket, a few shared by every bucket, one price reader, and a server that can be switched off. Immutable, no proxies, nothing forked. This page is the engineer's map: the stack, the pieces, who calls whom, where every USDC goes, a ticket's states, and the choices behind them. Verified addresses, the invariants with their tests, every dial and how to run it on one machine are on the [contracts page](/docs/contracts).
+Two contracts per bucket, a few shared by every bucket, one price reader, and a server that can be switched off. Immutable, no proxies, nothing forked. This page is the engineer's map: the stack, the pieces, who calls whom, where every USDC goes, a position's states, and the choices behind them. Verified addresses, the invariants with their tests, every dial and how to run it on one machine are on the [contracts page](/docs/contracts).
 
 ## The stack
 
 | Layer | Built with | Note |
 | --- | --- | --- |
-| **Chain** | Arbitrum One | Native USDC, WBTC and WETH. One bucket per coin |
+| **Chain** | Arbitrum One | Native USDC, WBTC and WETH. One bucket per asset |
 | **Contracts** | Solidity 0.8.26, Foundry | OpenZeppelin v5.1 for tokens, ownership, reentrancy and the time-lock. Nothing forked or modified |
-| **Spot market** | Uniswap v3 router | Every purchase and every sale of a pledged coin, floored by the price feed |
-| **Prices** | Chainlink coin/USD | Staleness and L2 sequencer checks. Values live tickets at the cut-off; never triggers a sale in term mode |
+| **Spot market** | Uniswap v3 router | Every purchase and every sale of a pledged asset, floored by the price feed |
+| **Prices** | Chainlink asset/USD | Staleness and L2 sequencer checks. Values live positions at the cut-off; never triggers a sale in term mode |
 | **SCR market** | Uniswap v4, one hooked pool | Token and hook adapted from Standard Reserve's verified contracts (MIT); solady |
-| **Ownership** | `TimelockController`, 2-day delay, a multisig | A guardian can pause new tickets and new deposits, and cannot unpause. Exits are never pausable |
+| **Ownership** | `TimelockController`, 2-day delay, a multisig | A guardian can pause new positions and new deposits, and cannot unpause. Exits are never pausable |
 | **Verification** | Foundry unit, fuzz, invariant and fork suites; Halmos | 281 tests; eight arithmetic properties attempted symbolically, two proved |
 | **Server** | Python 3.12, FastAPI, web3.py | A keeper, an indexer, a read-only API for points. pytest |
 | **Frontend** | Next.js 15, React 19, wagmi, viem | One data layer naming each read; one panel per role. Vitest and Playwright. These docs are MDX |
@@ -24,16 +24,16 @@ Two contracts per bucket, a few shared by every bucket, one price reader, and a 
 
 | | Lines | Role |
 | --- | --- | --- |
-| `Vault` | ~300 | One bucket: shares, queues, the weekly cut-off, the loss reserve, lending to the desk. Knows nothing about coins or prices |
-| `Desk` | ~330 | Tickets: open, close, pay off, part pay, settle. Holds the pledged coins. Knows nothing about shares |
-| `TicketMath` | ~50 | Pure arithmetic: cost, markup, earned markup, settlement, the payment split, the profit share |
-| `Oracle` | ~50 | Chainlink coin/USD with staleness and L2 sequencer checks |
+| `Vault` | ~300 | One bucket: shares, queues, the weekly cut-off, the loss reserve, lending to the desk. Knows nothing about assets or prices |
+| `Desk` | ~330 | Positions: open, close, pay off, part pay, settle. Holds the pledged assets. Knows nothing about shares |
+| `PositionMath` | ~50 | Pure arithmetic: cost, markup, earned markup, settlement, the payment split, the profit share |
+| `Oracle` | ~50 | Chainlink asset/USD with staleness and L2 sequencer checks |
 | `StakedBackstopFund` | ~230 | SCR staking with cooldown, a 90-day USDC stream, shortfall cover from USDC then a capped sale of staked SCR |
 | `Reserve`, `ReserveSale` | ~190 | The liquidity reserve, and the sale of new SCR into it, delivered staked |
 | Token, `TaxHook`, minter, liquidity manager, fee splitter, registry | ~600 | SCR, its hooked Uniswap v4 pool, its fee and its liquidity |
 | Server | Python | A keeper that settles and runs the cut-off; an indexer; an API serving points. Every exit works with it off |
 
-The vault and the desk split the work so that each can be read in one sitting. The vault holds USDC and shares and lends to the desk; the desk holds coins and tickets and borrows from the vault. Neither reads the other's storage: the desk asks the vault to `lend`, `repay` and `writeOff`, and the vault asks the desk for `bookValue` once a week.
+The vault and the desk split the work so that each can be read in one sitting. The vault holds USDC and shares and lends to the desk; the desk holds assets and positions and borrows from the vault. Neither reads the other's storage: the desk asks the vault to `lend`, `repay` and `writeOff`, and the vault asks the desk for `bookValue` once a week.
 
 ## Who calls whom
 
@@ -47,25 +47,25 @@ Depositors call the vault (`requestDeposit`, `requestWithdraw`, `claim`); trader
 
 Every payment to the vault is applied to principal first, then to markup, and the loss reserve takes its slice from markup only. The desk pays the vault `settlementAmount` on close and pay off, and `min(net, balance)` on settlement, so the vault can never receive more than it is owed. Settlement surpluses and the treasury's cut are credited and claimed rather than pushed, so a blocked USDC recipient cannot block anyone else's exit.
 
-## Life of a ticket
+## Life of a position
 
 <Lifecycle />
 
-Cost, markup, down payment and due date are written once, at `open`, and no function changes them. The only field that moves is `repaid`, and it only rises. A change to a dial by the time-lock applies to tickets opened afterwards; a live ticket keeps the terms it was sold on.
+Cost, markup, down payment and due date are written once, at `open`, and no function changes them. The only field that moves is `repaid`, and it only rises. A change to a dial by the time-lock applies to positions opened afterwards; a live position keeps the terms it was sold on.
 
 ## When a sale falls short
 
 <LossOrder />
 
-The order is fixed in code. The trader's layer is implicit: a coin worth less than the balance has already consumed the down payment. The reserve is per bucket and stays with the depositors who remain. Staked SCR is sold at most 30% of the stake per event, stopping 10% below the pool's average price, and the simulation sizes it at zero when solvency is tested.
+The order is fixed in code. The trader's layer is implicit: an asset worth less than the balance has already consumed the down payment. The reserve is per bucket and stays with the depositors who remain. Staked SCR is sold at most 30% of the stake per event, stopping 10% below the pool's average price, and the simulation sizes it at zero when solvency is tested.
 
 ## Design choices and why
 
-- **Two contracts per bucket, not one and not many.** One contract per ticket would separate coins physically but adds deployment cost and code; a board may still want it, and it would be a new desk rather than a change to this one.
-- **Immutable, no proxies.** A live ticket's rules must not change under it. New behaviour ships as a new bucket. The admin can only tune parameters for future tickets, inside limits written into the code.
+- **Two contracts per bucket, not one and not many.** One contract per position would separate assets physically but adds deployment cost and code; a board may still want it, and it would be a new desk rather than a change to this one.
+- **Immutable, no proxies.** A live position's rules must not change under it. New behaviour ships as a new bucket. The admin can only tune parameters for future positions, inside limits written into the code.
 - **Internal accounting only.** The vault tracks idle cash, queued deposits, the reserve and claimable cash itself and never reads `balanceOf(this)`. Donations cannot move the share price, which removes the usual vault inflation attacks.
 - **Epoch queues instead of ERC-4626.** Shares are priced once a week, so instant deposit and redeem cannot exist. Requests are recorded per epoch and settled lazily on claim, which keeps the cut-off cheap however many depositors there are.
-- **The feed values, the market sells.** The feed values live tickets at the cut-off and floors every sale the protocol triggers, and every purchase too: without the floor a trader could move the pool, make the vault overpay, and abandon the ticket. It never decides whether a term ticket is sold.
+- **The feed values, the market sells.** The feed values live positions at the cut-off and floors every sale the protocol triggers, and every purchase too: without the floor a trader could move the pool, make the vault overpay, and abandon the position. It never decides whether a term position is sold.
 - **The keeper has no rights.** `settle` and `cutoff` are open to anyone. The server is a convenience, and every exit works with it switched off.
 - **Gas is not optimised.** Storage is written plainly for readability. The one loop, `bookValue`, is capped by `maxLive` (at most 500). On an L2 this is cheap.
 
@@ -74,7 +74,7 @@ The order is fixed in code. The trader's layer is implicit: a coin worth less th
 ```
 sacred/
   contracts/   src/ (Vault, Desk, Oracle, BackstopFund, StakedBackstopFund, Reserve,
-               TicketMath, token/, mocks), test/, script/
+               PositionMath, token/, mocks), test/, script/
   server/      destiny/ (chain, keeper, indexer, points, api), tests/
   frontend/    app/ (landing page; app/ with data.js and one panel per role; docs/),
                lib/ (math, scr, errors, api, contracts), e2e/, abi/

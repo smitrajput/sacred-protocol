@@ -1218,7 +1218,7 @@ abstract contract SacredSystemTest is Test {
         reserve.claim(vault);
         assertEq(reserve.totalAssets(), reserveBefore);
 
-        // 4. Tickets repay with markup, and the reserve leaves with its share of it.
+        // 4. Positions repay with markup, and the reserve leaves with its share of it.
         usdc.mint(address(desk), 10_000 * USDC);
         desk.repay(950_000 * USDC, 10_000 * USDC);
         _cutoff();

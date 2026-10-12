@@ -26,7 +26,7 @@ abstract contract Base is Test {
     address internal keeper = makeAddr("keeper");
 
     MockERC20 internal usdc;
-    MockERC20 internal coin;
+    MockERC20 internal asset;
     MockFeed internal feed;
     MockRouter internal router;
     Oracle internal oracle;
@@ -37,15 +37,15 @@ abstract contract Base is Test {
     function setUp() public virtual {
         vm.warp(1_760_000_000);
         usdc = new MockERC20("USD Coin", "USDC", 6);
-        coin = new MockERC20("Wrapped BTC", "WBTC", 8);
+        asset = new MockERC20("Wrapped BTC", "WBTC", 8);
         feed = new MockFeed(8, int256(PRICE0 * 1e8));
-        router = new MockRouter(usdc, coin, PRICE0 * USDC);
+        router = new MockRouter(usdc, asset, PRICE0 * USDC);
         oracle = new Oracle(IAggregatorV3(address(feed)), IAggregatorV3(address(0)), 1 hours, 8);
         fund = new BackstopFund(IERC20(address(usdc)), treasury, admin);
         vault = new Vault(IERC20(address(usdc)), manager, admin, 1_000_000 * USDC, block.timestamp + 7 days, "Destiny BTC Term");
         desk = new Desk(
             IERC20(address(usdc)),
-            IERC20(address(coin)),
+            IERC20(address(asset)),
             IVault(address(vault)),
             ISwapRouter(address(router)),
             500,
@@ -77,9 +77,9 @@ abstract contract Base is Test {
 
     // ── helpers ──
 
-    function setPrice(uint256 usdPerCoin) internal {
-        feed.set(int256(usdPerCoin * 1e8));
-        router.setPrice(usdPerCoin * USDC);
+    function setPrice(uint256 usdPerAsset) internal {
+        feed.set(int256(usdPerAsset * 1e8));
+        router.setPrice(usdPerAsset * USDC);
     }
 
     function skipFresh(uint256 secs) internal {
@@ -113,8 +113,8 @@ abstract contract Base is Test {
         id = desk.open(1_000 * USDC, 30_000, 14 days, 0);
     }
 
-    function ticket(uint256 id) internal view returns (Desk.Ticket memory) {
-        return desk.getTicket(id);
+    function position(uint256 id) internal view returns (Desk.Position memory) {
+        return desk.getPosition(id);
     }
 
     function vaultBacked() internal view returns (uint256) {

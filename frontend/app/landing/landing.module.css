@@ -1,6 +1,6 @@
 /*
   Styles for the landing page sections. Tokens come from app/globals.css; buttons and the
-  sheet from app/shared/shared.module.css; the live ticket adds Ticket.module.css.
+  sheet from app/shared/shared.module.css; the live position adds Position.module.css.
 
   The page reads as one document: a 4px rhythm, hairlines between sections, serif for display
   and prose, sans for labels, mono for every figure. One accent, used sparingly.
@@ -704,7 +704,7 @@
   color: var(--ink);
 }
 
-/* ---- Leverage: the steps and the two modes beside the live ticket ---- */
+/* ---- Leverage: the steps and the two modes beside the live position ---- */
 
 .leverage {
   display: grid;
@@ -718,7 +718,7 @@
     gap: 4.5rem;
     align-items: start;
   }
-  .ticketCol {
+  .positionCol {
     position: sticky;
     top: 2rem;
   }

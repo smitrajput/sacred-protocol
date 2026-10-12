@@ -7,9 +7,9 @@ export default function Safety() {
   return (
     <section id="safety" className={styles.section}>
       <div className={styles.wrap}>
-        <h2 className={styles.h2}>What stands between a crash and your deposit.</h2>
+        <h2 className={styles.h2}>Solvency Robustness.</h2>
         <p className={styles.lead}>
-          A term ticket is never sold before its due date, so there is no liquidation price. If the coin sells for
+          A term position is never sold before its due date, so there is no liquidation price. If the asset sells for
           less than the balance, the gap is absorbed in this order, and it moves down only when the layer above is
           used up.
         </p>

@@ -29,18 +29,18 @@ def create_app(chain, indexer) -> FastAPI:
     def sale():
         return _or_404(chain.reserve_sale(), "no reserve sale in this deployment")
 
-    @app.get("/tickets")
-    def tickets(owner: str | None = None):
-        out = [asdict(chain.ticket(i)) for i in range(1, chain.ticket_count() + 1)]
+    @app.get("/positions")
+    def positions(owner: str | None = None):
+        out = [asdict(chain.position(i)) for i in range(1, chain.position_count() + 1)]
         if owner:
             out = [t for t in out if t["owner"].lower() == owner.lower()]
         return out
 
-    @app.get("/tickets/{ticket_id}")
-    def ticket(ticket_id: int):
-        if ticket_id < 1 or ticket_id > chain.ticket_count():
-            raise HTTPException(404, "no such ticket")
-        return asdict(chain.ticket(ticket_id))
+    @app.get("/positions/{position_id}")
+    def position(position_id: int):
+        if position_id < 1 or position_id > chain.position_count():
+            raise HTTPException(404, "no such position")
+        return asdict(chain.position(position_id))
 
     @app.get("/points")
     def points():

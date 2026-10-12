@@ -1,9 +1,9 @@
-import { exampleCoin, modes, proposed, traderSteps } from "./content";
+import { exampleAsset, modes, proposed, traderSteps } from "./content";
 import styles from "./landing.module.css";
-import Ticket from "./Ticket";
+import Position from "./Position";
 
-// How a ticket works from the trader's side, the two kinds of ticket, and a live one to try.
-// `price` is the example coin's spot price for the worked ticket, or null if it could not be fetched.
+// How a position works from the trader's side, the two kinds of position, and a live one to try.
+// `price` is the example asset's spot price for the worked position, or null if it could not be fetched.
 export default function Leverage({ price }) {
   return (
     <section id="leverage" className={styles.section}>
@@ -11,7 +11,7 @@ export default function Leverage({ price }) {
         <span className={styles.eyebrow}>For traders</span>
         <h2 className={styles.h2}>Leverage without a loan.</h2>
         <p className={styles.lead}>
-          A ticket is a coin bought on credit: you pay part now, the rest by a due date, and the coin stays pledged
+          A position is a commodity-like crypto asset, BTC or ETH, bought on credit: you pay part now, the rest by a due date, and the asset stays pledged
           until then. The price is fixed the moment you open it. No funding, no interest, no margin call.
         </p>
 
@@ -25,7 +25,7 @@ export default function Leverage({ price }) {
               ))}
             </ol>
 
-            <h3 className={`${styles.h3} ${styles.afterRows}`}>Two kinds of ticket.</h3>
+            <h3 className={`${styles.h3} ${styles.afterRows}`}>Two kinds of position.</h3>
             <table className={`${styles.table} ${styles.modes}`}>
               <thead>
                 <tr>
@@ -47,15 +47,15 @@ export default function Leverage({ price }) {
               </tbody>
             </table>
             <p className={`${styles.small} ${styles.afterList}`}>
-              Cover is the coin&rsquo;s value divided by what you owe. A 10x perp is liquidated in full at about a 9%
-              fall; a 5x margin ticket sells part of the coin at an 8% fall and leaves you the rest of the position.
+              Cover is the asset&rsquo;s value divided by what you owe. A 10x perp is liquidated in full at about a 9%
+              fall; a 5x margin position sells a third of the asset at a 12% fall and leaves you the rest of the position.
             </p>
           </div>
 
-          <div className={styles.ticketCol}>
-            <Ticket coin={exampleCoin} price={price} params={proposed} />
+          <div className={styles.positionCol}>
+            <Position asset={exampleAsset} price={price} params={proposed} />
             <p className={`${styles.small} ${styles.caption}`}>
-              A term ticket at today&rsquo;s {exampleCoin} price. Pick a down payment, a leverage and a term, then
+              A term position at today&rsquo;s {exampleAsset} price. Pick a down payment, a leverage and a term, then
               move the price to the due date. The figures come from the same arithmetic the contracts use.
             </p>
           </div>

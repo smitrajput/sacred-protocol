@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { maxUint256 } from "viem";
 import { useBlock, useReadContracts } from "wagmi";
 import { fetchApi } from "../../lib/api";
-import { coinDecimals, coinSymbol, desk, fund, oracle, preview, reserve, sale, scr, usdc, vault } from "../../lib/contracts";
+import { assetDecimals, assetSymbol, desk, fund, oracle, preview, reserve, sale, scr, usdc, vault } from "../../lib/contracts";
 import { DESK_DEFAULTS, MAX_LEVERAGE_BPS } from "../../lib/defaults";
 
 // Every read the app makes, by name. Each hook returns a plain object whose fields are undefined
@@ -63,7 +63,7 @@ export function useDepositor(address, sample) {
   return { shares: r.shares, queuedDeposit: r.deposit?.[0], queuedWithdraw: r.withdraw?.[0] };
 }
 
-// ───────────────────────── The desk and its tickets ─────────────────────────
+// ───────────────────────── The desk and its positions ─────────────────────────
 
 export function useDeskParams() {
   return useReads(
@@ -74,34 +74,34 @@ export function useDeskParams() {
       maxLeverageBps: call(desk, "maxLeverageBps"),
       minDownPayment: call(desk, "minDownPayment"),
     },
-    { sample: { ...DESK_DEFAULTS, maxLeverageBps: MAX_LEVERAGE_BPS[coinSymbol] } },
+    { sample: { ...DESK_DEFAULTS, maxLeverageBps: MAX_LEVERAGE_BPS[assetSymbol] } },
   );
 }
 
-// The feed's price of one whole coin, in USDC units: what the Desk will actually pay.
+// The feed's price of one whole asset, in USDC units: what the Desk will actually pay.
 export function useFeedPrice() {
-  const { value } = useReads({ value: call(oracle, "value", 10n ** BigInt(coinDecimals)) });
+  const { value } = useReads({ value: call(oracle, "value", 10n ** BigInt(assetDecimals)) });
   return value;
 }
 
-// The coin the feed says `cost` buys. The trader's price limit is a little below it.
+// The asset the feed says `cost` buys. The trader's price limit is a little below it.
 export function useFairQuantity(cost) {
   const { quantity } = useReads({ quantity: call(oracle, "quantity", cost ?? 0n) }, { enabled: !!cost });
   return quantity;
 }
 
-// Every ticket on the desk that belongs to `address`, with today's settlement amount and the
-// coin's value for the live ones, and any settlement surplus waiting to be collected.
-export function useTickets(address, sample) {
+// Every position on the desk that belongs to `address`, with today's settlement amount and the
+// asset's value for the live ones, and any settlement surplus waiting to be collected.
+export function usePositions(address, sample) {
   const onChain = !preview && !!address;
   const { nextId } = useReads({ nextId: call(desk, "nextId") }, { enabled: onChain });
   const ids = onChain && nextId ? Array.from({ length: Number(nextId - 1n) }, (_, i) => BigInt(i + 1)) : [];
   const { data: raw } = useReadContracts({
-    contracts: ids.map((id) => call(desk, "getTicket", id)),
+    contracts: ids.map((id) => call(desk, "getPosition", id)),
     query: { enabled: ids.length > 0, ...REFRESH },
   });
   const mine = preview
-    ? sample.tickets
+    ? sample.positions
     : ids.map((id, i) => ({ id, ...(raw?.[i]?.result || {}) })).filter((t) => t.owner?.toLowerCase() === address.toLowerCase());
   const live = mine.filter((t) => t.status === LIVE);
   const { data: details } = useReadContracts({
@@ -110,13 +110,13 @@ export function useTickets(address, sample) {
   });
   const { owed } = useReads({ owed: call(desk, "owed", address) }, { enabled: onChain, sample: { owed: 0n } });
 
-  const tickets = preview
+  const positions = preview
     ? mine
     : mine.map((t) => {
         const k = live.indexOf(t);
         return k < 0 ? t : { ...t, settle: details?.[2 * k]?.result, value: details?.[2 * k + 1]?.result };
       });
-  return { tickets, owed };
+  return { positions, owed };
 }
 
 // ───────────────────────── The backstop fund and its stakers ─────────────────────────

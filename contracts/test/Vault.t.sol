@@ -97,7 +97,7 @@ contract VaultTest is Base {
         desk.setParams(1_000, 100, 20_000, 30_000, 1_000_000 * USDC, 200);
         for (uint256 i; i < 4; ++i) {
             vm.prank(trader);
-            desk.open(10_000 * USDC, 30_000, 14 days, 0); // four tickets finance 80,000; idle 20,000
+            desk.open(10_000 * USDC, 30_000, 14 days, 0); // four positions finance 80,000; idle 20,000
         }
         vm.prank(admin);
         vault.setDepositor(bob, true);
@@ -173,7 +173,7 @@ contract VaultTest is Base {
     function test_sharePrice_marksUnrealisedLossAtCutoff() public {
         seed();
         openExample();
-        setPrice(36_000); // coin worth 1,800 against 2,000 financed
+        setPrice(36_000); // asset worth 1,800 against 2,000 financed
         doCutoff();
         assertEq(vault.lastNav(), 98_000 * USDC + 1_800 * USDC);
         assertLt(vault.lastPrice(), 1e18);
@@ -181,7 +181,7 @@ contract VaultTest is Base {
 
     function test_sharePrice_reserveAbsorbsVisibleShortfall() public {
         seed();
-        // Build a reserve from a profitable ticket first.
+        // Build a reserve from a profitable position first.
         vm.prank(admin);
         desk.setParams(1_000, 100, 20_000, 30_000, 1_000_000 * USDC, 200);
         vm.prank(trader);
@@ -192,9 +192,9 @@ contract VaultTest is Base {
         assertGt(reserve, 20 * USDC);
 
         uint256 id = openExample();
-        setPrice(59_500); // coin worth 2,975 against a settlement of about 2,000: no shortfall
+        setPrice(59_500); // asset worth 2,975 against a settlement of about 2,000: no shortfall
         uint256 navNoLoss = vault.navNow();
-        setPrice(39_800); // coin worth 1,990: about 10.6 short of settlement, inside the reserve
+        setPrice(39_800); // asset worth 1,990: about 10.6 short of settlement, inside the reserve
         assertApproxEqAbs(vault.navNow(), navNoLoss, 1, "reserve fills the gap in the share price");
         id;
     }
@@ -226,7 +226,7 @@ contract VaultTest is Base {
         assertEq(vault.balanceOf(manager), 1_000 * USDC, "an empty bucket restarts at a price of one");
     }
 
-    function test_cutoff_revertsWhenFeedIsStaleAndTicketsAreLive() public {
+    function test_cutoff_revertsWhenFeedIsStaleAndPositionsAreLive() public {
         seed();
         openExample();
         vm.warp(vault.nextCutoff());

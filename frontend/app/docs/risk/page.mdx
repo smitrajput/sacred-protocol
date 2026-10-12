@@ -6,18 +6,18 @@ We would rather tell you where the money stops than pretend it never does. In te
 
 ## The order of loss
 
-A term ticket is never sold before its due date, so there is no liquidation price. If its coin sells for less than the balance at settlement, the gap is absorbed in this order, and it moves down only when the layer above is used up.
+A term position is never sold before its due date, so there is no liquidation price. If its asset sells for less than the balance at settlement, the gap is absorbed in this order, and it moves down only when the layer above is used up.
 
-1. **The trader's down payment.** It is inside the coin's value: the first third of a fall on a 3x ticket is the trader's.
-2. **The bucket's loss reserve**, built from 10% of markup until it holds 5% of the bucket.
-3. **The backstop fund's USDC**, fed by 30% of trader profit; then **staked SCR**, sold up to a cap, once the token is live.
+1. **The trader's down payment.** It is inside the asset's value: the first third of a fall on a 3x position is the trader's.
+2. **The bucket's loss reserve**, built from 5% of markup until it holds 3% of the bucket.
+3. **The backstop fund's USDC**, fed by 10% of traders' net profit and held to 8% of the financed amount before stakers are paid; then **staked SCR**, sold up to a cap, once the token is live, and counted as zero when solvency is tested.
 4. **The depositors of that bucket**, through the share price, in proportion. The manager's own deposit loses with them.
 
 Buckets never share losses. A shortfall in BTC cannot reach the ETH bucket. Beyond its deposit the manager loses only its fee.
 
-## Term mode, 14-day tickets, 2020 to 2026
+## Term mode, 14-day positions, 2020 to 2026
 
-| Ticket | Tickets ending short | Average gap cost a year | Worst year (2020) | Worst loss on a full book |
+| Position | Positions ending short | Average gap cost a year | Worst year (2020) | Worst loss on a full book |
 | --- | --- | --- | --- | --- |
 | BTC 2x | 0.0% | 0.0% | 0.0% | 0% |
 | **BTC 3x** | 0.6% | 1.0% | 5.1% | 5% |
@@ -26,11 +26,11 @@ Buckets never share losses. A shortfall in BTC cannot reach the ETH bucket. Beyo
 | ETH 3x | 1.4% | 3.9% | 13.9% | 14% |
 | ETH 4x | 3.2% | 9.3% | 21.9% | 22% |
 
-Costs are a share of the amount financed, against markup of about 11% a year. The last column is a fully used bucket with tickets spread evenly, in March 2020. Losses clump: almost all BTC losses fall in 2020 to 2022 and none in 2023 to 2026, so a calm stretch says little. This table is why the proposal is 3x for BTC and 2x for ETH, and why 5x needs margin mode.
+Costs are a share of the amount financed, against a markup of 15.5% to 17% a year. The last column is a fully used bucket with positions spread evenly, in March 2020. Losses clump: almost all BTC losses fall in 2020 to 2022 and none in 2023 to 2026, so a calm stretch says little. This table is why term mode is 3x for BTC and 2x for ETH, and why 5x needs margin mode.
 
 ## Margin and evergreen, with a forced partial sale
 
-| Ticket | Forced sale within 30 days | Within 365 days | Gap cost a year, pessimistic | With a 60-minute outage | Worst year |
+| Position | Forced sale within 30 days | Within 365 days | Gap cost a year, pessimistic | With a 60-minute outage | Worst year |
 | --- | --- | --- | --- | --- | --- |
 | Evergreen BTC 2x | 2% | 30% | 0.03% | 0.19% | 0.4% |
 | Evergreen BTC 3x | 8% | 47% | 0.13% | 0.53% | 1.4% |
@@ -38,50 +38,51 @@ Costs are a share of the amount financed, against markup of about 11% a year. Th
 | Margin BTC 5x, 30 days | about 40% | | 0.12% | 2.3% | |
 | Margin ETH 5x, 30 days | about 53% | | 0.29% | 2.7% | |
 
-Base case: the sale executes at the next minute's close less 0.3%. Pessimistic: at the lowest price of the next 5 minutes, less 1%. Outage: nobody can sell for 60 minutes, then the lowest price of that hour, less 1%. At a 110% sale level restored to 125%, no evergreen ticket ended in a shortfall in the base case.
+Base case: the sale executes at the next minute's close less 0.3%. Pessimistic: at the lowest price of the next 5 minutes, less 1%. Outage: nobody can sell for 60 minutes, then the lowest price of that hour, less 1%. At a 110% sale level restored to 125%, no evergreen position ended in a shortfall in the base case.
 
-Keeper reliability is the risk to engineer, not leverage itself. Forced sales are frequent at 5x and 10x and traders must expect them; of unmanaged 10x tickets, 38% on BTC and 49% on ETH were sold within a week.
+Keeper reliability is the risk to engineer, not leverage itself. Forced sales are frequent at 5x and 10x and traders must expect them; of unmanaged 10x positions, 38% on BTC and 49% on ETH were sold within a week.
 
 ## The whole system, 1,000 five-year paths
 
 | Test | Result |
 | --- | --- |
-| Term only, BTC 3x and ETH 2x, with the proposed economics | Payout at or above 9% in every month; depositors lose in 0.02% of years, worst year 0.5% |
+| Term only, BTC 3x and ETH 2x, with the launch economics | Payout at or above 9% in every month; depositors lose in 0.02% of years, worst year 0.5% |
+| Margin mode added, BTC and ETH 3x to 5x | Payout at or above 9% in 99.6% of months, bull and bear; no year with a depositor loss in the base case |
 | A 60-minute outage on every forced sale | Payout unchanged; depositors lose in 1.5% of years, worst year 7.1%. With a 3% fund buffer in place of 8%: 6% of years |
 | Idle cash earns 4% in a sukuk wrapper | No month under 9%; average 9.6% |
 | Demand elasticity from 0 to 1.5 | Payout unchanged; fees move under 5% |
 | Bear demand at 0.15 of bull, as GMX and Aave fell in 2022 | Payout unchanged; fees fall to about a fifth |
 
-Method: a stationary block bootstrap of historical days, mean block 90 days, after a one-year warm-up. Each simulated ticket takes the outcome of the real ticket opened on the matching historical day, so the fat tails are the real ones. Regimes by BTC against its 200-day average: bull 47% of days at +107% a year, chop 23% at +10%, bear 31% at −32%. The longest bear spell ran 312 days.
+Method: a stationary block bootstrap of historical days, mean block 90 days, after a one-year warm-up. Each simulated position takes the outcome of the real position opened on the matching historical day, so the fat tails are the real ones. Regimes by BTC against its 200-day average: bull 47% of days at +107% a year, chop 23% at +10%, bear 31% at −32%. The longest bear spell ran 312 days.
 
 ## Rising and falling markets
 
 | | Rising | Falling |
 | --- | --- | --- |
 | Depositor yield | Markup at high utilisation | Markup at lower utilisation |
-| Backstop fund | 30% of trader profit | Little or nothing |
-| Liquidity reserve | SCR sales and buy fees | Sell fees only; sales close because buyers leave |
+| Backstop fund | 10% of traders' net profit | Little or nothing |
+| Liquidity reserve | SCR sales, buy fees and a tenth of the profit share | Sell fees only; sales close because buyers leave |
 
-The reserve and the fund are built in good times and sized to last through bad ones. In the proposal the reserve is seeded from the raise, because it cannot be built in a bear.
+The reserve and the fund are built in good times and sized to last through bad ones. Both are seeded from the raise, because neither can be built in a bear.
 
 ## Known risks
 
 | Risk | What could happen | What limits it |
 | --- | --- | --- |
-| Contract bug | Loss of deposits or pledged coins | Audits, bucket caps, a seed phase with the manager's own capital. No audit has happened yet |
+| Contract bug | Loss of deposits or pledged assets | Audits, bucket caps, a seed phase with the manager's own capital. No audit has happened yet |
 | Stale or wrong price feed | Cut-off, settlement and opening revert while stale; a wrong price misprices one cut-off | Staleness and sequencer checks; the time-lock can point the desk at a new oracle |
-| Thin market at settlement | The sale reverts below the floor and the ticket stays live | Retry; ticket size cap; no auction fallback yet |
-| Sandwiching | Up to the 1% tolerance on opens and protocol-triggered sales | The feed floor; the trader's own limit; the proposal measures profit at feed prices |
+| Thin market at settlement | The sale reverts below the floor and the position stays live | Retry; position size cap; no auction fallback yet |
+| Sandwiching | Up to the sale tolerance on opens and protocol-triggered sales | The feed floor; the trader's own limit; a 0.3% to 0.5% tolerance; profit measured at feed prices |
 | Wrapped BTC | The wrapper fails or loses its peg | Choice of wrapper; a cap on the BTC bucket |
 | USDC | A freeze or a broken peg hits every bucket | None inside this design |
-| Withdrawal wait | Depositors wait two or three cut-offs | Utilisation cap; withdrawals rank ahead of new tickets; the liquidity reserve |
-| Admin keys | A captured multisig could, after two days, swap in a lying oracle or a hostile fund for future business | Time-lock delay; hard limits; no function moves a pledged coin or a depositor's cash |
+| Withdrawal wait | Depositors wait two or three cut-offs when idle cash is short or a position's cover is thin | Instant withdrawals against idle cash otherwise; the utilisation cap; withdrawals rank ahead of new positions; the liquidity reserve |
+| Admin keys | A captured multisig could, after two days, swap in a lying oracle or a hostile fund for future business | Time-lock delay; hard limits; no function moves a pledged asset or a depositor's cash |
 | Regulation | How UAE law classes this product is not settled; a token from a UAE entity falls under Dubai's virtual-asset rules | Legal counsel before launch |
 | Shariah | A board declines a key ruling; some scholars reject crypto itself | The fallbacks on the [Shariah page](/docs/shariah) |
 
 ## Unknown or untested
 
-- Behaviour with hundreds of live tickets on a real chain, and many buckets sharing one fund.
+- Behaviour with hundreds of live positions on a real chain, and many buckets sharing one fund.
 - Economic attacks that combine deposit timing, cut-off timing and price moves. The invariant suite samples these but proves nothing.
 - Anything a professional audit would find. This code has had none.
 - A crash worse than March 2020. The past does not bound the future.

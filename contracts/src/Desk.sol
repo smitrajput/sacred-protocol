@@ -6,7 +6,7 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {Ownable, Ownable2Step} from "@openzeppelin/contracts/access/Ownable2Step.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import {ISwapRouter} from "./interfaces/External.sol";
-import {TicketMath} from "./TicketMath.sol";
+import {PositionMath} from "./PositionMath.sol";
 import {Oracle} from "./Oracle.sol";
 
 interface IVault {
@@ -21,16 +21,17 @@ interface IFund {
 }
 
 /// @title Desk (term mode)
-/// @notice Runs murabaha tickets for one bucket. For each ticket the vault's USDC buys a
-///         coin on the spot market, the coin is sold to the trader at cost plus a fixed
-///         markup, and the coin stays pledged here until the balance is paid.
-///         Term mode: nobody but the trader can sell the coin before the due date.
+/// @notice Runs murabaha positions for one bucket. The asset is a commodity-like crypto
+///         asset such as WBTC or WETH. For each position the vault's USDC buys the
+///         asset on the spot market, the asset is sold to the trader at cost plus a fixed
+///         markup, and the asset stays pledged here until the balance is paid.
+///         Term mode: nobody but the trader can sell the asset before the due date.
 /// @dev    Rules this contract must always keep:
-///         - the coin is bought before it is sold to the trader;
-///         - a ticket's balance never increases;
+///         - the asset is bought before it is sold to the trader;
+///         - a position's balance never increases;
 ///         - the vault never receives more than the settlement amount;
-///         - the trader never owes more than the pledged coin fetches;
-///         - the pledged coin leaves only to the trader (paid off) or to the market;
+///         - the trader never owes more than the pledged asset fetches;
+///         - the pledged asset leaves only to the trader (paid off) or to the market;
 ///         - close, pay off, part payment and settlement cannot be paused.
 contract Desk is Ownable2Step, ReentrancyGuard {
     using SafeERC20 for IERC20;
@@ -40,7 +41,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     error BadLeverage();
     error BadTerm();
     error TooLarge();
-    error TooManyTickets();
+    error TooManyPositions();
     error NotOwner();
     error NotLive();
     error NotDue();
@@ -60,13 +61,13 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         SettledShort
     }
 
-    struct Ticket {
+    struct Position {
         address owner;
         Status status;
         uint40 opened;
         uint40 due;
-        uint256 qty; // pledged coin
-        uint256 cost; // what the vault paid for the coin
+        uint256 qty; // pledged asset
+        uint256 cost; // what the vault paid for the asset
         uint256 downPayment;
         uint256 financed; // cost minus down payment
         uint256 markup; // fixed at opening
@@ -79,7 +80,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     );
     event Paid(uint256 indexed id, address indexed owner, uint256 principal, uint256 markup);
     event PartPaid(uint256 indexed id, uint256 amount);
-    event Ended(uint256 indexed id, Status status, uint256 coinValue, uint256 toTrader, uint256 toFund, uint256 shortfall);
+    event Ended(uint256 indexed id, Status status, uint256 assetValue, uint256 toTrader, uint256 toFund, uint256 shortfall);
     event OwedClaimed(address indexed user, uint256 amount);
     event ParamsSet(
         uint256 baseRateBps, uint256 surchargeBps, uint256 surchargeAboveBps, uint256 maxLeverageBps, uint256 maxCost, uint256 maxLive
@@ -96,25 +97,25 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     uint256 public constant MAX_MIN_DOWN_PAYMENT = 10_000e6;
 
     IERC20 public immutable usdc;
-    IERC20 public immutable coin;
+    IERC20 public immutable asset;
     IVault public immutable vault;
     ISwapRouter public immutable router;
     uint24 public immutable poolFee;
-    /// The leverage ceiling approved for this coin. Fixed for good.
+    /// The leverage ceiling approved for this asset. Fixed for good.
     uint256 public immutable hardMaxLeverageBps;
 
     Oracle public oracle;
     IFund public fund;
     address public guardian;
 
-    // Parameters (admin, through the time-lock). They apply only to new tickets.
+    // Parameters (admin, through the time-lock). They apply only to new positions.
     uint256 public baseRateBps = 1_000;
     uint256 public surchargeBps = 100;
     uint256 public surchargeAboveBps = 20_000; // leverage above this pays the surcharge
     uint256 public maxLeverageBps;
     uint256 public maxCost = 100_000e6;
     uint256 public maxLive = 200;
-    /// Keeps dust tickets from filling the live list.
+    /// Keeps dust positions from filling the live list.
     uint256 public minDownPayment = 100e6;
     uint256 public saleToleranceBps = 100;
     uint256 public keeperFee = 1e6;
@@ -124,7 +125,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     mapping(address => bool) public traderAllowed;
 
     uint256 public nextId = 1;
-    mapping(uint256 => Ticket) public tickets;
+    mapping(uint256 => Position) public positions;
     uint256[] public liveIds;
     mapping(uint256 => uint256) internal liveIndex; // id => index + 1
     /// Settlement surpluses wait here for the trader, so a blocked recipient cannot block a settlement.
@@ -133,7 +134,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
 
     constructor(
         IERC20 usdc_,
-        IERC20 coin_,
+        IERC20 asset_,
         IVault vault_,
         ISwapRouter router_,
         uint24 poolFee_,
@@ -144,7 +145,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     ) Ownable(owner_) {
         if (address(fund_) == address(0) || address(oracle_) == address(0)) revert ZeroAddress();
         usdc = usdc_;
-        coin = coin_;
+        asset = asset_;
         vault = vault_;
         router = router_;
         poolFee = poolFee_;
@@ -162,31 +163,31 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         return baseRateBps + (leverageBps > surchargeAboveBps ? surchargeBps : 0);
     }
 
-    /// What closes the ticket today.
+    /// What closes the position today.
     function settlementAmount(uint256 id) public view returns (uint256) {
-        Ticket storage t = tickets[id];
-        return TicketMath.settlement(t.financed, t.markup, t.repaid, t.opened, t.due, block.timestamp);
+        Position storage t = positions[id];
+        return PositionMath.settlement(t.financed, t.markup, t.repaid, t.opened, t.due, block.timestamp);
     }
 
-    function getTicket(uint256 id) external view returns (Ticket memory) {
-        return tickets[id];
+    function getPosition(uint256 id) external view returns (Position memory) {
+        return positions[id];
     }
 
     function liveCount() external view returns (uint256) {
         return liveIds.length;
     }
 
-    /// For the vault's share price: every live ticket at the lower of its settlement
-    /// amount and its coin's value, and the total by which coins fall short.
+    /// For the vault's share price: every live position at the lower of its settlement
+    /// amount and its asset's value, and the total by which assets fall short.
     /// Gas is bounded by `maxLive`.
     function bookValue() external view returns (uint256 book, uint256 shortfall) {
         uint256 n = liveIds.length;
         if (n == 0) return (0, 0);
-        uint256 unit = oracle.value(1e18); // one call; scaled back per ticket below
+        uint256 unit = oracle.value(1e18); // one call; scaled back per position below
         for (uint256 i; i < n; ++i) {
             uint256 id = liveIds[i];
             uint256 s = settlementAmount(id);
-            uint256 v = tickets[id].qty * unit / 1e18;
+            uint256 v = positions[id].qty * unit / 1e18;
             if (v < s) {
                 book += v;
                 shortfall += s - v;
@@ -198,9 +199,9 @@ contract Desk is Ownable2Step, ReentrancyGuard {
 
     // ───────────────────────── Opening ─────────────────────────
 
-    /// Open a ticket. `minCoinOut` is the trader's price limit: the least coin they
+    /// Open a position. `minAssetOut` is the trader's price limit: the least asset they
     /// accept for the full cost. Everything happens in this one transaction.
-    function open(uint256 downPayment, uint256 leverageBps, uint256 term, uint256 minCoinOut)
+    function open(uint256 downPayment, uint256 leverageBps, uint256 term, uint256 minAssetOut)
         external
         nonReentrant
         returns (uint256 id)
@@ -209,29 +210,29 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         if (allowlistOn && !traderAllowed[msg.sender]) revert NotAllowed();
         if (leverageBps <= BPS || leverageBps > maxLeverageBps) revert BadLeverage();
         if (!termAllowed[term]) revert BadTerm();
-        if (liveIds.length >= maxLive) revert TooManyTickets();
+        if (liveIds.length >= maxLive) revert TooManyPositions();
         if (downPayment < minDownPayment) revert TooSmall();
-        uint256 cost = TicketMath.cost(downPayment, leverageBps);
+        uint256 cost = PositionMath.cost(downPayment, leverageBps);
         if (cost == 0 || cost > maxCost) revert TooLarge();
         uint256 financed = cost - downPayment;
 
-        // 1. The vault buys the coin with its own USDC. The feed floors the price so a
+        // 1. The vault buys the asset with its own USDC. The feed floors the price so a
         //    trader cannot make the vault overpay into a pool they have moved.
         vault.lend(cost);
         uint256 floorQty = oracle.quantity(cost) * (BPS - saleToleranceBps) / BPS;
-        uint256 qty = _swap(usdc, coin, cost, minCoinOut > floorQty ? minCoinOut : floorQty);
+        uint256 qty = _swap(usdc, asset, cost, minAssetOut > floorQty ? minAssetOut : floorQty);
 
-        // 2. The vault sells the coin to the trader at cost plus markup. The down
+        // 2. The vault sells the asset to the trader at cost plus markup. The down
         //    payment is the first part of the price.
         usdc.safeTransferFrom(msg.sender, address(this), downPayment);
         usdc.forceApprove(address(vault), downPayment);
         vault.repay(downPayment, 0);
         vault.assertHealthy();
 
-        // 3. The coin stays here, pledged against the balance.
+        // 3. The asset stays here, pledged against the balance.
         id = nextId++;
-        uint256 markup = TicketMath.markup(financed, rateBps(leverageBps), term);
-        tickets[id] = Ticket({
+        uint256 markup = PositionMath.markup(financed, rateBps(leverageBps), term);
+        positions[id] = Position({
             owner: msg.sender,
             status: Status.Live,
             opened: uint40(block.timestamp),
@@ -251,49 +252,49 @@ contract Desk is Ownable2Step, ReentrancyGuard {
 
     // ───────────────────────── The trader's exits (never pausable) ─────────────────────────
 
-    /// Sell the coin on the market, pay the vault the settlement amount, keep the rest.
+    /// Sell the asset on the market, pay the vault the settlement amount, keep the rest.
     /// Fails if the sale would not cover the settlement amount.
     function close(uint256 id, uint256 minUsdcOut) external nonReentrant {
-        Ticket storage t = _liveOwned(id);
+        Position storage t = _liveOwned(id);
         uint256 s = settlementAmount(id);
-        uint256 proceeds = _swap(coin, usdc, t.qty, _floorOr(t.qty, minUsdcOut));
+        uint256 proceeds = _swap(asset, usdc, t.qty, _floorOr(t.qty, minUsdcOut));
         if (proceeds < s) revert SaleBelowSettlement();
 
         _payVault(id, t, s);
         uint256 surplus = proceeds - s;
-        uint256 share = TicketMath.profitShare(surplus, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
+        uint256 share = PositionMath.profitShare(surplus, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
         _toFund(share);
         _end(id, t, Status.Closed, proceeds, surplus - share, share, 0);
         usdc.safeTransfer(t.owner, surplus - share);
     }
 
-    /// Pay the settlement amount in USDC and take the coin. The profit share is
+    /// Pay the settlement amount in USDC and take the asset. The profit share is
     /// computed from the price feed, so paying off cannot be used to avoid it.
     function payOff(uint256 id) external nonReentrant {
-        Ticket storage t = _liveOwned(id);
+        Position storage t = _liveOwned(id);
         uint256 s = settlementAmount(id);
         // If the feed is down the trader can still leave; the share is then zero.
-        uint256 coinValue;
+        uint256 assetValue;
         try oracle.value(t.qty) returns (uint256 v) {
-            coinValue = v;
+            assetValue = v;
         } catch {}
         uint256 share =
-            TicketMath.profitShare(coinValue > s ? coinValue - s : 0, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
+            PositionMath.profitShare(assetValue > s ? assetValue - s : 0, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
 
         usdc.safeTransferFrom(msg.sender, address(this), s + share);
         _payVault(id, t, s);
         _toFund(share);
         uint256 qty = t.qty;
-        _end(id, t, Status.PaidOff, coinValue, 0, share, 0);
-        coin.safeTransfer(t.owner, qty);
+        _end(id, t, Status.PaidOff, assetValue, 0, share, 0);
+        asset.safeTransfer(t.owner, qty);
     }
 
-    /// Reduce the balance. The coin stays pledged.
+    /// Reduce the balance. The asset stays pledged.
     function partPay(uint256 id, uint256 amount) external nonReentrant {
-        Ticket storage t = _liveOwned(id);
+        Position storage t = _liveOwned(id);
         if (amount == 0 || amount >= settlementAmount(id)) revert BadAmount();
         usdc.safeTransferFrom(msg.sender, address(this), amount);
-        (uint256 principal, uint256 markup) = TicketMath.split(amount, t.financed - t.principalRepaid);
+        (uint256 principal, uint256 markup) = PositionMath.split(amount, t.financed - t.principalRepaid);
         t.repaid += amount;
         t.principalRepaid += principal;
         usdc.forceApprove(address(vault), amount);
@@ -304,15 +305,15 @@ contract Desk is Ownable2Step, ReentrancyGuard {
 
     // ───────────────────────── Settlement (anyone, after the due date) ─────────────────────────
 
-    /// Sell the coin and settle. The vault takes the balance, the trader the surplus.
+    /// Sell the asset and settle. The vault takes the balance, the trader the surplus.
     /// If the sale falls short the debt is closed and the vault absorbs the gap.
     function settle(uint256 id) external nonReentrant {
-        Ticket storage t = tickets[id];
+        Position storage t = positions[id];
         if (t.status != Status.Live) revert NotLive();
         if (block.timestamp <= t.due) revert NotDue();
 
         // Reverts if the feed is down: an unprotected sale could be sandwiched.
-        uint256 proceeds = _swap(coin, usdc, t.qty, oracle.value(t.qty) * (BPS - saleToleranceBps) / BPS);
+        uint256 proceeds = _swap(asset, usdc, t.qty, oracle.value(t.qty) * (BPS - saleToleranceBps) / BPS);
         uint256 fee = keeperFee < proceeds ? keeperFee : proceeds;
         uint256 net = proceeds - fee;
         uint256 balance = t.financed + t.markup - t.repaid;
@@ -320,7 +321,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         if (net >= balance) {
             _payVault(id, t, balance);
             uint256 surplus = net - balance;
-            uint256 share = TicketMath.profitShare(surplus, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
+            uint256 share = PositionMath.profitShare(surplus, t.downPayment + t.repaid, PROFIT_SHARE_BPS);
             _toFund(share);
             owed[t.owner] += surplus - share;
             totalOwed += surplus - share;
@@ -345,8 +346,8 @@ contract Desk is Ownable2Step, ReentrancyGuard {
 
     // ───────────────────────── Internals ─────────────────────────
 
-    function _liveOwned(uint256 id) internal view returns (Ticket storage t) {
-        t = tickets[id];
+    function _liveOwned(uint256 id) internal view returns (Position storage t) {
+        t = positions[id];
         if (t.status != Status.Live) revert NotLive();
         if (t.owner != msg.sender) revert NotOwner();
     }
@@ -381,9 +382,9 @@ contract Desk is Ownable2Step, ReentrancyGuard {
 
     /// Pay `amount` to the vault as principal first, then markup, and write off any
     /// principal that is still outstanding.
-    function _payVault(uint256 id, Ticket storage t, uint256 amount) internal {
+    function _payVault(uint256 id, Position storage t, uint256 amount) internal {
         uint256 principalLeft = t.financed - t.principalRepaid;
-        (uint256 principal, uint256 markup) = TicketMath.split(amount, principalLeft);
+        (uint256 principal, uint256 markup) = PositionMath.split(amount, principalLeft);
         usdc.forceApprove(address(vault), amount);
         vault.repay(principal, markup);
         if (principal < principalLeft) vault.writeOff(principalLeft - principal);
@@ -397,7 +398,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         fund.receiveShare(share);
     }
 
-    function _end(uint256 id, Ticket storage t, Status status, uint256 coinValue, uint256 toTrader, uint256 toFund, uint256 shortfall)
+    function _end(uint256 id, Position storage t, Status status, uint256 assetValue, uint256 toTrader, uint256 toFund, uint256 shortfall)
         internal
     {
         t.status = status;
@@ -408,7 +409,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         liveIndex[last] = index + 1;
         liveIds.pop();
         delete liveIndex[id];
-        emit Ended(id, status, coinValue, toTrader, toFund, shortfall);
+        emit Ended(id, status, assetValue, toTrader, toFund, shortfall);
     }
 
     // ───────────────────────── Admin (time-lock) and guardian ─────────────────────────
@@ -445,7 +446,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
     }
 
     function setTerm(uint256 term, bool allowed) external onlyOwner {
-        if (term < TicketMath.MIN_EARNED || term > MAX_TERM) revert OutOfBounds();
+        if (term < PositionMath.MIN_EARNED || term > MAX_TERM) revert OutOfBounds();
         termAllowed[term] = allowed;
     }
 
@@ -471,7 +472,7 @@ contract Desk is Ownable2Step, ReentrancyGuard {
         traderAllowed[user] = allowed;
     }
 
-    /// Only new tickets can be paused. Every exit keeps working.
+    /// Only new positions can be paused. Every exit keeps working.
     function pauseOpening(bool paused) external {
         if (msg.sender != owner() && !(paused && msg.sender == guardian)) revert NotAllowed();
         openingPaused = paused;

@@ -26,9 +26,9 @@ export const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || "http://127.0.0.1:8545"
 // transactions. Local development keeps reading the anvil deployment from local.json.
 export const preview = !process.env.NEXT_PUBLIC_VAULT && process.env.NODE_ENV === "production";
 
-// The local deployment's mock coin is WBTC with 8 decimals; the preview shows the ETH bucket.
-export const coinSymbol = process.env.NEXT_PUBLIC_COIN_SYMBOL || (preview ? "ETH" : "BTC");
-export const coinDecimals = Number(process.env.NEXT_PUBLIC_COIN_DECIMALS || (preview ? "18" : "8"));
+// The local deployment's mock asset is WBTC with 8 decimals; the preview shows the ETH bucket.
+export const assetSymbol = process.env.NEXT_PUBLIC_ASSET_SYMBOL || (preview ? "ETH" : "BTC");
+export const assetDecimals = Number(process.env.NEXT_PUBLIC_ASSET_DECIMALS || (preview ? "18" : "8"));
 
 export const vault = { address: addresses.vault, abi: vaultAbi };
 export const desk = { address: addresses.desk, abi: deskAbi };

@@ -199,7 +199,7 @@ contract StakedBackstopFund is Ownable2Step, ReentrancyGuard, IUnlockCallback {
     // ───────────────────────── Money in ─────────────────────────
 
     /// Pull a profit share from the caller. Anyone may donate. The treasury's part is
-    /// set aside and pulled later, so a blocked treasury can never block a ticket.
+    /// set aside and pulled later, so a blocked treasury can never block a position.
     function receiveShare(uint256 amount) external nonReentrant {
         _accrue(address(0));
         usdc.safeTransferFrom(msg.sender, address(this), amount);

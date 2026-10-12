@@ -4,20 +4,20 @@ import { priceToUnits } from "../../lib/price";
 import { SCR } from "../../lib/scr";
 
 // Sample figures for the preview, shown while no contract addresses are configured. The
-// tickets are built with the contract's own arithmetic around today's spot price so every
+// positions are built with the contract's own arithmetic around today's spot price so every
 // column is internally consistent. Nothing here is real.
 
 const FALLBACK_PRICE = 2_500; // when the spot price could not be fetched
 const USDC = 1_000_000n;
 
-export function sampleData({ spotPrice, coinDecimals, now }) {
+export function sampleData({ spotPrice, assetDecimals, now }) {
   const price = spotPrice ?? FALLBACK_PRICE;
   const nowS = BigInt(now);
   const priceUnits = priceToUnits(price);
 
-  // One ticket as the Desk would store it, plus today's settlement amount and coin value as the
+  // One position as the Desk would store it, plus today's settlement amount and asset value as the
   // app would read them. `openedAt` is the price then, relative to today's.
-  const ticket = (id, { down, leverageBps, termDays, openedDaysAgo, openedAt, status = 1 }) => {
+  const position = (id, { down, leverageBps, termDays, openedDaysAgo, openedAt, status = 1 }) => {
     const downPayment = BigInt(down) * USDC;
     const total = cost(downPayment, leverageBps);
     const financed = total - downPayment;
@@ -25,7 +25,7 @@ export function sampleData({ spotPrice, coinDecimals, now }) {
       DESK_DEFAULTS.baseRateBps + (leverageBps > DESK_DEFAULTS.surchargeAboveBps ? DESK_DEFAULTS.surchargeBps : 0n);
     const term = BigInt(termDays) * DAY;
     const opened = nowS - BigInt(openedDaysAgo) * DAY;
-    const qty = quantityAt(total, priceToUnits(price * openedAt), coinDecimals);
+    const qty = quantityAt(total, priceToUnits(price * openedAt), assetDecimals);
     const fixedMarkup = markup(financed, rateBps, term);
     const live = status === 1;
     return {
@@ -42,7 +42,7 @@ export function sampleData({ spotPrice, coinDecimals, now }) {
       repaid: 0n,
       principalRepaid: 0n,
       settle: live ? settlement(financed, fixedMarkup, 0n, opened, opened + term, nowS) : undefined,
-      value: live ? valueAt(qty, priceUnits, coinDecimals) : undefined,
+      value: live ? valueAt(qty, priceUnits, assetDecimals) : undefined,
     };
   };
 
@@ -60,10 +60,10 @@ export function sampleData({ spotPrice, coinDecimals, now }) {
       nextCutoff: BigInt(nextCutoff),
     },
     depositor: { shares: 0n, queuedDeposit: 0n, queuedWithdraw: 0n },
-    tickets: [
-      ticket(41, { down: 1_000, leverageBps: 20_000n, termDays: 14, openedDaysAgo: 5, openedAt: 0.97 }),
-      ticket(38, { down: 2_500, leverageBps: 15_000n, termDays: 7, openedDaysAgo: 3, openedAt: 1.03 }),
-      ticket(27, { down: 500, leverageBps: 20_000n, termDays: 7, openedDaysAgo: 12, openedAt: 0.99, status: 2 }),
+    positions: [
+      position(41, { down: 1_000, leverageBps: 20_000n, termDays: 14, openedDaysAgo: 5, openedAt: 0.97 }),
+      position(38, { down: 2_500, leverageBps: 15_000n, termDays: 7, openedDaysAgo: 3, openedAt: 1.03 }),
+      position(27, { down: 500, leverageBps: 20_000n, termDays: 7, openedDaysAgo: 12, openedAt: 0.99, status: 2 }),
     ],
     fund: {
       totalStaked: 12_500_000n * SCR,

@@ -1,7 +1,7 @@
 import { parseUsdc } from "./math";
 
 // Spot price in USD from Coinbase's public endpoint, cached for a minute by Next. It is only
-// used for display (quantities, the price slider, sample tickets); the contracts use Chainlink.
+// used for display (quantities, the price slider, sample positions); the contracts use Chainlink.
 // Returns null when the price cannot be fetched, and callers must cope with that.
 export async function getSpotPrice(symbol) {
   try {

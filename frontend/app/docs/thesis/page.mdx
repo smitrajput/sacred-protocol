@@ -1,3 +1,5 @@
+import { Penetration } from "../figures/thesis";
+
 export const metadata = { title: "Thesis" };
 
 # Thesis
@@ -11,6 +13,27 @@ Two billion people are told that among the two biggest things in DeFi, yield and
 
 So a Muslim trader sits out or trades against their own faith, and a Muslim saver holds idle stablecoins. Both are large groups. Both have no product. The whole of Islamic DeFi held under 50 million dollars in mid-2026; the largest halal protocol tracked by DefiLlama holds 4 million. The demand is unproven on chain, and that is the bet: a market this size with this many people in it has never been offered a product that is conducive to their values.
 
+### How far behind Islamic DeFi is
+
+<Penetration />
+
+Compare how much of each parent market has moved on chain. DeFi holds about 93 billion dollars against the 468 trillion the world's financial system intermediates (DefiLlama, October 2026; McKinsey, 2025): a penetration of 0.02%, with another 313 billion in stablecoins beside it. Islamic DeFi holds under 50 million against 5.98 trillion of Islamic finance assets (ICD-LSEG, 2024): 0.0008%. Islamic DeFi is about 25 times further behind its parent than DeFi is behind its own.
+
+The same gap shows from the other side. Islamic finance is 1.3% of global finance. If Islamic DeFi held 1.3% of DeFi it would hold about 1.2 billion dollars. It holds under 50 million, 25 times less. And Islamic finance is itself behind: Muslims are 26% of the world's population (Pew, 2020 data) and 1.3% of its financial assets, a 20-times gap again.
+
+### The four layers of market
+
+Each gap is a layer of market that Islamic DeFi can grow into, and each is bigger than the one before it.
+
+| Layer | Islamic DeFi catching up to | What closing it means | Size today |
+| --- | --- | --- | --- |
+| **1** | DeFi's TVL, volume and metrics | Islamic DeFi reaches DeFi's share of its parent market, then DeFi's scale outright. Perp DEXs alone turn over about 600 billion a month (CoinGecko, early 2026); Islamic DeFi has no leverage venue at all | 1.2 billion at parity of share; 93 billion TVL and 313 billion of stablecoins at DeFi's scale |
+| **2** | Islamic finance's assets | Mudarabah deposits, murabaha financing and sukuk move on chain the way lending, trading and treasuries already have | 5.98 trillion, projected 9.7 trillion by 2029 (ICD-LSEG) |
+| **3** | Finance in general | Muslims hold financial assets in proportion to their numbers, and the rails they hold them on are Shariah-compliant by construction | 26% of 468 trillion, about 120 trillion |
+| **4** | Finance not yet thought of | Structures built on ownership and profit-sharing, with no interest and no liquidation, turn out to be safer and more efficient than the ones they replace, and the rest of finance follows | Unbounded |
+
+Layer 1 is the one Sacred must prove in the first year. The others are the reason to build the desk as the first avenue of a vault and not as a standalone product.
+
 ## The novel primitive
 
 Custodied selling, over lending.
@@ -23,37 +46,37 @@ And on the demand side, the trader deposits a down payment for a commodity-like 
 
 What makes it a *better* product and not merely a permitted one:
 
-| A perp | A ticket |
+| A perp | A position |
 | --- | --- |
 | Funding paid every hour, set by how crowded one side is. The total cost is unknown until you close | Markup fixed at opening; the whole cost is known before you commit. No counterparty is needed, so a crowded market costs nothing extra |
-| Liquidation price. At 10x, a 9% wick closes the position in full, even if the price recovers an hour later | Term mode has no liquidation price. Price drops do not close a ticket before its due date |
-| A contract against another trader; no asset is owned. In cross margin, one position's loss can take the whole account | The trader owns the actual asset, bought on the spot market and pledged. Each ticket stands alone; the most it can lose is its down payment |
+| Liquidation price. At 10x, a 9% wick closes the position in full, even if the price recovers an hour later | Term mode has no liquidation price. Price drops do not close a position before its due date |
+| A contract against another trader; no asset is owned. In cross margin, one position's loss can take the whole account | The trader owns the actual asset, bought on the spot market and pledged. Each position stands alone; the most it can lose is its down payment |
 | Perp vaults (HLP, GLP, JLP) earn by trading against traders: their losses, spreads and liquidations | Depositors earn the markup whichever way the price moves. They lose only if the asset sells for less than what the trader still owes, and that gap is bigger than the loss reserve, backstop fund and staked SCR together |
 
 The desk is the one piece that is new. Nothing like it exists on chain. Everything else in the plan composes around it.
 
 ## What it grows into
 
-Sacred is one vault routing stablecoins to halal yield sleeves. The desk is the first sleeve and the only one that had to be invented.
+Sacred is one vault routing stablecoins to halal yield avenues. The desk is the first avenue and the only one that had to be invented. Each phase is aimed at one of the four layers above.
 
-| Phase | Horizon | What | Gate |
-| --- | --- | --- | --- |
-| **1. The desk** | Now to 6 months | Term mode on BTC and ETH, a screened LP sleeve, the app, points | Board rulings on the open points; an audit; the first allow-listed cohort trading on Arbitrum One |
-| **2. Halal Earn** | 6 to 18 months | The vault shell routing to tokenised sukuk, the desk and screened LP. Margin and evergreen modes. Shariah-compliant tokenised stocks up to 5x. B2B distribution through wallets and neobanks | Rulings on forced sale; real fees for 6 to 12 months; SCR launch |
-| **3. Beyond** | Later | Payment float, own issuance, institutions, a neobank | Phase 2 live and its reserve sized through a bear market |
+| Phase | Timeline | Layer | What | Checkpoints |
+| --- | --- | --- | --- | --- |
+| **1. The desk** | Now to 6 months | 1: catch up to DeFi | Term mode on BTC and ETH, the app, points | Board rulings on the open points; an audit |
+| **2. Halal Earn** | 6 to 18 months | 1 and 2: DeFi's scale, then Islamic finance on chain | The vault shell routing to tokenised sukuk and the desk. Margin and evergreen modes. Shariah-compliant tokenised stocks up to 5x. B2B distribution through wallets and neobanks | Rulings on forced sale; real fees for 6 to 12 months; SCR launch |
+| **3. Beyond** | Later | 2, 3 and 4: Islamic finance, all finance, and what comes after | Stablecoin payment-fee sharing, own issuance, institutions, a neobank | Phase 2 live and its reserve sized through a bear market |
 
-## Why the economics can work
+The layers set the order. The desk proves on chain demand against DeFi's own metrics (layer 1). Sukuk, tokenised stocks and neobank distribution bring the instruments and the customers of Islamic finance on chain (layer 2). Own issuance and institutions are the step from serving Muslims who already use Islamic finance to serving the ones who do not, which is most of them (layer 3). What a desk that never lends and never liquidates makes possible beyond that is layer 4, and no one has a number for it yet.
 
-A mechanism-design simulation over Binance prices from 2018 to 2026, with 1,000 bootstrapped five-year paths, found that the built version pays depositors about 5% and charges traders about five times the market price of leverage, and that a redesign of the splits and a capacity rule takes depositors to a 9% target payout in 99.7% of simulated months, bull and bear, with traders paying 17 to 25% of exposure a year: inside what perp venues collect per dollar of open interest. Total fees run at about 23% of deposits a year; the protocol keeps 4.8%. The whole analysis, with what it does not fix, is on the [economics page](/docs/economics).
+## Why there are strong chances of the economics working
 
-The revenue question is then a demand question. 500k a month in total fees needs about 26 million of deposits on a cycle average. On the multiples comparable protocols trade at (2 to 24 times fees, 6 to 30 times revenue), a 6 million valuation needs 200k to 1 million of yearly protocol revenue, which the proposal earns on 4 to 21 million of deposits.
+A mechanism-design simulation over Binance prices from 2018 to 2026, with 1,000 bootstrapped five-year paths, found that the first design paid depositors about 5% and charged traders about five times the market price of leverage, and that the launch dials, a re-cut of the splits and a capacity rule, take depositors to a 9% target payout in 99.6% of simulated months, bull and bear, with traders paying 17 to 25% of exposure a year: inside what perp venues collect per dollar of open interest. Total fees run at about 23% of deposits a year; the protocol keeps 4.8%. The whole analysis, with what it does not fix, is on the [economics page](/docs/economics).
+
+The revenue question is then a demand question. 500k a month in total fees needs about 26 million of deposits on a cycle average. On the multiples comparable protocols trade at (2 to 24 times fees, 6 to 30 times revenue), a 6 million valuation needs 200k to 1 million of yearly protocol revenue, which the mechanism earns on 4 to 21 million of deposits.
+
+Against the four layers, 26 million is small. It is half of what all of Islamic DeFi holds today, 2% of the 1.2 billion that parity with DeFi would mean, and 0.03% of DeFi itself. The economics close inside layer 1; layers 2 to 4 are upside the model does not count.
 
 ## Why now
 
 - **Stablecoins and tokenised assets are on chain at scale**, so the thing being sold is real, liquid and provable, which is exactly what murabaha requires.
 - **A 2026 Islamic DeFi field with under 50 million in it** and no leverage product at all.
-- **The code is done.** Term mode is deployed on Arbitrum One with 279 Foundry tests, invariants, a fork test and browser flows. The open work is the board, the audit and the cohort, not the build.
-
-## What this is not
-
-Not certified: no Shariah board has reviewed the design, and the design's own estimate for the term-mode package at 3x is 40 to 50% odds of approval, with fallbacks for each ruling. Not audited. Not a promise of any yield: a mudarabah cannot promise a return, only target a payout and smooth it. Every number on these pages is a proposal, a backtest or a simulation, and the [risk page](/docs/risk) says what the simulations cannot capture.
+- **Islamic DeFi has penetrated its parent market 25 times less than DeFi has penetrated its own.** DeFi holds 0.02% of what the world's financial system intermediates; Islamic DeFi holds 0.0008% of Islamic finance's 5.98 trillion. Islamic finance grows at about 10% a year toward 9.7 trillion by 2029, and almost none of that growth has a place to go on chain. The first layer of market, catching Islamic DeFi up to DeFi's share, is worth about 1.2 billion of TVL before any of the layers above it count.

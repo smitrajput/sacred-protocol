@@ -1,4 +1,4 @@
-"""End to end against a local anvil node: deploy, deposit, cut-off, open a ticket,
+"""End to end against a local anvil node: deploy, deposit, cut-off, open a position,
 let it fall due, and have the keeper settle it; then a profitable close that feeds
 the staking fund, a stake, and a reserve sale. Skipped when Foundry is not installed."""
 import json
@@ -78,22 +78,22 @@ def test_full_lifecycle(node, tmp_path):
     send(chain.vault.functions.claimDeposit(me))
     assert chain.vault.functions.balanceOf(me).call() == 100_000 * USDC
 
-    # ── Trader: the design's example ticket, 1,000 down on BTC at 3x for 14 days ──
+    # ── Trader: the design's example position, 1,000 down on BTC at 3x for 14 days ──
     send(chain.desk.functions.open(1_000 * USDC, 30_000, 14 * 86_400, 0))
-    ticket = chain.ticket(1)
-    assert (ticket.status, ticket.financed, ticket.markup) == ("live", 2_000 * USDC, 8_438_356)
+    position = chain.position(1)
+    assert (position.status, position.financed, position.markup) == ("live", 2_000 * USDC, 8_438_356)
     assert chain.bucket()["lent"] == 2_000 * USDC
 
     # Before the due date the keeper must not touch it.
     travel(w3, 13 * 86_400)
     assert all(a["action"] != "settle" for a in tick(chain))
-    assert chain.ticket(1).status == "live"
+    assert chain.position(1).status == "live"
 
     # After the due date the keeper settles it and the vault is whole again, plus markup.
     travel(w3, 2 * 86_400)
     actions = tick(chain)
     assert actions[0]["action"] == "settle" and "tx" in actions[0]
-    assert chain.ticket(1).status == "settled"
+    assert chain.position(1).status == "settled"
     bucket = chain.bucket()
     assert bucket["lent"] == 0
     assert bucket["idle"] + bucket["reserve"] == 100_000 * USDC + 8_438_356
@@ -111,7 +111,7 @@ def test_full_lifecycle(node, tmp_path):
     send(feed.functions.set(72_000 * 10**8))
     send(router.functions.setPrice(72_000 * USDC))
     send(chain.desk.functions.close(2, 0))
-    assert chain.ticket(2).status == "closed"
+    assert chain.position(2).status == "closed"
     fund = chain.backstop()
     assert fund["usdcHeld"] > 0 and fund["available"] > 0
     assert chain.reserve_sale()["reserveAssets"] > 0, "15% of the share went to the reserve"

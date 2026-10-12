@@ -7,22 +7,22 @@ import { formatPrice, priceToUnits } from "../../lib/price";
 import Row from "../shared/Row";
 import Segmented from "../shared/Segmented";
 import shared from "../shared/shared.module.css";
-import styles from "./Ticket.module.css";
+import styles from "./Position.module.css";
 
-const COIN_DECIMALS = 18;
+const ASSET_DECIMALS = 18;
 const TERMS = [
   { label: "7 days", value: 7 },
   { label: "14 days", value: 14 },
 ];
 const MOVE_RANGE = 60; // the price slider runs from -60% to +60%
 
-// A worked ticket the visitor can change. Every figure is computed by lib/math.js, the same
+// A worked position the visitor can change. Every figure is computed by lib/math.js, the same
 // arithmetic the app uses, so the demonstration and the product cannot disagree. `price` is
-// the coin's spot price in USD, or null when it could not be fetched. `params` is the rate
+// the asset's spot price in USD, or null when it could not be fetched. `params` is the rate
 // card: the Desk's fields plus profitShareBps.
-export default function Ticket({ coin, price, params }) {
+export default function Position({ asset, price, params }) {
   const id = useId();
-  const leverages = leverageOptions(MAX_LEVERAGE_BPS[coin]);
+  const leverages = leverageOptions(MAX_LEVERAGE_BPS[asset]);
   const [down, setDown] = useState("1000");
   const [leverageBps, setLeverageBps] = useState(leverages[leverages.length - 1]);
   const [termDays, setTermDays] = useState(14);
@@ -32,12 +32,12 @@ export default function Ticket({ coin, price, params }) {
   const valid = downPayment !== null && downPayment >= params.minDownPayment;
   const q = valid ? quote({ downPayment, leverageBps, termDays, ...params }) : null;
 
-  // Held to the due date the whole markup is earned, so the balance is what the coin must cover.
-  const coinValue = q ? (q.cost * BigInt(10_000 + movePct * 100)) / 10_000n : 0n;
-  const exit = q ? exitPreview({ coinValue, settlementAmount: q.balance, paidIn: downPayment, shareBps: params.profitShareBps }) : null;
+  // Held to the due date the whole markup is earned, so the balance is what the asset must cover.
+  const assetValue = q ? (q.cost * BigInt(10_000 + movePct * 100)) / 10_000n : 0n;
+  const exit = q ? exitPreview({ assetValue, settlementAmount: q.balance, paidIn: downPayment, shareBps: params.profitShareBps }) : null;
 
   const priceUnits = price ? priceToUnits(price) : null;
-  const quantity = q && priceUnits ? quantityAt(q.cost, priceUnits, COIN_DECIMALS) : null;
+  const quantity = q && priceUnits ? quantityAt(q.cost, priceUnits, ASSET_DECIMALS) : null;
   const priceAtDue = price ? price * (1 + movePct / 100) : null;
 
   const amount = (units) => (q ? formatUsdc(units) : "0.00");
@@ -46,8 +46,8 @@ export default function Ticket({ coin, price, params }) {
   return (
     <div className={`${shared.paper} ${styles.enter}`}>
       <div className={shared.head}>
-        <h3 className={shared.title}>A term ticket</h3>
-        <span className={shared.sub}>{price ? `${coin} at ${formatPrice(price)} USDC` : `${coin}, paid in USDC`}</span>
+        <h3 className={shared.title}>A term position</h3>
+        <span className={shared.sub}>{price ? `${asset} at ${formatPrice(price)} USDC` : `${asset}, paid in USDC`}</span>
       </div>
 
       <div className={styles.controls}>
@@ -77,9 +77,9 @@ export default function Ticket({ coin, price, params }) {
       </div>
 
       <dl className={shared.rows}>
-        <Row label={`The vault buys ${coin} for`} value={amount(q?.cost)} />
+        <Row label={`The vault buys ${asset} for`} value={amount(q?.cost)} />
         {quantity !== null && (
-          <Row label={`At ${formatPrice(price)}, that is`} value={`${formatAmount(quantity, COIN_DECIMALS, 4)} ${coin}`} />
+          <Row label={`At ${formatPrice(price)}, that is`} value={`${formatAmount(quantity, ASSET_DECIMALS, 4)} ${asset}`} />
         )}
         <Row label="Your down payment" value={amount(downPayment)} />
         <Row label="The vault finances" value={amount(q?.financed)} />
@@ -90,7 +90,7 @@ export default function Ticket({ coin, price, params }) {
       <div className={styles.outcome}>
         <label className={shared.field}>
           <span className={styles.rangeHead}>
-            <span>{priceAtDue ? `If ${coin} is ${formatPrice(priceAtDue)} at the due date` : `If ${coin} moves by the due date`}</span>
+            <span>{priceAtDue ? `If ${asset} is ${formatPrice(priceAtDue)} at the due date` : `If ${asset} moves by the due date`}</span>
             <b>{movedBy}</b>
           </span>
           <input
@@ -106,7 +106,7 @@ export default function Ticket({ coin, price, params }) {
         </label>
         {q && (
           <Outcome
-            coinValue={coinValue}
+            assetValue={assetValue}
             balance={q.balance}
             downPayment={downPayment}
             exit={exit}
@@ -116,7 +116,7 @@ export default function Ticket({ coin, price, params }) {
       </div>
 
       <p className={`${shared.note} ${styles.footnote}`}>
-        Rates are the proposed launch parameters, before swap costs. The design is not yet reviewed by a Shariah
+        Rates are the launch parameters, before swap costs. The design is not yet reviewed by a Shariah
         board. Nothing here is a quote or a promise.
       </p>
     </div>
@@ -124,15 +124,15 @@ export default function Ticket({ coin, price, params }) {
 }
 
 // What the trader walks away with, in the three cases the contract distinguishes.
-function Outcome({ coinValue, balance, downPayment, exit, sharePct }) {
-  const sold = formatUsdc(coinValue);
+function Outcome({ assetValue, balance, downPayment, exit, sharePct }) {
+  const sold = formatUsdc(assetValue);
 
   if (!exit.canClose) {
     return (
       <p className={styles.result}>
-        The coin sells for <b>{sold}</b>, below the balance of <b>{formatUsdc(balance)}</b>.{" "}
+        The asset sells for <b>{sold}</b>, below the balance of <b>{formatUsdc(balance)}</b>.{" "}
         <span className={styles.loss}>You lose your down payment of {formatUsdc(downPayment)}</span> and owe nothing
-        more. The bucket absorbs the remaining <b>{formatUsdc(balance - coinValue)}</b>.
+        more. The bucket absorbs the remaining <b>{formatUsdc(balance - assetValue)}</b>.
       </p>
     );
   }
@@ -140,7 +140,7 @@ function Outcome({ coinValue, balance, downPayment, exit, sharePct }) {
   if (exit.profit === 0n) {
     return (
       <p className={styles.result}>
-        The coin sells for <b>{sold}</b>. You take home <b>{formatUsdc(exit.toTrader)}</b>,{" "}
+        The asset sells for <b>{sold}</b>. You take home <b>{formatUsdc(exit.toTrader)}</b>,{" "}
         <span className={styles.loss}>a loss of {formatUsdc(downPayment - exit.toTrader)}</span>. Nothing is
         shared.
       </p>
@@ -149,7 +149,7 @@ function Outcome({ coinValue, balance, downPayment, exit, sharePct }) {
 
   return (
     <p className={styles.result}>
-      The coin sells for <b>{sold}</b>. You take home <b>{formatUsdc(exit.toTrader)}</b>, a gain of{" "}
+      The asset sells for <b>{sold}</b>. You take home <b>{formatUsdc(exit.toTrader)}</b>, a gain of{" "}
       <b>{formatUsdc(exit.toTrader - downPayment)}</b> on your down payment. The backstop fund receives{" "}
       <b>{formatUsdc(exit.toFund)}</b>, {sharePct}% of the profit.
     </p>

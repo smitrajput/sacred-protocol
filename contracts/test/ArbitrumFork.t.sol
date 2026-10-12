@@ -74,8 +74,8 @@ contract ArbitrumForkTest is Test {
         vm.setEnv("RESERVE", vm.toString(address(scr.reserve())));
         vm.setEnv("MANAGER", vm.toString(manager));
         vm.setEnv("USDC", vm.toString(USDC));
-        vm.setEnv("COIN", vm.toString(WBTC));
-        vm.setEnv("COIN_DECIMALS", "8");
+        vm.setEnv("ASSET", vm.toString(WBTC));
+        vm.setEnv("ASSET_DECIMALS", "8");
         vm.setEnv("FEED", vm.toString(BTC_USD_FEED));
         vm.setEnv("SEQUENCER_FEED", vm.toString(SEQUENCER_FEED));
         vm.setEnv("ROUTER", vm.toString(SWAP_ROUTER_02));
@@ -148,8 +148,8 @@ contract ArbitrumForkTest is Test {
         assertEq(uint160(address(scr.hook())) & Hooks.ALL_HOOK_MASK, uint160(0x2DCD));
     }
 
-    /// A 3x BTC ticket bought and sold on the real pool, priced by the real feed.
-    function test_fork_ticketOpensAndClosesOnUniswap() public {
+    /// A 3x BTC position bought and sold on the real pool, priced by the real feed.
+    function test_fork_positionOpensAndClosesOnUniswap() public {
         _seedBucket();
         deal(USDC, trader, 5_000 * USDC_UNIT);
         uint256 btcPrice = bucket.oracle().value(1e8); // USDC for one BTC

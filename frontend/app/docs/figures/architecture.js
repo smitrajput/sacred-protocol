@@ -1,7 +1,7 @@
 import { Arrow, Box, Figure, Text } from "./Figure";
 import styles from "./figures.module.css";
 
-// The architecture page's pictures: who calls whom, where every USDC goes, a ticket's states,
+// The architecture page's pictures: who calls whom, where every USDC goes, a position's states,
 // and the order a shortfall is absorbed in. Function names are the contracts' own.
 
 // ---- Who calls whom ----
@@ -24,7 +24,7 @@ export function Calls() {
 
       {/* Contracts */}
       <Box x={150} y={120} w={110} h={60} title="Vault" sub={["shares, queues,", "the loss reserve"]} />
-      <Box x={360} y={120} w={130} h={60} title="Desk" sub={["tickets and", "the pledged coins"]} />
+      <Box x={360} y={120} w={130} h={60} title="Desk" sub={["positions and", "the pledged assets"]} />
       <Box x={665} y={120} w={90} h={60} title="Reserve sale" sub={["SCR for USDC,", "delivered staked"]} />
 
       <Box x={150} y={250} w={110} h={60} title="Staking fund" sub={["USDC and", "staked SCR"]} />
@@ -50,7 +50,7 @@ export function Calls() {
       <Arrow points={[[360, 140], [260, 140]]} label={["lend, repay,", "write off"]} at={[310, 122]} />
       <Arrow points={[[260, 165], [360, 165]]} label="book value" at={[310, 178]} />
       <Arrow points={[[205, 180], [205, 250]]} label={["cover,", "on a shortfall"]} at={[211, 212]} anchor="start" />
-      <Arrow points={[[370, 180], [370, 280], [260, 280]]} label="30% of profit" at={[315, 273]} />
+      <Arrow points={[[370, 180], [370, 280], [260, 280]]} label={["10% of", "net profit"]} at={[315, 268]} />
       <Arrow points={[[422, 180], [422, 250]]} label="price" at={[428, 218]} anchor="start" />
       <Arrow points={[[475, 180], [475, 215], [550, 215], [550, 250]]} label="swap" at={[481, 200]} anchor="start" />
       <Arrow points={[[205, 310], [205, 350]]} label="sells staked SCR on a shortfall" at={[211, 334]} anchor="start" />
@@ -70,7 +70,7 @@ export function Money() {
       w={760}
       h={380}
       min={700}
-      label="A deposit enters the vault's idle cash at the cut-off. The vault lends the full cost to the desk, which buys the coin on the spot market and holds it pledged. The trader pays the down payment, part payments and pay-offs to the desk. When the coin is sold the desk returns principal and earned markup to the vault, pays 30 percent of any profit to the backstop fund and the rest to the trader. The vault moves 10 percent of markup into its loss reserve, which covers shortfalls first; the fund covers them second and passes 20 percent of what it receives to the treasury. Withdrawals move idle cash to claimable at the cut-off, and the depositor claims it."
+      label="A deposit enters the vault's idle cash at the cut-off. The vault lends the full cost to the desk, which buys the asset on the spot market and holds it pledged. The trader pays the down payment, part payments and pay-offs to the desk. When the asset is sold the desk returns principal and earned markup to the vault, pays 10 percent of any net profit to the backstop fund and the rest to the trader. The vault pays 10 percent of markup to the manager and moves 5 percent into its loss reserve, which covers shortfalls first; the fund covers them second and passes 30 percent of what it receives to the treasury. Withdrawals move idle cash to claimable at the cut-off, and the depositor claims it."
       caption="Every USDC in a bucket, and the path it takes. Solid arrows are the ordinary flow; dashed ones move only on a shortfall. The vault never reads its own balance: it counts idle cash, the reserve, queued deposits and claimable cash itself, so a donation cannot move the share price."
     >
       <Box x={10} y={60} w={90} h={44} title="Depositor" />
@@ -83,7 +83,7 @@ export function Money() {
       <Box x={200} y={170} w={90} h={44} title="Loss reserve" />
       <Box x={160} y={300} w={130} h={44} title="Claimable" />
 
-      <Box x={380} y={50} w={120} h={115} title="Desk" sub={["holds the", "pledged coin"]} />
+      <Box x={380} y={50} w={120} h={115} title="Desk" sub={["holds the", "pledged asset"]} />
       <Box x={610} y={50} w={110} h={40} title="Spot market" />
       <Box x={610} y={118} w={110} h={40} title="Trader" />
       <Box x={380} y={290} w={120} h={44} title="Backstop fund" />
@@ -93,16 +93,16 @@ export function Money() {
       <Arrow points={[[290, 75], [380, 75]]} label="lends the cost" at={[335, 68]} />
       <Arrow points={[[380, 97], [290, 97]]} label={["principal and", "earned markup"]} at={[335, 111]} />
 
-      <Arrow points={[[500, 62], [610, 62]]} label="buys the coin" at={[555, 55]} />
-      <Arrow points={[[610, 82], [500, 82]]} label="the coin, pledged" at={[555, 96]} />
+      <Arrow points={[[500, 62], [610, 62]]} label="buys the asset" at={[555, 55]} />
+      <Arrow points={[[610, 82], [500, 82]]} label="the asset, pledged" at={[555, 96]} />
       <Arrow points={[[610, 132], [500, 132]]} label={["down payment,", "part pay, pay off"]} at={[555, 112]} />
       <Arrow points={[[500, 150], [610, 150]]} label={["the surplus,", "less the profit share"]} at={[555, 164]} />
 
-      <Arrow points={[[440, 165], [440, 290]]} label={["30% of a", "trader's profit"]} at={[446, 230]} anchor="start" />
-      <Arrow points={[[500, 312], [610, 312]]} label="20% of what it gets" at={[555, 305]} />
+      <Arrow points={[[440, 165], [440, 290]]} label={["10% of a", "trader's net profit"]} at={[446, 230]} anchor="start" />
+      <Arrow points={[[500, 312], [610, 312]]} label="30% of what it gets" at={[555, 305]} />
       <Arrow points={[[380, 320], [340, 320], [340, 250], [310, 250]]} dashed label={["covers a shortfall,", "after the reserve"]} at={[334, 274]} anchor="end" />
 
-      <Arrow points={[[225, 110], [225, 170]]} label={["10% of", "markup"]} at={[219, 136]} anchor="end" />
+      <Arrow points={[[225, 110], [225, 170]]} label={["5% of", "markup"]} at={[219, 136]} anchor="end" />
       <Arrow points={[[265, 170], [265, 110]]} dashed label={["shortfalls,", "first"]} at={[271, 136]} anchor="start" />
       <Arrow points={[[175, 110], [175, 300]]} label={["withdrawals,", "at the cut-off"]} at={[181, 250]} anchor="start" />
       <Arrow points={[[160, 322], [55, 322], [55, 104]]} label="claim" at={[61, 200]} anchor="start" />
@@ -110,12 +110,12 @@ export function Money() {
   );
 }
 
-// ---- Life of a ticket ----
+// ---- Life of a position ----
 
 const states = [
-  { y: 30, fn: "close", title: "Closed", sub: ["by the trader, any time;", "the coin sold, the surplus paid"] },
-  { y: 84, fn: "payOff", title: "Paid off", sub: ["by the trader, any time;", "the coin released to the trader"] },
-  { y: 138, fn: "settle", title: "Settled", sub: ["by anyone, after the due date;", "the coin sold, the surplus credited"] },
+  { y: 30, fn: "close", title: "Closed", sub: ["by the trader, any time;", "the asset sold, the surplus paid"] },
+  { y: 84, fn: "payOff", title: "Paid off", sub: ["by the trader, any time;", "the asset released to the trader"] },
+  { y: 138, fn: "settle", title: "Settled", sub: ["by anyone, after the due date;", "the asset sold, the surplus credited"] },
   { y: 192, fn: "settle, short", title: "Settled short", sub: ["the sale fell below the balance;", "the bucket absorbs the gap"] },
 ];
 
@@ -124,12 +124,12 @@ export function Lifecycle() {
     <Figure
       w={660}
       h={230}
-      label="A ticket is opened and is live. Part payments keep it live with a lower balance. It ends closed, paid off, settled, or settled short, and no state follows those."
-      caption="A ticket's states. Four are final and nothing follows them; a ticket cannot be reopened, extended or re-priced. Only the trader can move a live ticket before the due date."
+      label="A position is opened and is live. Part payments keep it live with a lower balance. It ends closed, paid off, settled, or settled short, and no state follows those."
+      caption="A position's states. Four are final and nothing follows them; a position cannot be reopened, extended or re-priced. Only the trader can move a live position before the due date."
     >
       <circle cx={16} cy={120} r="4" className={styles.head} />
       <Arrow points={[[20, 120], [50, 120]]} label="open" at={[35, 112]} />
-      <Box x={50} y={88} w={140} h={64} title="Live" sub={["the coin pledged,", "a balance owed"]} />
+      <Box x={50} y={88} w={140} h={64} title="Live" sub={["the asset pledged,", "a balance owed"]} />
       <Arrow d="M150 88 C150 44 90 44 90 88" label="partPay: the balance falls" at={[120, 40]} />
       {states.map((s) => (
         <g key={s.title}>
@@ -144,9 +144,9 @@ export function Lifecycle() {
 // ---- The order a shortfall is absorbed in ----
 
 const layers = [
-  ["The trader's down payment", "it is inside the coin's value"],
-  ["The bucket's loss reserve", "10% of every markup, up to 5% of the bucket"],
-  ["The backstop fund's USDC", "fed by 30% of traders' profit"],
+  ["The trader's down payment", "it is inside the asset's value"],
+  ["The bucket's loss reserve", "5% of every markup, up to 3% of the bucket"],
+  ["The backstop fund's USDC", "fed by 10% of traders' net profit; holds 8% of the financed amount"],
   ["Staked SCR, sold in the pool", "at most 30% of the stake, 10% under the average"],
   ["The bucket's depositors", "in proportion, through the share price"],
 ];
@@ -158,7 +158,7 @@ export function LossOrder() {
       h={250}
       min={520}
       label="A shortfall is absorbed in order by the trader's down payment, the bucket's loss reserve, the backstop fund's USDC, staked SCR sold in the pool, and finally the bucket's depositors through the share price."
-      caption="When a pledged coin sells for less than the balance, the gap falls through these layers in order. No other bucket is touched, and a depositor who leaves gives up any claim on the reserve."
+      caption="When a pledged asset sells for less than the balance, the gap falls through these layers in order. No other bucket is touched, and a depositor who leaves gives up any claim on the reserve."
     >
       <Text x={10} y={26} anchor="start" lines="A shortfall" className={styles.big} />
       <Text x={10} y={44} anchor="start" lines={["what one layer", "cannot cover", "falls to the next"]} className={styles.sub} />

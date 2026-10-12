@@ -32,7 +32,7 @@ const abi = {
   ]),
   approve: parseAbi(["function approve(address, uint256) returns (bool)"]),
   desk: parseAbi([
-    "function getTicket(uint256) view returns ((address owner, uint8 status, uint40 opened, uint40 due, uint256 qty, uint256 cost, uint256 downPayment, uint256 financed, uint256 markup, uint256 repaid, uint256 principalRepaid))",
+    "function getPosition(uint256) view returns ((address owner, uint8 status, uint40 opened, uint40 due, uint256 qty, uint256 cost, uint256 downPayment, uint256 financed, uint256 markup, uint256 repaid, uint256 principalRepaid))",
   ]),
   fund: parseAbi(["function stakeOf(address) view returns (uint256)"]),
   sale: parseAbi(["function price() view returns (uint256)"]),
@@ -71,11 +71,11 @@ export function makeChain({ rpcUrl, addresses }) {
     },
     usdcOf: (who) => read("usdc", "erc20", "balanceOf", [who]),
     scrOf: (who) => read("token", "erc20", "balanceOf", [who]),
-    coinOf: (who) => read("coin", "erc20", "balanceOf", [who]),
+    assetOf: (who) => read("asset", "erc20", "balanceOf", [who]),
     sharesOf: (who) => read("vault", "vault", "balanceOf", [who]),
     stakeOf: (who) => read("fund", "fund", "stakeOf", [who]),
     epoch: () => read("vault", "vault", "epoch"),
-    ticket: (id) => read("desk", "desk", "getTicket", [id]),
+    position: (id) => read("desk", "desk", "getPosition", [id]),
     salePrice: () => read("sale", "sale", "price"),
     reserveAssets: () => read("reserve", "reserve", "totalAssets"),
   };

@@ -16,7 +16,7 @@ EVENTS = {
 
 
 @dataclass
-class Ticket:
+class Position:
     id: int
     owner: str
     status: str
@@ -62,16 +62,16 @@ class Chain:
         n = self.desk.functions.liveCount().call()
         return [self.desk.functions.liveIds(i).call() for i in range(n)]
 
-    def ticket(self, ticket_id: int) -> Ticket:
-        t = self.desk.functions.getTicket(ticket_id).call()
+    def position(self, position_id: int) -> Position:
+        t = self.desk.functions.getPosition(position_id).call()
         live = t[1] == 1
-        return Ticket(
-            id=ticket_id, owner=t[0], status=STATUS[t[1]], opened=t[2], due=t[3], qty=t[4], cost=t[5],
+        return Position(
+            id=position_id, owner=t[0], status=STATUS[t[1]], opened=t[2], due=t[3], qty=t[4], cost=t[5],
             down_payment=t[6], financed=t[7], markup=t[8], repaid=t[9],
-            settlement=self.desk.functions.settlementAmount(ticket_id).call() if live else 0,
+            settlement=self.desk.functions.settlementAmount(position_id).call() if live else 0,
         )
 
-    def ticket_count(self) -> int:
+    def position_count(self) -> int:
         return self.desk.functions.nextId().call() - 1
 
     def bucket(self) -> dict:
@@ -86,7 +86,7 @@ class Chain:
             "claimable": v.claimable().call(), "nav": nav, "lastPrice": v.lastPrice().call(),
             "totalShares": v.totalSupply().call(), "epoch": v.epoch().call(), "nextCutoff": v.nextCutoff().call(),
             "utilisationBps": lent * 10_000 // (idle + lent) if idle + lent else 0,
-            "liveTickets": self.desk.functions.liveCount().call(),
+            "livePositions": self.desk.functions.liveCount().call(),
         }
 
     def backstop(self) -> dict | None:
@@ -143,5 +143,5 @@ class Chain:
     def cutoff(self) -> str:
         return self._send(self.vault.functions.cutoff())
 
-    def settle(self, ticket_id: int) -> str:
-        return self._send(self.desk.functions.settle(ticket_id))
+    def settle(self, position_id: int) -> str:
+        return self._send(self.desk.functions.settle(position_id))

@@ -1,5 +1,5 @@
 """The keeper does two jobs anyone could do: run the weekly cut-off once it is due and
-settle tickets once their due date has passed. It holds no special rights. If it
+settle positions once their due date has passed. It holds no special rights. If it
 stops, anyone can call the same two functions; nothing in the protocol waits on it
 for an exit."""
 import logging
@@ -13,15 +13,15 @@ def tick(chain) -> list[dict]:
     actions = []
     now = chain.now()
 
-    for ticket_id in chain.live_ids():
+    for position_id in chain.live_ids():
         try:
-            if chain.ticket(ticket_id).due < now:
-                actions.append({"action": "settle", "ticket": ticket_id, "tx": chain.settle(ticket_id)})
+            if chain.position(position_id).due < now:
+                actions.append({"action": "settle", "position": position_id, "tx": chain.settle(position_id)})
         except Exception as error:  # e.g. the sale is below the price floor; try again next pass
-            log.warning("settle %s failed: %s", ticket_id, error)
-            actions.append({"action": "settle", "ticket": ticket_id, "error": str(error)})
+            log.warning("settle %s failed: %s", position_id, error)
+            actions.append({"action": "settle", "position": position_id, "error": str(error)})
 
-    # Settle first, so the cut-off prices as few live tickets as possible.
+    # Settle first, so the cut-off prices as few live positions as possible.
     if chain.next_cutoff() <= now:
         try:
             actions.append({"action": "cutoff", "tx": chain.cutoff()})

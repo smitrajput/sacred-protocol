@@ -2,40 +2,47 @@ export const metadata = { title: "Depositors" };
 
 # Depositors
 
-Your USDC buys a coin that a trader has committed to pay for. The markup the trader pays is your yield. You earn it whether the trader wins or loses, and nothing is promised.
+Your USDC buys a commodity-like crypto asset, BTC or ETH, that a trader has committed to pay for. The markup the trader pays is your yield, paid as a 9% a year target and steadied by a reserve. You earn it whether the trader wins or loses, and nothing is promised.
 
 ## Buckets
 
-One bucket per coin and mode: BTC term and ETH term at launch. Each bucket stands alone with its own USDC, shares, loss reserve and limits. A loss in one bucket never touches another. You pick a bucket, and with it the coin and the risk.
+One bucket per asset and mode: BTC term and ETH term at launch. Each bucket stands alone with its own USDC, shares, loss reserve and limits. A loss in one bucket never touches another. You pick a bucket, and with it the asset and the risk.
 
-Each bucket is a mudarabah: you provide capital, the manager runs the desk, profit is shared by a fixed ratio, and loss falls on capital. In version one the manager takes no share of the markup. The proposed economics give it 10%; see [economics](/docs/economics).
+Each bucket is a mudarabah: you provide capital, the manager runs the desk, profit is shared by a fixed ratio, and loss falls on capital. The ratio is 85% of the markup to depositors, 10% to the manager and 5% to the bucket's loss reserve.
 
 The manager must hold at least 5% of every bucket as an ordinary depositor, and cannot withdraw below it. Its deposit earns and loses like yours.
 
 ## Where the yield comes from
 
-Traders pay a fixed markup for buying a coin on deferred payment. In version one all of it goes to depositors, less the slice that builds the loss reserve. One week in a bucket of 100,000 USDC with 80,000 financed at 11% a year and no shortfalls:
+Traders pay a fixed markup for buying an asset on deferred payment. One week in a BTC bucket of 100,000 USDC with 85,000 financed at 17% a year and no shortfalls:
 
 | | USDC |
 | --- | --- |
-| Markup earned in the week: 80,000 × 11% × 7 ÷ 365 | 168.77 |
-| Of which to the loss reserve, at 10% | 16.88 |
-| Added to the share price | 151.89 |
+| Markup earned in the week: 85,000 × 17% × 7 ÷ 365 | 277.12 |
+| Of which to the manager, at 10% | 27.71 |
+| Of which to the loss reserve, at 5%, until it holds 3% of the bucket | 13.86 |
+| The depositors' 85% | 235.55 |
 
-That is 0.15% for the week, about 7.9% a year before shortfalls, at suggested values. Idle USDC earns nothing at launch.
+That is 0.24% for the week, about 12.3% a year before shortfalls, at the quoted rate. Idle USDC earns nothing: it sits in the vault, unlent and outside any pool, until a safe on-chain home for it is found.
+
+## The target and the payout reserve
+
+The payout is a target of 9% a year, not whatever was earned that week. Weeks that earn more than the target put the excess into a payout reserve, held for the bucket's depositors up to 6% of deposits; weeks that earn less draw on it. Once the reserve is full, the surplus above the target is split equally between depositors and the manager. In the simulation on 2018 to 2026 prices the payout held at 9% in 99.6% of months, bull and bear; without the reserve, 29% of months fell under it. The smoothing is the accepted Islamic practice (IFSB GN-3) and is disclosed here and in the contract.
+
+Deposits are tied to demand. New deposits are admitted only while more than 85% of the bucket is financed, at most 5% growth a week, and the rest queue in time order. If utilisation stays under 70% for 28 days, idle USDC is returned to depositors pro rata until the bucket is 85% financed again. This is the rule that holds the target in a bear market: the 9% is earned on money at work, and money with no work is handed back.
 
 ## The share price
 
-Computed once a week at the cut-off: idle USDC, plus each live ticket at the lower of its settlement amount and its coin's market value from the price feed, divided by the shares. The feed is used only for this valuation; no price ever triggers the sale of a term ticket. A loss lowers the share price for every holder in proportion.
+Computed once a week at the cut-off: idle USDC, plus each live position at the lower of its settlement amount and its asset's market value from the price feed, less the expected shortfall on any position whose cover is thin, divided by the shares. The feed is used only for this valuation; no price ever triggers the sale of a term position. A loss lowers the share price for every holder in proportion.
 
 ## Deposits and withdrawals
 
-- **Request any time.** A deposit request parks USDC in a queue; a withdrawal request locks shares in a queue.
-- **Processed at the next cut-off**, at that cut-off's share price. Queued USDC is not at risk and earns nothing until then. Queued shares keep earning and losing until redeemed.
-- **Withdrawals rank ahead of new tickets.** The desk may not open a ticket with cash that queued withdrawals need.
-- **If cash is short**, every withdrawal is paid in the same proportion and the unredeemed shares go back to you to request again. The longest term ticket runs 14 days, so cash returns within two or three cut-offs. The liquidity reserve deposits into a bucket that is short for its queue.
+- **Deposit any time**, subject to the admission rule above. A deposit request parks USDC in a queue until the bucket admits it; queued USDC is not at risk and earns nothing until then.
+- **Withdraw instantly** against idle cash while no live position's cover is below 110%. Otherwise a withdrawal request locks shares in a queue, processed at the next cut-off at that cut-off's share price, unfilled requests kept in time order. Queued shares keep earning and losing until redeemed.
+- **Withdrawals rank ahead of new positions.** The desk may not open a position with cash that queued withdrawals need.
+- **If cash is short**, the longest term position runs 14 days, so cash returns within two or three cut-offs. The liquidity reserve deposits into a bucket that is short for its queue.
 
-A depositor who sees a crash can queue a withdrawal, but it is priced at the cut-off with the loss already marked, so a loss is shared, not dodged. The proposed version two adds instant withdrawals against idle cash while no ticket's cover is thin, and marks expected shortfall on thin-cover tickets so that leaving early gains nothing.
+A depositor who sees a crash can leave, but the share price already marks the loss and the expected shortfall on thin positions, so a loss is shared, not dodged.
 
 ## Shares cannot be traded
 
@@ -43,9 +50,9 @@ A bucket mostly holds debts owed by traders, and a debt may not be traded at any
 
 ## What can be lost
 
-If a coin sells for less than its balance at settlement, the gap is absorbed in order: the trader's down payment, then the bucket's loss reserve, then the backstop fund, then depositors through the share price. A depositor who leaves gives up any claim on the reserve; it stays for those who remain.
+If an asset sells for less than its balance at settlement, the gap is absorbed in order: the trader's down payment, then the bucket's loss reserve, then the backstop fund's USDC, then staked SCR, then depositors through the share price. A depositor who leaves gives up any claim on the reserve; it stays for those who remain.
 
-The backtests put the average loss for 14-day BTC 3x tickets at 1.0% of the amount financed a year, worst year 5.1% (2020), against markup of about 11%. ETH at 2x showed no loss in any year. The full tables, the Monte Carlo and their limits are on the [risk page](/docs/risk).
+The backtests put the average loss for 14-day BTC 3x positions at 1.0% of the amount financed a year, worst year 5.1% (2020), against a markup of 17%. ETH at 2x showed no loss in any year. In the whole-system simulation depositors lost principal in 0.02% of years, worst year 0.5%. The full tables, the Monte Carlo and their limits are on the [risk page](/docs/risk).
 
 ## Points
 

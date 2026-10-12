@@ -51,20 +51,20 @@ contract MockFeed {
     }
 }
 
-/// Spot market stand-in: swaps USDC and coin at a settable price by minting and burning.
+/// Spot market stand-in: swaps USDC and asset at a settable price by minting and burning.
 /// `slipBps` makes every swap execute that much worse than the price.
 contract MockRouter {
     MockERC20 public immutable usdc;
-    MockERC20 public immutable coin;
-    uint256 public price; // USDC (6 decimals) per whole coin
+    MockERC20 public immutable asset;
+    uint256 public price; // USDC (6 decimals) per whole asset
     uint256 public slipBps;
-    uint256 internal immutable coinUnit;
+    uint256 internal immutable assetUnit;
 
-    constructor(MockERC20 usdc_, MockERC20 coin_, uint256 price_) {
+    constructor(MockERC20 usdc_, MockERC20 asset_, uint256 price_) {
         usdc = usdc_;
-        coin = coin_;
+        asset = asset_;
         price = price_;
-        coinUnit = 10 ** coin_.decimals();
+        assetUnit = 10 ** asset_.decimals();
     }
 
     function setPrice(uint256 price_) external {
@@ -77,9 +77,9 @@ contract MockRouter {
 
     function exactInputSingle(ISwapRouter.ExactInputSingleParams calldata p) external payable returns (uint256 out) {
         if (p.tokenIn == address(usdc)) {
-            out = p.amountIn * coinUnit / price;
+            out = p.amountIn * assetUnit / price;
         } else {
-            out = p.amountIn * price / coinUnit;
+            out = p.amountIn * price / assetUnit;
         }
         out = out * (10_000 - slipBps) / 10_000;
         require(out >= p.amountOutMinimum, "Too little received");

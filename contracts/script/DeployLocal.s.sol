@@ -32,7 +32,7 @@ contract DeployLocal is DeployToken {
     int24 internal constant SPACING = 60;
 
     MockERC20 public usdc;
-    MockERC20 public coin;
+    MockERC20 public asset;
     MockFeed public feed;
     MockRouter public router;
     PoolManager public poolManager;
@@ -46,9 +46,9 @@ contract DeployLocal is DeployToken {
 
         // The world the protocol trades in.
         usdc = new MockERC20("USD Coin", "USDC", 6);
-        coin = new MockERC20("Wrapped BTC", "WBTC", 8);
+        asset = new MockERC20("Wrapped BTC", "WBTC", 8);
         feed = new MockFeed(8, int256(PRICE * 1e8));
-        router = new MockRouter(usdc, coin, PRICE * 1e6);
+        router = new MockRouter(usdc, asset, PRICE * 1e6);
         poolManager = new PoolManager(me);
 
         // The SCR side, then the pool it settles through.
@@ -72,7 +72,7 @@ contract DeployLocal is DeployToken {
         vault = new Vault(IERC20(address(usdc)), me, me, 1_000_000e6, block.timestamp + 7 days, "Sacred BTC Term");
         desk = new Desk(
             IERC20(address(usdc)),
-            IERC20(address(coin)),
+            IERC20(address(asset)),
             IVault(address(vault)),
             ISwapRouter(address(router)),
             500,
@@ -115,7 +115,7 @@ contract DeployLocal is DeployToken {
     function _write() internal {
         string memory o = "local";
         vm.serializeAddress(o, "usdc", address(usdc));
-        vm.serializeAddress(o, "coin", address(coin));
+        vm.serializeAddress(o, "asset", address(asset));
         vm.serializeAddress(o, "feed", address(feed));
         vm.serializeAddress(o, "router", address(router));
         vm.serializeAddress(o, "poolManager", address(poolManager));

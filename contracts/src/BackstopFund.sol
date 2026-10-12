@@ -36,7 +36,7 @@ contract BackstopFund is Ownable2Step {
     }
 
     /// Pull a donation from the caller. Anyone may donate. The treasury's part is
-    /// set aside and pulled later, so a blocked treasury can never block a ticket.
+    /// set aside and pulled later, so a blocked treasury can never block a position.
     function receiveShare(uint256 amount) external {
         uint256 toTreasury = amount * TREASURY_BPS / BPS;
         usdc.safeTransferFrom(msg.sender, address(this), amount);

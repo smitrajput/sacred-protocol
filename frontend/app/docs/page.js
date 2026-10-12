@@ -6,8 +6,8 @@ export const metadata = { title: "Overview" };
 
 // Who the reader is, and the page that answers their first question. Two to a row.
 const paths = [
-  { who: "Stablecoin depositor", go: "depositors", title: "What your USDC does", line: "It buys a coin a trader has committed to pay for. The markup is yours. Nothing is promised." },
-  { who: "Leverage trader", go: "traders", title: "What a ticket costs", line: "One fixed markup, known before you open. No funding, no fees, no liquidation price in term mode." },
+  { who: "Stablecoin depositor", go: "depositors", title: "What your USDC does", line: "It buys a crypto asset, BTC or ETH, that a trader has committed to pay for. The markup is yours. Nothing is promised." },
+  { who: "Leverage trader", go: "traders", title: "What a position costs", line: "One fixed markup, known before you open. No funding, no fees, no liquidation price in term mode." },
   { who: "SCR buyer or staker", go: "scr", title: "What the token does", line: "Backstop, liquidity reserve, one pool. The reserve sale, the fee splits, the allocation." },
   { who: "Investor", go: "thesis", title: "Why this, why now", line: "A locked-out market, one new primitive, and economics simulated over nine years of prices." },
   { who: "Engineer", go: "architecture", title: "How it is built", line: "The stack, the pieces, who calls whom, where every USDC goes. Then the addresses, invariants and tests." },

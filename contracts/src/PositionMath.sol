@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.26;
 
-/// @title TicketMath
-/// @notice Pure arithmetic for a murabaha ticket. Kept in one place so it can be
+/// @title PositionMath
+/// @notice Pure arithmetic for a murabaha position. Kept in one place so it can be
 ///         fuzzed and symbolically checked on its own. All amounts are USDC units.
-library TicketMath {
+library PositionMath {
     uint256 internal constant BPS = 10_000;
     uint256 internal constant YEAR = 365 days;
     /// The least markup the vault earns, in time. Stops free intraday financing.
     uint256 internal constant MIN_EARNED = 1 days;
 
-    /// What the vault pays for the coin: down payment times leverage.
+    /// What the vault pays for the asset: down payment times leverage.
     function cost(uint256 downPayment, uint256 leverageBps) internal pure returns (uint256) {
         return downPayment * leverageBps / BPS;
     }
@@ -30,7 +30,7 @@ library TicketMath {
         return markup_ * elapsed / term;
     }
 
-    /// What closes the ticket today: financed amount plus earned markup, minus part payments.
+    /// What closes the position today: financed amount plus earned markup, minus part payments.
     function settlement(uint256 financed, uint256 markup_, uint256 repaid, uint256 opened, uint256 due, uint256 nowTs)
         internal
         pure

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { formatUnits } from "viem";
-import { coinSymbol, preview, usdc, vault } from "../../lib/contracts";
+import { assetSymbol, preview, usdc, vault } from "../../lib/contracts";
 import { formatUsdc, parseUsdc } from "../../lib/math";
 import shared from "../shared/shared.module.css";
 import styles from "./app.module.css";
@@ -33,7 +33,7 @@ export default function Earn({ address, sample }) {
     <section className={shared.paper}>
       <div className={shared.head}>
         <h2 className={shared.title}>Earn</h2>
-        <span className={shared.sub}>{coinSymbol} bucket</span>
+        <span className={shared.sub}>{assetSymbol} bucket</span>
       </div>
 
       <dl className={styles.stats}>

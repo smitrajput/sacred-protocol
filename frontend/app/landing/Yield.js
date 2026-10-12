@@ -10,7 +10,7 @@ export default function Yield() {
         <span className={styles.eyebrow}>For depositors</span>
         <h2 className={styles.h2}>How the yield is made.</h2>
         <p className={styles.lead}>
-          No one is lent anything. Your USDC buys a coin, a trader buys that coin from the vault on credit at a
+          No one is lent anything. Your USDC buys a crypto asset, BTC or ETH, held like a commodity; a trader buys that asset from the vault on credit at a
           markup, and the markup is paid to you. Here is the path one dollar takes.
         </p>
 
@@ -29,10 +29,11 @@ export default function Yield() {
             <p className={`${styles.body} ${styles.afterList}`}>
               100,000 USDC in a bucket that is 85% financed at 17% a year earns 14,450 of markup. 12,282 of it is the
               depositors&rsquo;, a 12.3% return. The {proposed.targetPayout} target is paid out, and the rest fills a
-              payout reserve for the months the desk is quiet, so the payout holds in a bear market too.
+              payout reserve for the months the desk is quiet, so the payout holds in a bear market too. Once the
+              reserve is full, the surplus is split equally between depositors and the manager.
             </p>
             <p className={`${styles.small} ${styles.afterList}`}>
-              Arithmetic on proposed values, not a forecast. The simulation behind them is in the{" "}
+              Arithmetic on the launch values, not a forecast. The simulation behind them is in the{" "}
               <Link href={`${links.docs}/economics`}>docs</Link>.
             </p>
           </div>

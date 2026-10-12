@@ -37,56 +37,59 @@ ETH bucket (WETH, 2x max)
 | Desk | [`0x054738143B3126D943f97b4572bcDa155A9Af71d`](https://arbiscan.io/address/0x054738143B3126D943f97b4572bcDa155A9Af71d#code) |
 | Oracle | [`0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F`](https://arbiscan.io/address/0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F#code) |
 
-Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new tickets and new deposits, and cannot unpause. Exits are never pausable by anyone.
+Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new positions and new deposits, and cannot unpause. Exits are never pausable by anyone.
 
 ## The rules the code keeps, and where each is tested
 
 | Rule | How | Test |
 | --- | --- | --- |
-| The vault owns the coin before it sells it | `open` lends the full cost and swaps before it records the sale or takes the down payment | `test_open_recordsTheDesignExample` |
+| The vault owns the asset before it sells it | `open` lends the full cost and swaps before it records the sale or takes the down payment | `test_open_recordsTheDesignExample` |
 | A balance never increases | No function adds to `financed` or `markup`, or subtracts from `repaid` | `invariant_aBalanceNeverIncreases` |
 | The vault never receives more than the settlement amount | `_payVault` pays `settlementAmount` on close and pay off, `min(net, balance)` on settlement | `invariant_vaultNeverReceivesMoreThanTheBalance` |
-| The trader never owes more than the pledged coin | `settle` never pulls from the trader; a short sale closes the debt | `invariant_settlementNeverChargesTheTrader` |
+| The trader never owes more than the pledged asset | `settle` never pulls from the trader; a short sale closes the debt | `invariant_settlementNeverChargesTheTrader` |
 | Only the trader can sell before the due date | `settle` reverts until the due date; there is no other sale path | `test_noOneCanSellBeforeDueExceptTheTrader` |
-| A pledged coin leaves only to its owner or the market | `payOff` and `_swap` are the only coin transfers | `invariant_deskHoldsOnlyPledgesAndOwedSurpluses` |
+| A pledged asset leaves only to its owner or the market | `payOff` and `_swap` are the only asset transfers | `invariant_deskHoldsOnlyPledgesAndOwedSurpluses` |
 | Exits cannot be paused | Only `open` and `requestDeposit` check the pause flag | `test_deposit_pausedByGuardian_withdrawalsStillWork` |
 | Shares cannot be transferred | `transfer`, `transferFrom` and `approve` always revert | `test_shares_cannotBeTransferredOrApproved` |
 | Every USDC is counted exactly once | Four counters; the vault never reads its own balance, so donations cannot move the share price | `invariant_vaultIsFullyBacked` |
-| The admin cannot leave coded limits or touch live tickets | Bounds in every setter; ticket terms are stored at opening | `test_admin_cannotExceedHardLimits` |
+| The admin cannot leave coded limits or touch live positions | Bounds in every setter; position terms are stored at opening | `test_admin_cannotExceedHardLimits` |
 
 ## Every dial
 
-The time-lock can move a dial for future business, never past its limit, never for a live ticket.
+The time-lock can move a dial for future business, never past its limit, never for a live position. The deployed code carries the first design's values; the launch column is what ships with the re-cut, and the rows marked "new code" need a contract change, not a dial.
 
-| Dial | At launch | Limit in code |
-| --- | --- | --- |
-| Base rate | 10% a year | Base plus surcharge at most 50% |
-| Surcharge, above 2x | 1% a year | |
-| Leverage ceiling | BTC 3x, ETH 2x | Fixed per bucket at deployment; can only be lowered |
-| Term | 7 or 14 days | 1 to 30 days |
-| Ticket size | 100,000 USDC | |
-| Minimum down payment | 100 USDC | At most 10,000 |
-| Live tickets per desk | 200 | At most 500 |
-| Sale tolerance against Chainlink | 1% | At most 5% |
-| Keeper fee | 1 USDC | At most 20 |
-| Profit share | 30% to the fund | Fixed |
-| Cut-off period | 7 days | Fixed |
-| Utilisation cap | 85% | At most 95% |
-| Reserve slice of markup | 10% | At most 50% |
-| Reserve target | 5% of the bucket | At most 20% |
-| Manager minimum | 5% of the bucket | At most 20% |
-| Fund: treasury share, reserve share, stream, cooldown, window | 20%, 15%, 90 days, 14 days, 7 days | Fixed |
-| Fund: shortfall sale cap and discount | 30% of stake, 10% below average | At most 30% each |
-| Liquidity reserve target | 10% of registered buckets | At most 50% |
+| Dial | Deployed today | At launch | Limit in code |
+| --- | --- | --- | --- |
+| Base rate | 10% a year | 15.5% a year up to 85% utilisation, rising to 30% at the 92% cap (new code) | Base plus surcharge at most 50% |
+| Surcharge, above 2x | 1% a year | 1.5% on term positions, 0.5% on margin positions | |
+| Leverage ceiling | BTC 3x, ETH 2x | Term unchanged; margin 3x to 5x | Fixed per bucket at deployment; can only be lowered |
+| Term | 7 or 14 days | 7 or 14 days; up to 30 in margin mode | 1 to 30 days |
+| Position size | 100,000 USDC | 100,000 USDC | |
+| Minimum down payment | 100 USDC | 100 USDC | At most 10,000 |
+| Live positions per desk | 200 | No limit (new code) | At most 500 |
+| Sale tolerance against Chainlink | 1% | 0.3% to 0.5% | At most 5% |
+| Keeper fee | 1 USDC | Indexed to gas at the call (new code) | At most 20 |
+| Profit share | 30% of each winning position, to the fund | 10% of net profit, losses carried 90 days, measured at feed prices (new code) | Fixed |
+| Markup split | 100% to depositors | 85% depositors, 10% manager, 5% loss reserve (new code) | |
+| Payout | Whatever was earned | 9% target; reserve up to 6% of deposits; surplus split equally once full (new code) | |
+| Cut-off period | 7 days | 7 days; instant withdrawals against idle cash while no position's cover is under 110% (new code) | Fixed |
+| Utilisation cap | 85% | 92%, with deposits admitted only above 85% and returned under 70% for 28 days (new code) | At most 95% |
+| Reserve slice of markup | 10% | 5% | At most 50% |
+| Reserve target | 5% of the bucket | 3% of the bucket | At most 20% |
+| Manager minimum | 5% of the bucket | 5% of the bucket | At most 20% |
+| Fund: treasury share, reserve share, stream, cooldown, window | 20%, 15%, 90 days, 14 days, 7 days | 30%, 10% until the reserve's target, 90 days, 14 days, 7 days; an 8% USDC buffer before stakers are paid (new code) | Fixed |
+| Fund: shortfall sale cap and discount | 30% of stake, 10% below average | 30% of stake, 10% below average | At most 30% each |
+| Reserve sale: discount, ceiling, price | 4%, 10%, 30-minute average floored at reserve cash per token | 4%, sell tax plus one point, 24-hour average floored at 90% of the 7-day low (new code) | |
+| Liquidity reserve target | 10% of registered buckets | 10% of registered buckets | At most 50% |
 
 ## Tests
 
 | Suite | What it covers | Result |
 | --- | --- | --- |
 | `Desk.t.sol`, `Vault.t.sol` | Every function, every revert, the worked examples, a fuzzed full lifecycle (1,000 runs) | 68 passed |
-| `Invariant.t.sol` | Nine system invariants under random deposits, withdrawals, cut-offs, tickets, prices and time (64 × 120) | 9 passed |
+| `Invariant.t.sol` | Nine system invariants under random deposits, withdrawals, cut-offs, positions, prices and time (64 × 120) | 9 passed |
 | `TaxHook.t.sol`, `SacredSystem.t.sol` | The pool fee for all swap shapes; the whole SCR side wired to the real vault on a real Uniswap v4 `PoolManager` | 184 passed |
-| `ArbitrumFork.t.sol` | Both deploy scripts; a 3x BTC ticket on the real Uniswap v3 pool at the real Chainlink price; a shortfall sale on the real `PoolManager` | 5 passed |
+| `ArbitrumFork.t.sol` | Both deploy scripts; a 3x BTC position on the real Uniswap v3 pool at the real Chainlink price; a shortfall sale on the real `PoolManager` | 5 passed |
 | Halmos `check_*` | Eight arithmetic properties for all inputs in stated ranges | 2 proved, 6 timed out |
 | `server/tests` | Keeper, points, indexer, API, one end-to-end run against anvil | 18 passed |
 | `frontend/lib`, `frontend/e2e` | Arithmetic to the unit; four browser flows with a real keeper and API | 24 passed |

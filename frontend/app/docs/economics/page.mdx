@@ -2,50 +2,53 @@ export const metadata = { title: "Economics" };
 
 # Economics
 
-What traders pay, what depositors earn, what the protocol keeps, and why the built version will be re-cut before scale. Every figure here is a simulation on 2018 to 2026 prices under stated demand assumptions, not a forecast.
+What traders pay, what depositors earn, what the protocol keeps, and the simulation the dials were cut from. Every figure here is a simulation on 2018 to 2026 prices under stated demand assumptions, not a forecast.
 
-## The money, in version one
+## The money
 
 | Flow | Size | Goes to |
 | --- | --- | --- |
-| **Markup** | 10% a year on the financed amount, plus 1% above 2x | 100% to depositors; 10% of it builds the bucket's loss reserve until 5% |
-| **Profit share** | 30% of a winning ticket's profit | The backstop fund: 20% treasury, 15% liquidity reserve, 65% streamed to stakers over 90 days |
+| **Markup** | 15.5% a year on the financed amount while the bucket is at or under 85% financed, rising in a straight line to 30% at the 92% cap. Plus a gap premium: 1.5% on 3x term positions, 0.5% on margin positions | 85% to depositors, 10% to the manager, 5% to the bucket's loss reserve until it holds 3% of the bucket |
+| **Payout** | A 9% a year target. Markup above it fills a payout reserve up to 6% of deposits; months below it draw on the reserve | Once the reserve is full, the surplus is split equally between depositors and the manager |
+| **Profit share** | 10% of a trader's net profit, losses carried forward 90 days, measured at feed prices | 30% treasury, 10% to the liquidity reserve until it reaches its target, the rest to the backstop fund. The fund keeps USDC to 8% of the financed amount and streams only the excess to stakers over 90 days |
 | **Pool fee** | 1% on SCR buys, 3% on sells, in USDC | 20% treasury; the rest to the reserve until its target, then to the fund |
-| **Keeper repayment** | 1 USDC a call | Whoever settles or runs the cut-off |
+| **Keeper repayment** | A fee indexed to gas at the time of the call, capped at 20 USDC | Whoever settles, sells or runs the cut-off |
 
-Nothing else is charged. The manager takes no share of the markup. A bucket 80% financed at 11% pays depositors about 7.9% a year before shortfalls: 100,000 USDC earns 168.77 in a week, 16.88 goes to the reserve, 151.89 raises the share price.
+Nothing else is charged. A BTC bucket 85% financed at 17% earns 12.3% a year for depositors before shortfalls: 100,000 USDC earns 277.12 in a week, 27.71 goes to the manager, 13.86 to the loss reserve, 235.55 to depositors. The 9% target is paid, and the rest fills the payout reserve.
+
+Deposits follow demand. New deposits are admitted only while utilisation is above 85%, at most 5% growth a week, and idle USDC is returned pro rata if utilisation stays under 70% for 28 days. Without that rule the median month pays 7.0%.
 
 ## What the simulation found
 
-A mechanism-design review treated the founder as the rule-setter and each party as a player with one profitable deviation to close, then simulated the whole system: real tickets on Binance one-minute prices from January 2018 to September 2026, a daily model of deposits, rates, reserves and fund on top, and 1,000 bootstrapped five-year paths with the real crash clustering. Leverage demand follows perp funding, so bear demand is about 0.4 of bull demand.
+A mechanism-design review treated the founder as the rule-setter and each party as a player with one profitable deviation to close, then simulated the whole system: real positions on Binance one-minute prices from January 2018 to September 2026, a daily model of deposits, rates, reserves and fund on top, and 1,000 bootstrapped six-year paths with the real crash clustering. Leverage demand follows perp funding, so bear demand is about 0.4 of bull demand.
 
-At its own equilibrium the built version pays depositors about 5%, charges traders about five times the market price of leverage, and cannot offer 5x. The nine findings, largest first:
+The first design charged 10% a year plus 1% above 2x, took 30% of each winning position's profit, and paid all the markup to depositors. At its own equilibrium it paid depositors about 5%, charged traders about five times the market price of leverage, and could not offer 5x. The nine findings, largest first, are what the dials above answer:
 
 | # | Finding | Evidence |
 | --- | --- | --- |
-| 1 | **The 30% profit share is a tax on volatility, not on profit.** Charged per ticket with no netting of losses | A trader rolling 14-day BTC 3x tickets shares on 135% of exposure a year. All-in cost is 48% of exposure on BTC 3x, 61% on ETH 2x. Perp funding averaged 11.7%, and 3.3% in bear markets. A 3x ticket beats holding only if BTC rises faster than 72% a year |
-| 2 | **About a tenth of what traders pay reaches depositors** | Markup is 1.7 of every 16.6 paid. The yield ceiling is 85% × 10.5% × 0.9 = 8.0%; simulated average 5.3%, 3.9% in bear markets |
-| 3 | **Nothing ties deposits to demand** | Free entry pushes yield down to depositors' outside option; utilisation falls to about 40% in bear markets |
+| 1 | **A 30% profit share per position is a tax on volatility, not on profit.** Charged per position with no netting of losses | A trader rolling 14-day BTC 3x positions shares on 135% of exposure a year. All-in cost was 48% of exposure on BTC 3x, 61% on ETH 2x. Perp funding averaged 11.7%, and 3.3% in bear markets. A 3x position beat holding only if BTC rose faster than 72% a year |
+| 2 | **About a tenth of what traders paid reached depositors** | Markup was 1.7 of every 16.6 paid. The yield ceiling was 85% × 10.5% × 0.9 = 8.0%; simulated average 5.3%, 3.9% in bear markets |
+| 3 | **Nothing tied deposits to demand** | Free entry pushes yield down to depositors' outside option; utilisation falls to about 40% in bear markets |
 | 4 | **5x cannot run in term mode** | Shortfalls cost 9.6% of the financed amount a year on BTC 5x; depositors lose in 69% of years |
-| 5 | **The protocol earns 6% of the profit share and nothing from markup** | Income is lumpy and follows trader profit, so the manager is paid for volume, not depositor safety |
+| 5 | **The protocol earned 6% of the profit share and nothing from markup** | Income is lumpy and follows trader profit, so the manager is paid for volume, not depositor safety |
 | 6 | **Staked SCR adds little cover** | A shortfall sale capped 10% below average price raises about 5% of the pool's USDC per event |
-| 7 | **Exits are priced a little too high in a crash** | A ticket at 102% cover with a week left carries an unmarked expected shortfall near 2.5% |
-| 8 | **A trader can move profit outside the share** | Sandwiching one's own open and close inside the 1% tolerance shifts up to 2% of exposure per ticket |
+| 7 | **Exits were priced a little too high in a crash** | A position at 102% cover with a week left carries an unmarked expected shortfall near 2.5% |
+| 8 | **A trader could move profit outside the share** | Sandwiching one's own open and close inside a 1% tolerance shifts up to 2% of exposure per position |
 | 9 | **The liquidity reserve refills only in good times** | A 30-minute average is cheap to depress; a 10% discount ceiling lets a holder cycle SCR through the sale for 6.7% a round |
 
-## The proposed mechanism
+## What changed, and why
 
-Eighteen changes in five groups. Each keeps the sale, pledge and partnership; none adds a charge to a ticket after it opens. The simulation's own summary is that two of the founder's three outcomes can be made to hold in bull and bear markets, and the third is a scale question no mechanism delivers.
+Eighteen changes in five groups. Each keeps the sale, pledge and partnership; none adds a charge to a position after it opens.
 
-| Group | Today | Proposed | Why |
+| Group | First design | At launch | Why |
 | --- | --- | --- | --- |
-| **Price to traders** | 10% markup plus 1% above 2x; 30% share per ticket | Markup 15.5% up to 85% utilisation, rising to 30% at the 92% cap, plus a gap premium. Profit share 10% of *net* profit, losses carried forward 90 days. Profit measured at feed prices | The share base falls from 135% to 90% of exposure. All-in cost falls by about 60%, to inside what dYdX, Hyperliquid and GMX collect per dollar of open interest |
+| **Price to traders** | 10% markup plus 1% above 2x; 30% share per position | Markup 15.5% up to 85% utilisation, rising to 30% at the 92% cap, plus a gap premium. Profit share 10% of *net* profit, losses carried forward 90 days. Profit measured at feed prices | The share base falls from 135% to 90% of exposure. All-in cost falls by about 60%, to inside what dYdX, Hyperliquid and GMX collect per dollar of open interest |
 | **Split** | All markup to depositors | 85% depositors, 10% manager, 5% loss reserve. A 9% target payout: profit above it fills a payout reserve up to 6% of deposits, months below draw on it | Protocol income that is paid in bear markets. Smoothing is accepted practice (IFSB GN-3) and must be disclosed |
 | **Capacity** | A static bucket cap | Admit deposits only while utilisation is above 85%, at most 5% a week; return idle USDC pro rata if utilisation stays under 70% for 28 days | The rule that holds 9% in bear markets. Without it the median month pays 7.0% |
-| **Leverage** | BTC 3x, ETH 2x, term only | Term unchanged. Margin mode 3x to 5x with part of the coin sold at 110% cover, restored to 115%. No limit on ticket count; limits on size. Keeper fee indexed to gas, two independent keepers | 5x costs 0.12% a year on BTC with a working keeper, 2.3% with an hour's outage on every sale |
+| **Leverage** | BTC 3x, ETH 2x, term only | Term unchanged. Margin mode 3x to 5x with part of the asset sold at 110% cover, restored to 115%. No limit on position count; limits on size. Keeper fee indexed to gas, two independent keepers | 5x costs 0.12% a year on BTC with a working keeper, 2.3% with an hour's outage on every sale |
 | **Backstop and reserve** | Staked SCR counted as a loss layer | Staked SCR kept as the last layer, sized at zero in solvency tests; the fund holds USDC to 8% of the financed amount before paying stakers. Reserve-sale discount capped at the sell tax plus one point; price off a 24-hour average floored at 90% of the 7-day low; reserve seeded from the raise | Closes findings 6 and 9. An 8% buffer cuts loss years under outage stress from 6% to 1.5% |
 
-Under the proposal every party's best move is to stay and play straight, in both regimes. The profit share is the one dial to tune with launch data: start at 10%, raise toward 20% only if measured demand barely responds to price.
+Under these dials every party's best move is to stay and play straight, in both regimes. The profit share is the one dial to tune with launch data: start at 10%, raise toward 20% only if measured demand barely responds to price.
 
 ## What it pays, per 100 of demand
 
@@ -58,7 +61,7 @@ Under the proposal every party's best move is to stay and play straight, in both
 | Total fees a year | 19.7 | 13.1 | 7.9 |
 | Kept by the protocol | 4.3 | 2.5 | 1.6 |
 
-Fees run at about 23% of deposits a year across the cycle and the protocol keeps 4.8%. The system does not hold fees flat: it shrinks in a bear market and keeps its ratios. The 9% is earned on money in the vault; about 30% of deposits are handed back in a bear market.
+Fees run at about 23% of deposits a year across the cycle and the protocol keeps 4.8%. The system does not hold fees flat: it shrinks in a bear market and keeps its ratios. The 9% is earned on money in the vault; about 30% of deposits are handed back in a bear market. The payout held at 9% or more in 99.6% of simulated months, and reached 11% or more in one month in ten, when the reserve was full and the surplus was shared.
 
 ## Scale
 
@@ -67,19 +70,20 @@ Fees run at about 23% of deposits a year across the cycle and the protocol keeps
 | 500k a month in total fees | 26m, carrying about 27m of exposure | 47m on average, 36m in the bear |
 | 500k a month kept by the protocol | 124m | 237m on average |
 
-Comparable protocols trade at 2 to 24 times yearly fees and 6 to 30 times yearly revenue: GMX 6x, Maple 20x, Aave 30x. On those multiples a 6 million valuation needs 200k to 1 million of yearly protocol revenue, which the proposal earns on 4 to 21 million of deposits.
+Comparable protocols trade at 2 to 24 times yearly fees and 6 to 30 times yearly revenue: GMX 6x, Maple 20x, Aave 30x. On those multiples a 6 million valuation needs 200k to 1 million of yearly protocol revenue, which the mechanism earns on 4 to 21 million of deposits.
 
-## Treasury, in version one
+## Treasury
 
-One treasury pays for development. In version one its income is 20% of the backstop fund's receipts, which in a rising market is roughly 1,500 a month at 1 million of deposits, 7,500 at 5 million, 15,000 at 10 million, assuming winning tickets earn 25% of exposure a year, which is a guess. It is near zero in a falling market. Fees do not cover a founder's costs until deposits reach roughly 5 million; the treasury's token stream carries the early years, and before launch the build, the audit and the board need outside money. This is the case for the manager's 10% of markup in the proposal: income that is paid in every regime.
+One treasury pays for development. Its income is the manager's 10% of markup, paid in every regime, plus 30% of the profit share and 20% of pool fees, which arrive mostly in rising markets. In the simulation the protocol keeps about 4.8% of deposits a year across the cycle: roughly 4,000 a month at 1 million of deposits, 20,000 at 5 million, 40,000 at 10 million. Fees do not cover a founder's costs until deposits reach several million; the treasury's token stream carries the early years, and before launch the build, the audit and the board need outside money.
 
 ## What the simulation does not fix
 
 - **Demand is unproven.** Every fee figure scales with halal leverage demand, and proven on-chain halal demand is in single-digit millions. Treat deposits above 10 million as a distribution assumption.
-- **The price cut is a bet on elasticity.** Charging 60% less needs about 2.7 times the volume to match today's fees. Measure the response during the guarded launch before fixing the share.
+- **The price cut is a bet on elasticity.** Charging 60% less than the first design needs about 2.7 times its volume to match its fees. Measure the response during the guarded launch before fixing the share.
 - **5x rests on two rulings**: forced sale before the due date, and a 5x ceiling, which the design gives 35 to 45% odds. If refused, the term-only version still pays 9% but stops at BTC 3x and ETH 2x.
 - **Keeper or sequencer outage is the tail.** An hour's outage on every forced sale: depositors lose in 1.5% of years, worst year 7.1%.
 - **Bear-market traders pay about five times the conventional price**, 17% against 3.3% funding. The only verified Islamic margin rate found is about 11% a year, at 2x on equities.
-- **Launch starts with empty buffers.** Seed the 8% fund buffer from the raise, or cap the first tickets until it fills.
+- **Launch starts with empty buffers.** Seed the 8% fund buffer and the liquidity reserve from the raise, or cap the first positions until they fill.
+- **The launch dials are not yet in the deployed code.** The contracts on Arbitrum One run the first design's dials; the [status page](/docs/status) lists what changes before launch.
 
 Not modelled: the liquidity reserve and reserve sales, on-chain slippage at size, contract or oracle failure, a USDC or wrapped-BTC event, a crash worse than any since 2018, SCR's price, and traders who do anything other than hold to the due date.

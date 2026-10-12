@@ -32,15 +32,15 @@ def test_fund_and_sale_are_404_without_the_token_side(tmp_path):
     assert c.get("/bucket").status_code == 200
 
 
-def test_tickets_can_be_filtered_by_owner(tmp_path):
+def test_positions_can_be_filtered_by_owner(tmp_path):
     chain = FakeChain()
-    chain.add_ticket(1, due=1_500, owner="0xAAA")
-    chain.add_ticket(2, due=1_500, owner="0xBBB")
+    chain.add_position(1, due=1_500, owner="0xAAA")
+    chain.add_position(2, due=1_500, owner="0xBBB")
     c, _ = client(tmp_path, chain)
-    assert len(c.get("/tickets").json()) == 2
-    assert [t["id"] for t in c.get("/tickets", params={"owner": "0xaaa"}).json()] == [1]
-    assert c.get("/tickets/2").json()["owner"] == "0xBBB"
-    assert c.get("/tickets/9").status_code == 404
+    assert len(c.get("/positions").json()) == 2
+    assert [t["id"] for t in c.get("/positions", params={"owner": "0xaaa"}).json()] == [1]
+    assert c.get("/positions/2").json()["owner"] == "0xBBB"
+    assert c.get("/positions/9").status_code == 404
 
 
 def test_points_come_from_indexed_events_and_indexing_is_idempotent(tmp_path):

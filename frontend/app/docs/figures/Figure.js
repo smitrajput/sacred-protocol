@@ -108,11 +108,11 @@ export function Bucket({ x, y, label }) {
   );
 }
 
-export function Coin({ x, y }) {
+export function Asset({ x, y }) {
   return (
     <g>
-      <circle cx={x} cy={y} r="10" className={styles.coin} />
-      <text x={x} y={y + 2.5} textAnchor="middle" className={styles.coinText}>
+      <circle cx={x} cy={y} r="10" className={styles.asset} />
+      <text x={x} y={y + 2.5} textAnchor="middle" className={styles.assetText}>
         BTC
       </text>
     </g>

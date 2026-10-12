@@ -5,7 +5,7 @@ import {Base} from "./Base.t.sol";
 import {Desk} from "../src/Desk.sol";
 import {Vault} from "../src/Vault.sol";
 import {Oracle} from "../src/Oracle.sol";
-import {TicketMath} from "../src/TicketMath.sol";
+import {PositionMath} from "../src/PositionMath.sol";
 
 contract DeskTest is Base {
     uint256 internal constant MARKUP = 8_438_356; // 2,000 x 11% x 14 / 365
@@ -19,7 +19,7 @@ contract DeskTest is Base {
 
     function test_open_recordsTheDesignExample() public {
         uint256 id = openExample();
-        Desk.Ticket memory t = ticket(id);
+        Desk.Position memory t = position(id);
         assertEq(t.owner, trader);
         assertEq(uint8(t.status), uint8(Desk.Status.Live));
         assertEq(t.cost, 3_000 * USDC);
@@ -28,7 +28,7 @@ contract DeskTest is Base {
         assertEq(t.markup, MARKUP);
         assertEq(t.qty, 5_000_000); // 0.05 BTC
         assertEq(t.due, t.opened + 14 days);
-        assertEq(coin.balanceOf(address(desk)), t.qty, "coin pledged in the desk");
+        assertEq(asset.balanceOf(address(desk)), t.qty, "asset pledged in the desk");
         assertEq(vault.lent(), 2_000 * USDC);
         assertEq(vault.idle(), 98_000 * USDC);
         assertEq(usdc.balanceOf(address(desk)), 0);
@@ -111,7 +111,7 @@ contract DeskTest is Base {
         desk.setParams(1_000, 100, 20_000, 30_000, 100_000 * USDC, 1);
         openExample();
         vm.prank(trader);
-        vm.expectRevert(Desk.TooManyTickets.selector);
+        vm.expectRevert(Desk.TooManyPositions.selector);
         desk.open(1_000 * USDC, 30_000, 14 days, 0);
     }
 
@@ -154,8 +154,8 @@ contract DeskTest is Base {
         assertEq(usdc.balanceOf(trader) - before, surplus - share);
         assertEq(usdc.balanceOf(address(fund)), share);
         assertEq(vault.lent(), 0);
-        assertEq(coin.balanceOf(address(desk)), 0);
-        assertEq(uint8(ticket(id).status), uint8(Desk.Status.Closed));
+        assertEq(asset.balanceOf(address(desk)), 0);
+        assertEq(uint8(position(id).status), uint8(Desk.Status.Closed));
         assertEq(desk.liveCount(), 0);
         // The vault got exactly the settlement amount: principal plus five days of markup.
         assertEq(vault.idle() + vault.reserve(), 100_000 * USDC + MARKUP * 5 / 14);
@@ -177,7 +177,7 @@ contract DeskTest is Base {
 
     function test_close_revertsWhenSaleWouldNotCoverSettlement() public {
         uint256 id = openExample();
-        setPrice(36_000); // -40%: coin worth 1,800
+        setPrice(36_000); // -40%: asset worth 1,800
         vm.prank(trader);
         vm.expectRevert(Desk.SaleBelowSettlement.selector);
         desk.close(id, 0);
@@ -208,10 +208,10 @@ contract DeskTest is Base {
 
     // ── paying off ──
 
-    function test_payOff_releasesCoinAndChargesShareFromFeed() public {
+    function test_payOff_releasesAssetAndChargesShareFromFeed() public {
         uint256 id = openExample();
         skipFresh(14 days);
-        setPrice(72_000); // +20%: coin worth 3,600
+        setPrice(72_000); // +20%: asset worth 3,600
         uint256 s = desk.settlementAmount(id);
         assertEq(s, 2_000 * USDC + MARKUP);
         uint256 share = (3_600 * USDC - s - 1_000 * USDC) * 3_000 / 10_000; // 177.47
@@ -221,10 +221,10 @@ contract DeskTest is Base {
         vm.prank(trader);
         desk.payOff(id);
         assertEq(before - usdc.balanceOf(trader), s + share);
-        assertEq(coin.balanceOf(trader), 5_000_000);
-        assertEq(coin.balanceOf(address(desk)), 0);
+        assertEq(asset.balanceOf(trader), 5_000_000);
+        assertEq(asset.balanceOf(address(desk)), 0);
         assertEq(usdc.balanceOf(address(fund)), share);
-        assertEq(uint8(ticket(id).status), uint8(Desk.Status.PaidOff));
+        assertEq(uint8(position(id).status), uint8(Desk.Status.PaidOff));
     }
 
     function test_payOff_worksWhenFeedIsStale_shareIsZero() public {
@@ -232,7 +232,7 @@ contract DeskTest is Base {
         skip(3 days);
         vm.prank(trader);
         desk.payOff(id);
-        assertEq(coin.balanceOf(trader), 5_000_000);
+        assertEq(asset.balanceOf(trader), 5_000_000);
         assertEq(usdc.balanceOf(address(fund)), 0);
     }
 
@@ -245,7 +245,7 @@ contract DeskTest is Base {
         desk.partPay(id, 500 * USDC);
         assertEq(desk.settlementAmount(id), s0 - 500 * USDC);
         assertEq(vault.lent(), 1_500 * USDC);
-        assertEq(coin.balanceOf(address(desk)), 5_000_000);
+        assertEq(asset.balanceOf(address(desk)), 5_000_000);
     }
 
     function test_partPay_revertsAtOrAboveSettlement() public {
@@ -293,7 +293,7 @@ contract DeskTest is Base {
         assertEq(usdc.balanceOf(keeper), 1 * USDC);
         assertEq(desk.owed(trader), surplus - share);
         assertEq(usdc.balanceOf(address(desk)), desk.totalOwed());
-        assertEq(uint8(ticket(id).status), uint8(Desk.Status.Settled));
+        assertEq(uint8(position(id).status), uint8(Desk.Status.Settled));
 
         uint256 before = usdc.balanceOf(trader);
         vm.prank(trader);
@@ -309,13 +309,13 @@ contract DeskTest is Base {
         fund.receiveShare(125 * USDC); // 25 to the treasury, 100 available
         uint256 id = openExample();
         skipFresh(14 days + 1);
-        setPrice(36_000); // -40%: coin sells for 1,800
+        setPrice(36_000); // -40%: asset sells for 1,800
 
         uint256 traderBefore = usdc.balanceOf(trader);
         vm.prank(keeper);
         desk.settle(id);
 
-        assertEq(uint8(ticket(id).status), uint8(Desk.Status.SettledShort));
+        assertEq(uint8(position(id).status), uint8(Desk.Status.SettledShort));
         assertEq(usdc.balanceOf(trader), traderBefore, "trader pays nothing more");
         assertEq(desk.owed(trader), 0);
         assertEq(vault.lent(), 0);
@@ -347,12 +347,12 @@ contract DeskTest is Base {
         skipFresh(13 days);
         vm.expectRevert(Desk.NotDue.selector);
         desk.settle(id);
-        assertEq(coin.balanceOf(address(desk)), 5_000_000);
+        assertEq(asset.balanceOf(address(desk)), 5_000_000);
     }
 
     // ── book value ──
 
-    function test_bookValue_lowerOfSettlementAndCoinValue() public {
+    function test_bookValue_lowerOfSettlementAndAssetValue() public {
         uint256 id = openExample();
         (uint256 book, uint256 shortfall) = desk.bookValue();
         assertEq(book, desk.settlementAmount(id));
@@ -388,16 +388,16 @@ contract DeskTest is Base {
         desk.setTrader(alice, true);
     }
 
-    function test_paramChangeDoesNotTouchLiveTicket() public {
+    function test_paramChangeDoesNotTouchLivePosition() public {
         uint256 id = openExample();
         vm.prank(admin);
         desk.setParams(4_000, 100, 20_000, 30_000, 100_000 * USDC, 200);
-        assertEq(ticket(id).markup, MARKUP);
+        assertEq(position(id).markup, MARKUP);
     }
 
     // ── fuzz ──
 
-    /// Any ticket, any price path, any exit time: the vault never receives more than
+    /// Any position, any price path, any exit time: the vault never receives more than
     /// principal plus markup, the trader never pays more than they chose to, and the
     /// desk ends empty.
     function testFuzz_lifecycle(uint256 dp, uint256 lev, uint256 priceAtExit, uint256 wait, uint8 exit) public {
@@ -407,21 +407,21 @@ contract DeskTest is Base {
         wait = bound(wait, 0, 20 days);
         vm.prank(trader);
         uint256 id = desk.open(dp, lev, 14 days, 0);
-        Desk.Ticket memory t = ticket(id);
+        Desk.Position memory t = position(id);
         uint256 vaultBefore = vault.idle() + vault.reserve();
         uint256 traderBefore = usdc.balanceOf(trader);
 
         skipFresh(wait);
         setPrice(priceAtExit);
         uint256 s = desk.settlementAmount(id);
-        uint256 coinValue = oracle.value(t.qty);
+        uint256 assetValue = oracle.value(t.qty);
 
         if (wait > 14 days) {
             desk.settle(id);
             assertGe(usdc.balanceOf(trader), traderBefore, "settlement never takes from the trader");
         } else if (exit % 2 == 0) {
             vm.prank(trader);
-            if (coinValue < s) {
+            if (assetValue < s) {
                 vm.expectRevert(Desk.SaleBelowSettlement.selector);
                 desk.close(id, 0);
                 return;
@@ -431,12 +431,12 @@ contract DeskTest is Base {
         } else {
             vm.prank(trader);
             desk.payOff(id);
-            assertEq(coin.balanceOf(trader), t.qty);
+            assertEq(asset.balanceOf(trader), t.qty);
         }
         uint256 vaultGain = vault.idle() + vault.reserve() - (vaultBefore - 0);
         assertLe(vaultGain, t.financed + t.markup, "vault never gets more than the balance");
         assertEq(vault.lent(), 0);
-        assertEq(coin.balanceOf(address(desk)), 0);
+        assertEq(asset.balanceOf(address(desk)), 0);
         assertEq(usdc.balanceOf(address(desk)), desk.totalOwed());
         assertEq(usdc.balanceOf(address(vault)), vaultBacked());
     }

@@ -4,7 +4,7 @@ pragma solidity 0.8.26;
 import {IAggregatorV3} from "./interfaces/External.sol";
 
 /// @title Oracle
-/// @notice Reads one Chainlink coin/USD feed and converts between coin and USDC.
+/// @notice Reads one Chainlink asset/USD feed and converts between asset and USDC.
 ///         Assumes 1 USDC = 1 USD. Reverts when the price is stale, non-positive,
 ///         or the L2 sequencer is down or has only just restarted.
 contract Oracle {
@@ -19,16 +19,16 @@ contract Oracle {
     /// Zero on chains without a sequencer feed.
     IAggregatorV3 public immutable sequencerFeed;
     uint256 public immutable maxAge;
-    uint256 internal immutable scale; // 10^(coinDecimals + feedDecimals)
+    uint256 internal immutable scale; // 10^(assetDecimals + feedDecimals)
 
-    constructor(IAggregatorV3 feed_, IAggregatorV3 sequencerFeed_, uint256 maxAge_, uint8 coinDecimals) {
+    constructor(IAggregatorV3 feed_, IAggregatorV3 sequencerFeed_, uint256 maxAge_, uint8 assetDecimals) {
         feed = feed_;
         sequencerFeed = sequencerFeed_;
         maxAge = maxAge_;
-        scale = 10 ** (uint256(coinDecimals) + feed_.decimals());
+        scale = 10 ** (uint256(assetDecimals) + feed_.decimals());
     }
 
-    /// USD price of one whole coin, in feed decimals.
+    /// USD price of one whole asset, in feed decimals.
     function price() public view returns (uint256) {
         if (address(sequencerFeed) != address(0)) {
             (, int256 down, uint256 startedAt,,) = sequencerFeed.latestRoundData();
@@ -40,12 +40,12 @@ contract Oracle {
         return uint256(answer);
     }
 
-    /// USDC value of `qty` coin units. Rounds down.
+    /// USDC value of `qty` asset units. Rounds down.
     function value(uint256 qty) external view returns (uint256) {
         return qty * price() * USDC_UNIT / scale;
     }
 
-    /// Coin units that `usdc` buys at the feed price. Rounds down.
+    /// Asset units that `usdc` buys at the feed price. Rounds down.
     function quantity(uint256 usdc) external view returns (uint256) {
         return usdc * scale / (price() * USDC_UNIT);
     }

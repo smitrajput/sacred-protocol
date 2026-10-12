@@ -3,7 +3,7 @@
 
   The site is set like a merchant's term sheet: warm paper, ink, hairlines, and one seal-red
   accent for the single action on a screen and the one number that matters. No shadows carry
-  depth; rules do. The ticket is a whiter sheet laid on the paper.
+  depth; rules do. The position is a whiter sheet laid on the paper.
 
   Token names: --ground is the page, --paper the sheet. --gold and --gold-bright are kept as
   aliases of the accent so older components keep working.
@@ -33,7 +33,7 @@
   --up: #1f6a3a;
   --down: #a3301f;
 
-  /* The sheet: the ticket and the forms */
+  /* The sheet: the position and the forms */
   --paper: #fdfbf6;
   --paper-ink: #1b1915;
   --paper-mute: #6b665c;

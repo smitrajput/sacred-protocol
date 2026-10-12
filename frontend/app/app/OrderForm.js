@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { coinDecimals, coinSymbol, desk, preview, usdc } from "../../lib/contracts";
+import { assetDecimals, assetSymbol, desk, preview, usdc } from "../../lib/contracts";
 import { leverageLabel, leverageOptions } from "../../lib/defaults";
 import { formatAmount, formatUsdc, parseUsdc, quantityAt, quote } from "../../lib/math";
 import { formatPrice, priceToUnits } from "../../lib/price";
@@ -35,26 +35,26 @@ export default function OrderForm({ address, spotPrice: marketPrice }) {
   const downPayment = parseUsdc(down);
   const valid = downPayment !== null && params.minDownPayment !== undefined && downPayment >= params.minDownPayment;
   const q = valid && params.baseRateBps !== undefined ? quote({ downPayment, leverageBps, termDays, ...params }) : null;
-  const quantity = q && spotPrice ? quantityAt(q.cost, priceToUnits(spotPrice), coinDecimals) : null;
+  const quantity = q && spotPrice ? quantityAt(q.cost, priceToUnits(spotPrice), assetDecimals) : null;
 
-  // The trader's price limit: accept at most 0.3% less coin than the feed price implies.
+  // The trader's price limit: accept at most 0.3% less asset than the feed price implies.
   const fairQty = useFairQuantity(q?.cost);
-  const minCoinOut = fairQty ? (fairQty * 9_970n) / 10_000n : 0n;
+  const minAssetOut = fairQty ? (fairQty * 9_970n) / 10_000n : 0n;
 
   const amount = (units) => (q ? formatUsdc(units) : "0.00");
   const hint = preview
-    ? "Opening tickets switches on once the contracts are deployed."
+    ? "Opening positions switches on once the contracts are deployed."
     : !address
-      ? "Connect a wallet to open a ticket."
+      ? "Connect a wallet to open a position."
       : null;
 
   return (
     <section className={shared.paper}>
       <div className={shared.head}>
-        <h2 className={shared.title}>Buy {coinSymbol} now, pay the rest later</h2>
+        <h2 className={shared.title}>Buy {assetSymbol} now, pay the rest later</h2>
         {spotPrice && (
           <span className={shared.sub}>
-            {coinSymbol} at {formatPrice(spotPrice)} USDC
+            {assetSymbol} at {formatPrice(spotPrice)} USDC
           </span>
         )}
       </div>
@@ -81,9 +81,9 @@ export default function OrderForm({ address, spotPrice: marketPrice }) {
       </div>
 
       <dl className={shared.rows}>
-        <Row label={`The vault buys ${coinSymbol} for`} value={amount(q?.cost)} />
+        <Row label={`The vault buys ${assetSymbol} for`} value={amount(q?.cost)} />
         {quantity !== null && (
-          <Row label={`At ${formatPrice(spotPrice)}, that is`} value={`${formatAmount(quantity, coinDecimals, 4)} ${coinSymbol}`} />
+          <Row label={`At ${formatPrice(spotPrice)}, that is`} value={`${formatAmount(quantity, assetDecimals, 4)} ${assetSymbol}`} />
         )}
         <Row label="Your down payment" value={amount(downPayment)} />
         <Row label="The vault finances" value={amount(q?.financed)} />
@@ -93,7 +93,7 @@ export default function OrderForm({ address, spotPrice: marketPrice }) {
 
       <p className={shared.note}>
         The markup is the only charge and it never grows. Leave early and you pay only for the days used. If the
-        ticket ends in profit you keep 70% and 30% goes to the backstop fund. A price drop never closes your
+        position ends in profit you keep 90% and 10% of net profit goes to the backstop fund. A price drop never closes your
         position before the due date.
       </p>
 
@@ -104,11 +104,11 @@ export default function OrderForm({ address, spotPrice: marketPrice }) {
           onClick={() =>
             run(
               ...unlessAllowed(wallet.usdcForDesk, downPayment, approve(usdc, desk)),
-              call(desk, "open", downPayment, leverageBps, BigInt(termDays) * 86_400n, minCoinOut),
+              call(desk, "open", downPayment, leverageBps, BigInt(termDays) * 86_400n, minAssetOut),
             )
           }
         >
-          Open ticket
+          Open position
         </button>
         {hint && <span className={shared.hint}>{hint}</span>}
       </div>

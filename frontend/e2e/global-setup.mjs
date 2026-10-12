@@ -95,8 +95,8 @@ export default async function globalSetup() {
         NEXT_PUBLIC_FUND: addresses.fund,
         NEXT_PUBLIC_SALE: addresses.sale,
         NEXT_PUBLIC_RESERVE: addresses.reserve,
-        NEXT_PUBLIC_COIN_SYMBOL: "BTC",
-        NEXT_PUBLIC_COIN_DECIMALS: "8",
+        NEXT_PUBLIC_ASSET_SYMBOL: "BTC",
+        NEXT_PUBLIC_ASSET_DECIMALS: "8",
       },
     });
 

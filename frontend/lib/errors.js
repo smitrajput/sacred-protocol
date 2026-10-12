@@ -13,12 +13,12 @@ const REASONS = {
   // Desk
   BadLeverage: "That leverage is not offered.",
   BadTerm: "That term is not offered.",
-  TooLarge: "The ticket is above the size limit.",
-  TooManyTickets: "The desk has no room for another live ticket right now.",
+  TooLarge: "The position is above the size limit.",
+  TooManyPositions: "The desk has no room for another live position right now.",
   TooSmall: "The down payment is below the minimum.",
-  NotLive: "The ticket is no longer live.",
-  NotDue: "The ticket is not past its due date.",
-  SaleBelowSettlement: "The coin would sell for less than the settlement amount. Pay off instead, or wait.",
+  NotLive: "The position is no longer live.",
+  NotDue: "The position is not past its due date.",
+  SaleBelowSettlement: "The asset would sell for less than the settlement amount. Pay off instead, or wait.",
   Slippage: "The market moved past your price limit. Try again.",
   BadAmount: "A part payment must be below the settlement amount. Use pay off for the whole balance.",
   // Backstop fund

@@ -17,7 +17,7 @@ import {Preflight} from "./Preflight.sol";
 /// Environment:
 ///   PRIVATE_KEY, MANAGER, GUARDIAN, TREASURY
 ///   TIMELOCK, or MULTISIG to create one
-///   USDC, COIN, COIN_DECIMALS, FEED, SEQUENCER_FEED (0x0 only off Arbitrum One), ROUTER
+///   USDC, ASSET, ASSET_DECIMALS, FEED, SEQUENCER_FEED (0x0 only off Arbitrum One), ROUTER
 ///   (Uniswap v3 SwapRouter02), POOL_FEE, FEED_MAX_AGE (optional, 1 hour)
 ///   MAX_LEVERAGE_BPS (30000 for BTC, 20000 for ETH), BUCKET_CAP, FIRST_CUTOFF, NAME
 ///   FUND and RESERVE (optional, both or neither): the staking fund and liquidity
@@ -44,17 +44,17 @@ contract Deploy is Preflight {
         uint256 pk = vm.envUint("PRIVATE_KEY");
         address me = vm.addr(pk);
         IERC20 usdc = IERC20(vm.envAddress("USDC"));
-        address coin = vm.envAddress("COIN");
+        address asset = vm.envAddress("ASSET");
         address stakedFund = vm.envOr("FUND", address(0));
         address reserve = vm.envOr("RESERVE", address(0));
         uint256 feedMaxAge = vm.envOr("FEED_MAX_AGE", uint256(1 hours));
-        _checkInputs(address(usdc), coin, stakedFund, reserve, feedMaxAge);
+        _checkInputs(address(usdc), asset, stakedFund, reserve, feedMaxAge);
 
         vm.startBroadcast(pk);
         timelock = _timelock();
 
         oracle = new Oracle(
-            IAggregatorV3(vm.envAddress("FEED")), IAggregatorV3(vm.envAddress("SEQUENCER_FEED")), feedMaxAge, uint8(vm.envUint("COIN_DECIMALS"))
+            IAggregatorV3(vm.envAddress("FEED")), IAggregatorV3(vm.envAddress("SEQUENCER_FEED")), feedMaxAge, uint8(vm.envUint("ASSET_DECIMALS"))
         );
         if (stakedFund == address(0)) {
             fund = address(new BackstopFund(usdc, vm.envAddress("TREASURY"), me));
@@ -66,7 +66,7 @@ contract Deploy is Preflight {
         );
         desk = new Desk(
             usdc,
-            IERC20(coin),
+            IERC20(asset),
             IVault(address(vault)),
             ISwapRouter(vm.envAddress("ROUTER")),
             uint24(vm.envUint("POOL_FEE")),
@@ -100,15 +100,15 @@ contract Deploy is Preflight {
         console2.log("desk    ", address(desk));
     }
 
-    function _checkInputs(address usdc, address coin, address stakedFund, address reserve, uint256 feedMaxAge)
+    function _checkInputs(address usdc, address asset, address stakedFund, address reserve, uint256 feedMaxAge)
         internal
         view
     {
         _requireDecimals("USDC", usdc, 6);
-        _requireDecimals("COIN", coin, uint8(vm.envUint("COIN_DECIMALS")));
+        _requireDecimals("ASSET", asset, uint8(vm.envUint("ASSET_DECIMALS")));
         _requireLiveFeed(vm.envAddress("FEED"), feedMaxAge);
         _requireSequencerFeed(vm.envAddress("SEQUENCER_FEED"));
-        _requirePool(vm.envAddress("ROUTER"), usdc, coin, uint24(vm.envUint("POOL_FEE")));
+        _requirePool(vm.envAddress("ROUTER"), usdc, asset, uint24(vm.envUint("POOL_FEE")));
         _requireSet("MANAGER", vm.envAddress("MANAGER"));
         _requireSet("GUARDIAN", vm.envAddress("GUARDIAN"));
         _requireSet("TREASURY", vm.envAddress("TREASURY"));

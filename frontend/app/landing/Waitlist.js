@@ -48,11 +48,15 @@ export default function Waitlist() {
     <section id="waitlist" className={styles.section}>
       <div className={`${styles.wrap} ${styles.waitlist}`}>
         <div>
-          <h2 className={styles.h2}>Want in early?</h2>
+          <h2 className={styles.h2}>Early access is now open.</h2>
           <p className={styles.lead}>
-            I&rsquo;m opening the desk to a small first cohort of depositors and traders, with deposits capped at 1
-            million USDC. Leave your email and I&rsquo;ll write when the list opens. Add a wallet if you trade; seats
-            go by record, not by follower count.
+            The first cohort of depositors is small, with deposits capped at 1 million USDC. Leverage traders are
+            hand-picked for the genesis list, so add your wallet if it has a strong onchain record. Leave your email
+            and we&rsquo;ll let you know if you&rsquo;re in.
+          </p>
+          <p className={styles.lead}>
+            Curious builders and investors are welcome as early supporters too. Pick your role in the form and
+            we&rsquo;ll reach out personally.
           </p>
           <p className={`${styles.small} ${styles.afterList}`}>
             Points start on day one for everyone on the list who deposits or trades. They are a discretionary gift and

@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className={styles.wrap}>
       <div className={styles.footer}>
         <p>
-          Sacred is pre-launch. Term mode is deployed on Arbitrum One behind an allow-list and is not audited. No
+          Sacred is pre-launch. No
           Shariah board has reviewed the design, so nothing here is certified halal. Every number is a proposal, a
           backtest or a simulation, not a promise. This page is not an offer to sell anything.
         </p>

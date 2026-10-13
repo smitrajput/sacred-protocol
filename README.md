@@ -2,7 +2,7 @@
 
 Halal leverage for traders and real yield for depositors, with no interest anywhere.
 This repository holds the first working version: **term mode, end to end**.
-It is deployed on Arbitrum One (addresses in [section 3](#deployed-on-arbitrum-one)), but
+It is deployed on Arbitrum One and Monad testnet (addresses in [section 3](#deployed-on-arbitrum-one)), but
 nothing here is audited or certified by a Shariah board.
 
 | Part | Where | Language | What it does |
@@ -162,6 +162,8 @@ on Arbitrum One, the Uniswap pool, a contract multisig) and stop if one is wrong
    bits, and locks the registry bindings that must never change.
 2. `script/Deploy.s.sol` deploys one bucket and, given `FUND` and `RESERVE`, wires it to
    the staking fund and the reserve. Run it once per asset.
+3. `script/DeployMonadTestnet.s.sol` deploys both sides on Monad testnet in one run,
+   against test tokens, feeds and routers, since the testnet has none of the real ones.
 
 `contracts/.env.arbitrum.example` lists the Arbitrum One addresses, each checked against
 the chain. After both scripts, the deployer opens the SCR pool and adds the protocol's
@@ -201,6 +203,54 @@ ETH bucket (WETH, 2x max)
 | Vault | [`0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37`](https://arbiscan.io/address/0x87e1D4Bc94c932124E856963dE1a7Dc0E3E5Ed37#code) |
 | Desk | [`0x054738143B3126D943f97b4572bcDa155A9Af71d`](https://arbiscan.io/address/0x054738143B3126D943f97b4572bcDa155A9Af71d#code) |
 | Oracle | [`0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F`](https://arbiscan.io/address/0xB3D58e5F9D1C862CE88641C52DC43c2693C5f61F#code) |
+
+### Deployed on Monad testnet
+
+Monad testnet (chain 10143): the same contracts, deployed by `script/DeployMonadTestnet.s.sol` on 2026-10-14 and verified on MonadScan. Every SCR-side contract but the pool hook sits at the same address as on Arbitrum One. The testnet has no native USDC, WBTC or WETH, no Chainlink feeds and no Uniswap v3, so the desks trade against test stand-ins: tokens anyone can mint, price feeds anyone can set (seeded at BTC $83,180 and ETH $2,499 from Chainlink on Arbitrum One), and a router that swaps at the set price. The oracles accept a year-old price, since the feeds only move when someone sets them. The SCR pool runs on the Monad-maintained Uniswap v4 `PoolManager`. Testnet prices are not a reference.
+
+SCR side
+
+| Contract | Address |
+| --- | --- |
+| Token (`SacredTokenDummy`, SRD) | [`0x65660a41C634cDD8246c3a6f9816d35D2a29df21`](https://testnet.monadscan.com/address/0x65660a41C634cDD8246c3a6f9816d35D2a29df21#code) |
+| Minter (`SacredMinter`) | [`0xdc36Cb2E3be465aC31D06745283cD3420BB52F03`](https://testnet.monadscan.com/address/0xdc36Cb2E3be465aC31D06745283cD3420BB52F03#code) |
+| Pool hook (`TaxHook`) | [`0x9278DF35400c9868eCa463f53c2D60525279ADCD`](https://testnet.monadscan.com/address/0x9278DF35400c9868eCa463f53c2D60525279ADCD#code) |
+| Liquidity manager (`LiquidityManager`) | [`0x42E3735DF423fD006E10A3d97B9C83438d828193`](https://testnet.monadscan.com/address/0x42E3735DF423fD006E10A3d97B9C83438d828193#code) |
+| Liquidity reserve (`Reserve`) | [`0xe8d09aB2342b1DfA7BE38b3Af5929D55D054C7b3`](https://testnet.monadscan.com/address/0xe8d09aB2342b1DfA7BE38b3Af5929D55D054C7b3#code) |
+| Staking fund (`StakedBackstopFund`) | [`0x29E61dB6f53b4bCA6B9F838b3452c9054d8A446c`](https://testnet.monadscan.com/address/0x29E61dB6f53b4bCA6B9F838b3452c9054d8A446c#code) |
+| Fee splitter (`FeeSplitter`) | [`0xCBf479Cd35325d69236c26400ec06B764A38a98a`](https://testnet.monadscan.com/address/0xCBf479Cd35325d69236c26400ec06B764A38a98a#code) |
+| Reserve sale (`ReserveSale`) | [`0x158181DCC72FEF6870AA6460b14f826A3A4bA6e5`](https://testnet.monadscan.com/address/0x158181DCC72FEF6870AA6460b14f826A3A4bA6e5#code) |
+| Address registry (`AddressRegistry`) | [`0x92c9ce1a970E1CEc443018FB121A3b5015138a96`](https://testnet.monadscan.com/address/0x92c9ce1a970E1CEc443018FB121A3b5015138a96#code) |
+| Time-lock (`TimelockController`) | [`0xe408f23305cAc5719880597D36a811854A01d0c9`](https://testnet.monadscan.com/address/0xe408f23305cAc5719880597D36a811854A01d0c9#code) |
+
+BTC bucket (test WBTC, 3x max)
+
+| Contract | Address |
+| --- | --- |
+| Vault | [`0xf4623B09196469b02e287EA34B2e87DC6F948019`](https://testnet.monadscan.com/address/0xf4623B09196469b02e287EA34B2e87DC6F948019#code) |
+| Desk | [`0x8A324a2925A50a0212532df28C972fD211068529`](https://testnet.monadscan.com/address/0x8A324a2925A50a0212532df28C972fD211068529#code) |
+| Oracle | [`0x4a23B639aaaD509FdB52533C054621C259a510d9`](https://testnet.monadscan.com/address/0x4a23B639aaaD509FdB52533C054621C259a510d9#code) |
+
+ETH bucket (test WETH, 2x max)
+
+| Contract | Address |
+| --- | --- |
+| Vault | [`0x38a0772EE7f7EcA7cbc181814Abc0a187895722f`](https://testnet.monadscan.com/address/0x38a0772EE7f7EcA7cbc181814Abc0a187895722f#code) |
+| Desk | [`0x08c0F0699Ef17A44a6Ded158EdcA8F68338A312C`](https://testnet.monadscan.com/address/0x08c0F0699Ef17A44a6Ded158EdcA8F68338A312C#code) |
+| Oracle | [`0x1d8ebCf436EF2EB9286574CFEF559e86f1a36Db2`](https://testnet.monadscan.com/address/0x1d8ebCf436EF2EB9286574CFEF559e86f1a36Db2#code) |
+
+Test stand-ins
+
+| Contract | Address |
+| --- | --- |
+| USDC (open mint, 6 decimals) | [`0xdBEeb5EFf47054F3fF29aF08fb0D3E8EdE80E191`](https://testnet.monadscan.com/address/0xdBEeb5EFf47054F3fF29aF08fb0D3E8EdE80E191#code) |
+| WBTC (open mint, 8 decimals) | [`0x3D3EfDa1eC1Cc36C66606b945594bc38d7b45C03`](https://testnet.monadscan.com/address/0x3D3EfDa1eC1Cc36C66606b945594bc38d7b45C03#code) |
+| WETH (open mint, 18 decimals) | [`0x9046D6eA476a4ce6A0A6Da6b2087739833e69F13`](https://testnet.monadscan.com/address/0x9046D6eA476a4ce6A0A6Da6b2087739833e69F13#code) |
+| BTC / USD feed | [`0x0eAEe278AB79933A587efF9f99FF19926200C2D0`](https://testnet.monadscan.com/address/0x0eAEe278AB79933A587efF9f99FF19926200C2D0#code) |
+| ETH / USD feed | [`0x1Dc53908efe3346F6a5a87aB1aC4C0C477D28fA7`](https://testnet.monadscan.com/address/0x1Dc53908efe3346F6a5a87aB1aC4C0C477D28fA7#code) |
+| BTC swap router | [`0x4BEe51748Dff0466B08bC292E3CbE30893Af2639`](https://testnet.monadscan.com/address/0x4BEe51748Dff0466B08bC292E3CbE30893Af2639#code) |
+| ETH swap router | [`0x8F03D8e00248AC02657e6b21d8934d9340bcAb6c`](https://testnet.monadscan.com/address/0x8F03D8e00248AC02657e6b21d8934d9340bcAb6c#code) |
+| Uniswap v4 `PoolManager` (Monad-maintained) | [`0x451D64ab3b650040d2aE1886602b97ed6eDc643d`](https://testnet.monadscan.com/address/0x451D64ab3b650040d2aE1886602b97ed6eDc643d) |
 
 ### The rules the code keeps (and where they are tested)
 
@@ -441,7 +491,7 @@ sacred/
                Positions, Earn, Stake, Sale), lib/ (math, scr, errors, api, contracts),
                e2e/ (harness, test wallet, one flow per role), abi/
   abi/         contract ABIs for the server
-  deployments/ local.json, written by the local deploy script
+  deployments/ local.json, written by the local deploy script; monad-testnet.json
   export_abi.py
 ```
 

@@ -30,7 +30,8 @@ const mono = Libertinus_Mono({
   adjustFontFallback: false,
 });
 
-const description = "Halal leverage for traders. Real yield for depositors. No interest anywhere.";
+const description =
+  "Onchain Shariah-powered Money Markets. 9% APY on stablecoins and up to 5x leverage on majors, grounded in Shariah.";
 
 export const metadata = {
   metadataBase: new URL("https://sacred.markets"),

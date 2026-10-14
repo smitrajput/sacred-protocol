@@ -14,7 +14,6 @@ export default function Footer() {
         <div className={styles.footerLinks}>
           <Link href={links.app}>Launch app</Link>
           <Link href={links.docs}>Docs</Link>
-          <a href={links.lightpaper}>Lightpaper</a>
           <a href={links.waitlist}>Waitlist</a>
         </div>
       </div>

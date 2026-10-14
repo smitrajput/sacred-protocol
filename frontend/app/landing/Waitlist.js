@@ -118,7 +118,6 @@ export default function Waitlist() {
             <button type="submit" className={shared.inkBtn} disabled={state.status === "sending"}>
               {state.status === "sending" ? "Joining…" : "Join the waitlist"}
             </button>
-            <p className={shared.note}>One email when the list opens, and nothing else. No sharing, no selling.</p>
           </form>
         )}
       </div>

@@ -6,7 +6,6 @@ export const links = {
   app: "/app",
   docs: "/docs",
   waitlist: "#waitlist",
-  lightpaper: "/sacred-lightpaper.pdf",
 };
 
 // The asset in the worked position. Its leverage ceiling comes from lib/defaults.js.

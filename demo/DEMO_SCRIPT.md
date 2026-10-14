@@ -11,8 +11,8 @@ the same numbers. `npm run rehearse` replays this script and prints each figure.
 - Open the link. Press the **backtick key** (`` ` ``) to open the presenter panel, bottom right;
   press it again to hide it. Keep it hidden on camera and open it only to move price or time.
 - **Reset demo** in the panel, or reload the page, starts again from the top.
-- **Hide demo badge** in the panel removes "Demo, simulated chain" from the bar. If you hide it,
-  say it is a simulation in the narration.
+- The bar carries no demo badge; **Show demo badge** in the panel adds "Demo, simulated chain".
+  Say it is a simulation in the narration.
 - Today on the simulated chain is the day you record, at 12:00 UTC. The next weekly cut-off is
   three days later. Dates below are relative to that.
 - Each action takes about a second to confirm, like a wallet confirmation and a block.

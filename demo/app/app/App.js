@@ -23,7 +23,7 @@ import { formatDay } from "./format";
 export default function App() {
   const [address, setAddress] = useState(null);
   const [connecting, setConnecting] = useState(false);
-  const [showBadge, setShowBadge] = useState(true);
+  const [showBadge, setShowBadge] = useState(false);
   const [presenterOpen, setPresenterOpen] = useState(false);
   const { now } = useChain();
   const wallet = useWallet(address);

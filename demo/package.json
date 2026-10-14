@@ -1,0 +1,17 @@
+{
+  "name": "sacred-demo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "rehearse": "node scripts/rehearse.mjs"
+  },
+  "dependencies": {
+    "next": "15.5.27",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "viem": "^2.21.0"
+  }
+}

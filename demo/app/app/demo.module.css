@@ -1,0 +1,139 @@
+/* What the demo adds to the app: the bar's date and wallet chips, the confirmations, and the
+   presenter's panel. Tokens from app/globals.css. */
+
+.chip {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+
+.badge {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+
+.receipts {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 0.5rem;
+  width: min(30rem, calc(100vw - 2rem));
+  z-index: 20;
+}
+
+.receipt {
+  all: unset;
+  cursor: pointer;
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem 0.9rem;
+  background: var(--paper);
+  border: 1px solid var(--paper-edge);
+  border-left: 3px solid var(--up);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--paper-ink);
+  animation: arrive 0.35s var(--ease-out);
+}
+
+.receiptKind {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--paper-mute);
+}
+
+@keyframes arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.presenter {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  width: 21rem;
+  z-index: 30;
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+}
+
+.presenterHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.line {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  color: #d9d3c4;
+}
+
+.group {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.groupLabel {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #a39d90;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.buttons button,
+.buttons input {
+  font: inherit;
+  padding: 0.3rem 0.55rem;
+  border-radius: var(--radius);
+  border: 1px solid #5a554b;
+  background: transparent;
+  color: var(--paper);
+}
+
+.buttons button {
+  cursor: pointer;
+}
+
+.buttons button:hover {
+  border-color: var(--paper);
+}
+
+.buttons input {
+  width: 6.5rem;
+}
+
+.link {
+  all: unset;
+  cursor: pointer;
+  color: #a39d90;
+}

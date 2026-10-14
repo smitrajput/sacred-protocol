@@ -1,0 +1,75 @@
+// Mirrors contracts/src/PositionMath.sol exactly, in BigInt, so the order form shows the
+// same numbers the contract will record. All amounts are USDC units (6 decimals).
+
+export const BPS = 10_000n;
+export const YEAR = 365n * 86_400n;
+export const DAY = 86_400n;
+// 10% of net profit at launch. A preview shares on one position's own profit; the 90-day
+// carry-forward of earlier losses, which can only lower the share, is not modelled here.
+export const PROFIT_SHARE_BPS = 1_000n;
+
+export const cost = (downPayment, leverageBps) => (downPayment * leverageBps) / BPS;
+
+export const markup = (financed, rateBps, term) => (financed * rateBps * term) / (BPS * YEAR);
+
+export function earned(markup_, opened, due, now) {
+  const term = due - opened;
+  let elapsed = now > opened ? now - opened : 0n;
+  if (elapsed < DAY) elapsed = DAY;
+  if (elapsed > term) elapsed = term;
+  return (markup_ * elapsed) / term;
+}
+
+export const settlement = (financed, markup_, repaid, opened, due, now) =>
+  financed + earned(markup_, opened, due, now) - repaid;
+
+export function profitShare(takesOut, paidIn, shareBps = PROFIT_SHARE_BPS) {
+  if (takesOut <= paidIn) return 0n;
+  return ((takesOut - paidIn) * shareBps) / BPS;
+}
+
+// What the order form shows before a position opens.
+export function quote({ downPayment, leverageBps, termDays, baseRateBps, surchargeBps, surchargeAboveBps }) {
+  const rateBps = baseRateBps + (leverageBps > surchargeAboveBps ? surchargeBps : 0n);
+  const total = cost(downPayment, leverageBps);
+  const financed = total - downPayment;
+  const fixedMarkup = markup(financed, rateBps, BigInt(termDays) * DAY);
+  return { cost: total, financed, markup: fixedMarkup, balance: financed + fixedMarkup, rateBps };
+}
+
+// What the trader would walk away with if the asset were sold for `assetValue` now.
+export function exitPreview({ assetValue, settlementAmount, paidIn, shareBps = PROFIT_SHARE_BPS }) {
+  if (assetValue < settlementAmount) return { canClose: false, toTrader: 0n, toFund: 0n, profit: 0n };
+  const surplus = assetValue - settlementAmount;
+  const toFund = profitShare(surplus, paidIn, shareBps);
+  return { canClose: true, toTrader: surplus - toFund, toFund, profit: surplus > paidIn ? surplus - paidIn : 0n };
+}
+
+// Mirrors Oracle.quantity and Oracle.value for a price given in USDC units.
+export const quantityAt = (usdcAmount, priceUnits, assetDecimals) => (usdcAmount * 10n ** BigInt(assetDecimals)) / priceUnits;
+export const valueAt = (qty, priceUnits, assetDecimals) => (qty * priceUnits) / 10n ** BigInt(assetDecimals);
+
+// A token amount with `decimals`, rounded half up to `digits` and grouped with commas.
+export function formatAmount(units, decimals, digits = 2) {
+  const negative = units < 0n;
+  const abs = negative ? -units : units;
+  const scale = 10n ** BigInt(decimals - digits);
+  const rounded = (abs + scale / 2n) / scale;
+  const whole = rounded / 10n ** BigInt(digits);
+  const frac = (rounded % 10n ** BigInt(digits)).toString().padStart(digits, "0");
+  return `${negative ? "-" : ""}${whole.toLocaleString("en-US")}${digits > 0 ? `.${frac}` : ""}`;
+}
+
+export const formatUsdc = (units, digits = 2) => formatAmount(units, 6, digits);
+
+// A typed amount as token units, or null if it is not a plain decimal with at most `decimals` places.
+export function parseAmount(text, decimals) {
+  const clean = String(text).trim().replace(/,/g, "");
+  if (!/^\d*\.?\d*$/.test(clean) || clean === "" || clean === ".") return null;
+  const [whole, frac = ""] = clean.split(".");
+  if (frac.length > decimals) return null;
+  return BigInt(whole || "0") * 10n ** BigInt(decimals) + BigInt(frac.padEnd(decimals, "0") || "0");
+}
+
+export const parseUsdc = (text) => parseAmount(text, 6);
+export const parseScr = (text) => parseAmount(text, 18);

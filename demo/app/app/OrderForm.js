@@ -51,7 +51,7 @@ export default function OrderForm({ address, spotPrice: marketPrice }) {
   return (
     <section className={shared.paper}>
       <div className={shared.head}>
-        <h2 className={shared.title}>Buy {assetSymbol} now, pay the rest later</h2>
+        <h2 className={shared.title}>Liquidation-free leverage</h2>
         {spotPrice && (
           <span className={shared.sub}>
             {assetSymbol} at {formatPrice(spotPrice)} USDC

@@ -387,6 +387,13 @@ must deposit into the bucket before anyone else can: the manager has to hold at 
 it. The app connects to any injected wallet on chain 31337; point it at the node with
 `NEXT_PUBLIC_RPC_URL` if it is not on port 8545.
 
+On Arbitrum One and Monad testnet the node is Alchemy. Set `ALCHEMY_API_KEY` (never
+`NEXT_PUBLIC_`, so it stays off the browser) in the site's environment: the app's Arbitrum
+reads go through `/api/rpc/42161`, a read-only proxy to Alchemy, and the contracts page in the
+docs reads the deployed buckets' live state through it. The keeper and the indexer use Alchemy
+too when `ALCHEMY_API_KEY` is set and `RPC_URL` is not, on `CHAIN_ID` (42161 by default, or
+10143).
+
 ## 6. Assumptions
 
 1. **1 USDC = 1 USD.** The Oracle reads an asset/USD feed and treats it as asset/USDC.

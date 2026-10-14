@@ -1,4 +1,7 @@
+import LiveChain from "./LiveChain";
+
 export const metadata = { title: "Contracts and code" };
+export const revalidate = 60;
 
 # Contracts and code
 
@@ -86,6 +89,10 @@ Test stand-ins
 | BTC swap router | [`0x4BEe51748Dff0466B08bC292E3CbE30893Af2639`](https://testnet.monadscan.com/address/0x4BEe51748Dff0466B08bC292E3CbE30893Af2639#code) |
 | ETH swap router | [`0x8F03D8e00248AC02657e6b21d8934d9340bcAb6c`](https://testnet.monadscan.com/address/0x8F03D8e00248AC02657e6b21d8934d9340bcAb6c#code) |
 | Uniswap v4 `PoolManager` (Monad-maintained) | [`0x451D64ab3b650040d2aE1886602b97ed6eDc643d`](https://testnet.monadscan.com/address/0x451D64ab3b650040d2aE1886602b97ed6eDc643d) |
+
+### Live on-chain state
+
+<LiveChain />
 
 The deployed version is the first design's: a vault paired with each desk, so two vaults exist. The design is now one vault lending to every desk, with a loss reserve and a capital cap per desk ([architecture](/docs/architecture)). That rewrite ships with the launch re-cut, and these addresses change with it.
 

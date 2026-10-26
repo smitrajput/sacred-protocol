@@ -296,3 +296,19 @@
     animation: none;
   }
 }
+
+/* ---- The signature: mark and name, as in the brand kit's horizontal lockup ---- */
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  color: var(--ink);
+}
+
+.brandMark {
+  flex: none;
+  width: 1.45em;
+  height: 1.45em;
+  color: var(--accent);
+}

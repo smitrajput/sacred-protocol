@@ -39,7 +39,11 @@ export const metadata = {
   description,
   openGraph: { title: "Sacred", description, type: "website", siteName: "Sacred" },
   twitter: { card: "summary_large_image", title: "Sacred", description },
+  manifest: "/site.webmanifest",
 };
+
+// The browser chrome takes the page's paper colour.
+export const viewport = { themeColor: "#f4f0e7" };
 
 export default function RootLayout({ children }) {
   return (

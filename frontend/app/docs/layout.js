@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Brand from "../shared/Brand";
 import shared from "../shared/shared.module.css";
 import styles from "./docs.module.css";
 import DocsNav from "./DocsNav";
@@ -12,9 +13,7 @@ export default function DocsLayout({ children }) {
   return (
     <div className={styles.shell}>
       <header className={styles.bar}>
-        <Link href="/" className={styles.brand}>
-          Sacred
-        </Link>
+        <Brand className={styles.brand} />
         <span className={styles.barDocs}>
           <Link href="/docs">Docs</Link>
         </span>

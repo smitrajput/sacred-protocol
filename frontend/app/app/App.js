@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { assetDecimals, assetSymbol, preview } from "../../lib/contracts";
+import Brand from "../shared/Brand";
 import shared from "../shared/shared.module.css";
 import styles from "./app.module.css";
 import { usePoints } from "./data";
@@ -33,9 +33,7 @@ export default function App({ spotPrice, renderedAt }) {
   return (
     <div className={styles.shell}>
       <header className={styles.bar}>
-        <Link href="/" className={styles.brand}>
-          Sacred
-        </Link>
+        <Brand className={styles.brand} />
         <span className={styles.bucket}>{assetSymbol} bucket, term mode</span>
         <div className={styles.barRight}>
           {points && (

@@ -738,3 +738,101 @@
   color: var(--ink-2);
   text-wrap: pretty;
 }
+
+/* ---- FAQ: the heading held left, four folded lists right ---- */
+
+.faq {
+  display: grid;
+  gap: 2.5rem;
+}
+
+@media (min-width: 960px) {
+  .faq {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 7fr);
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .faqIntro {
+    position: sticky;
+    top: 2rem;
+  }
+}
+
+.faqIntro .small {
+  margin-top: 1.25rem;
+}
+
+.faqIntro a,
+.faqA a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.faqGroup + .faqGroup {
+  margin-top: 2.5rem;
+}
+
+.faqLabel {
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--rule-strong);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--rule);
+}
+
+.faqQ {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 1rem;
+  gap: 1rem;
+  align-items: baseline;
+  padding-block: 1rem;
+  list-style: none;
+  cursor: pointer;
+  font: 600 1.1rem / 1.35 var(--font-serif);
+  color: var(--ink);
+  text-wrap: pretty;
+  transition: color 0.2s var(--ease-out);
+}
+
+.faqQ::-webkit-details-marker {
+  display: none;
+}
+
+/* A plus that turns into a cross when the answer is open. */
+.faqQ::after {
+  content: "+";
+  justify-self: end;
+  font: 400 1.35rem / 1 var(--font-sans);
+  color: var(--accent);
+  transition: transform 0.25s var(--ease-out);
+}
+
+.faqItem[open] > .faqQ::after {
+  transform: rotate(45deg);
+}
+
+.faqQ:hover {
+  color: var(--accent-deep);
+}
+
+.faqA {
+  padding: 0 2rem 1.25rem 0;
+  max-width: var(--measure);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .faqItem[open] > .faqA {
+    animation: rise 0.4s var(--ease-out) both;
+  }
+}

@@ -17,6 +17,7 @@ export const nav = [
   { label: "Leverage", href: "#leverage" },
   { label: "Shariah", href: "#shariah" },
   { label: "Safety", href: "#safety" },
+  { label: "FAQ", href: "#faq" },
   { label: "Docs", href: links.docs },
 ];
 
@@ -186,3 +187,81 @@ export const system = {
     ["A 60-minute outage on every forced sale", "Payout unchanged. Depositors lose in 1.5% of years; worst year 7.1%."],
   ],
 };
+
+// ---- FAQ: grouped so the page shows four short lists, each answer folded until asked ----
+
+export const faq = [
+  {
+    group: "Shariah",
+    items: [
+      {
+        q: "Is Sacred halal?",
+        a: "Sacred is designed around Islamic sale and profit-sharing contracts. Formal Shariah rulings are in the works.",
+      },
+      {
+        q: "How can leverage be halal?",
+        a: "Sacred uses a real asset sale: the protocol buys the asset, then sells it to you at a fixed price payable later. The asset secures what you owe. This structure still requires Shariah approval.",
+      },
+    ],
+  },
+  {
+    group: "Depositing",
+    items: [
+      {
+        q: "Are the 9% returns guaranteed?",
+        a: "No. 9% a year is a target, not a promise. A payout reserve is designed to smooth returns, while four planned protective layers help absorb trading losses before they reach depositors. Returns can still fall below the target, and your capital remains at risk.",
+      },
+      {
+        q: "Where does the yield come from?",
+        a: "Traders pay a markup to buy assets on credit. Depositors receive a share of that markup. A reserve saves some earnings from stronger periods to help support payouts in weaker ones.",
+      },
+      {
+        q: "What protects my deposit against trading losses?",
+        a: "Sacred’s planned design puts four layers ahead of depositors: the trader’s down payment, the asset desk’s loss reserve, the backstop fund’s USDC, and staked SCR. These absorb trading losses in that order before depositors bear any remaining shortfall. Protection depends on the funds available; the SCR layer is planned for a later phase.",
+      },
+      {
+        q: "What are the risks?",
+        a: "Trading losses can reach depositors if the available protective layers are exhausted. Smart-contract bugs, stablecoin failures and problems with price feeds or the network can also cause losses or delay withdrawals. The protections reduce exposure to trading losses but do not cover every risk. Traders can lose their full down payment.",
+      },
+      {
+        q: "Can I withdraw my deposit whenever I want?",
+        a: "At launch, withdrawals are planned to be instant when enough cash is available and safety conditions are met. Otherwise, requests enter a queue processed weekly. Your deposit continues to earn returns—and remains exposed to losses—until withdrawn.",
+      },
+    ],
+  },
+  {
+    group: "Trading",
+    items: [
+      {
+        q: "What assets and leverage will be available?",
+        a: "The initial plan is BTC up to 3x and ETH up to 2x, with positions lasting 7 or 14 days, subject to Shariah approval. Leverage up to 5x is planned for a later phase.",
+      },
+      {
+        q: "Can my trade be liquidated?",
+        a: "In term mode, price drops will not close your position before its due date. If you haven’t repaid by then, the asset can be sold to settle it. You can lose your full down payment, but you won’t owe more.",
+      },
+      {
+        q: "What does it cost to trade?",
+        a: "Planned launch pricing includes a markup fixed when you open, plus 10% of your net trading profit. There are no ongoing funding payments or late-payment penalties. Network transaction costs also apply.",
+      },
+      {
+        q: "Do I actually own the asset?",
+        a: "Yes. Sacred buys the asset and sells it to you. It stays locked as collateral until you repay the balance, after which you can take it into your wallet.",
+      },
+    ],
+  },
+  {
+    group: "Status",
+    items: [
+      {
+        q: "Can I use Sacred today?",
+        a: "Not yet. Sacred is still being built. Join the waitlist for early access.",
+        link: { text: "Join the waitlist", href: links.waitlist },
+      },
+      {
+        q: "Has Sacred been audited?",
+        a: "Not yet. The smart contracts are still being developed and will be independently audited before launch.",
+      },
+    ],
+  },
+];

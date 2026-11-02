@@ -120,7 +120,7 @@
   }
 }
 
-/* ---- Hero: one statement, centred, filling the first screen ---- */
+/* ---- Hero: a ledger of three verbs, centred, filling the first screen ---- */
 
 .hero {
   min-height: calc(100svh - 4.25rem);
@@ -132,37 +132,96 @@
   padding-block: clamp(4rem, 10vh, 7rem);
 }
 
-.hero .h1 {
-  font-size: clamp(2.8rem, 1.4rem + 5.6vw, 6.25rem);
-  line-height: 1.02;
+/*
+  The ledger. Three columns, one per verb: the verb at display size with the rest of its
+  sentence at reading size beneath, and a hairline between columns. The top row alone reads
+  "Earn. Trade. Borrow." On a phone each column becomes a row, the verb beside its sentence.
+*/
+.ledger {
+  display: grid;
+  width: 100%;
+  max-width: 64rem;
+  font: 400 clamp(2.4rem, 1.2rem + 3.6vw, 5.25rem) / 1 var(--font-serif);
   letter-spacing: -0.03em;
-  max-width: 14ch;
+  text-align: left;
 }
 
-.hero .h1 em {
-  font-style: italic;
-  color: var(--accent);
+.ledgerCol {
+  display: grid;
+  grid-template-columns: 3.5em minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: 0.4em;
+  padding-block: 0.4em;
+  border-top: 1px solid var(--rule);
 }
 
-/* Two lines on a wide screen, three on a phone; never a break inside a phrase. */
-.hero .h1 em,
-.hero .h1 span {
-  white-space: nowrap;
+.ledgerCol:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.ledgerVerb {
+  color: var(--ink);
+}
+
+.ledgerRest {
+  font-size: 0.42em;
+  line-height: 1.25;
+  letter-spacing: -0.012em;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  text-wrap: pretty;
 }
 
 @media (min-width: 720px) {
-  .hero .h1 span {
-    display: block;
+  .ledger {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: clamp(1.5rem, 3vw, 2.75rem);
+  }
+
+  .ledgerCol {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    row-gap: 0.35em;
+    padding-block: 0;
+    padding-left: clamp(1.5rem, 3vw, 2.75rem);
+    border-top: 0;
+    border-left: 1px solid var(--rule);
+  }
+
+  .ledgerCol:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .ledgerCol:last-child {
+    border-bottom: 0;
+  }
+
+  .ledgerRest {
+    max-width: 18ch;
   }
 }
 
-.heroLead {
-  margin-top: 1.75rem;
-  font-size: clamp(1.125rem, 1rem + 0.6vw, 1.45rem);
-  line-height: 1.45;
+/* The one thing the three lines share, set off by a short rule. */
+.heroClosing {
+  margin-top: 2.5rem;
+  font: 400 clamp(1.25rem, 1.05rem + 0.8vw, 1.7rem) / 1.3 var(--font-serif);
+  letter-spacing: -0.01em;
   color: var(--ink-2);
-  max-width: 36ch;
-  text-wrap: balance;
+}
+
+.heroClosing::before {
+  content: "";
+  display: block;
+  width: 2.5rem;
+  height: 1px;
+  margin: 0 auto 1.25rem;
+  background: var(--rule-strong);
+}
+
+.heroClosing em {
+  font-style: italic;
+  color: var(--accent);
 }
 
 .ctas {
@@ -174,18 +233,25 @@
 
 .hero .ctas {
   justify-content: center;
-  margin-top: 2.75rem;
+  margin-top: 2.5rem;
 }
 
+/* Each column of the ledger rises in turn, then the closing line, then the actions. */
 @media (prefers-reduced-motion: no-preference) {
-  .hero > * {
+  .ledgerVerb,
+  .ledgerRest {
+    animation: rise 0.9s var(--ease-out) both;
+    animation-delay: calc(var(--i) * 0.12s);
+  }
+  .heroClosing,
+  .hero .ctas {
     animation: rise 0.9s var(--ease-out) both;
   }
-  .hero > :nth-child(2) {
-    animation-delay: 0.1s;
+  .heroClosing {
+    animation-delay: 0.42s;
   }
-  .hero > :nth-child(3) {
-    animation-delay: 0.2s;
+  .hero .ctas {
+    animation-delay: 0.52s;
   }
 }
 

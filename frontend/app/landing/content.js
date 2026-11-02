@@ -21,8 +21,20 @@ export const nav = [
   { label: "Docs", href: links.docs },
 ];
 
-// The two numbers the hero promises. The payout is the mechanism's target, and the markup
-// below is cut for it; the two move together or not at all.
+// The hero: three verbs across one line, each with the sentence that explains it beneath, so
+// the headline and the lead are the same three columns read at two sizes. The closing line is
+// the one thing the three share.
+export const hero = {
+  columns: [
+    { verb: "Earn", rest: "Up to 7% APY on stablecoins." },
+    { verb: "Trade", rest: "BTC & ETH with up to 5× leverage." },
+    { verb: "Borrow", rest: "USDC against your crypto." },
+  ],
+  closing: ["Grounded in ", "Shariah", "."],
+};
+
+// The two numbers the Why section promises. The payout is the mechanism's target, and the
+// markup below is cut for it; the two move together or not at all.
 export const headline = { yield: "9%", leverage: "5x" };
 
 // The launch parameters, from the final mechanism. Shaped like the Desk's defaults so the

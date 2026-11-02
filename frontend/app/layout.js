@@ -31,7 +31,7 @@ const mono = Libertinus_Mono({
 });
 
 const description =
-  "Onchain Shariah-powered Money Markets. 9% APY on stablecoins and up to 5x leverage on majors, grounded in Shariah.";
+  "Earn on stablecoins, trade BTC and ETH with costs shown upfront, and access USDC against your crypto. Onchain financing grounded in Shariah.";
 
 export const metadata = {
   metadataBase: new URL("https://sacred.markets"),

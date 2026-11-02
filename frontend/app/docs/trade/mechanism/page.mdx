@@ -1,0 +1,115 @@
+import { Strip, Anatomy, PartialSale } from "../../figures/trade";
+
+export const metadata = { title: "Trade mechanics" };
+
+# Trade mechanics
+
+A position is one genuine sale of one asset to one trader, with the asset pledged back as security. The running example is a $10,000 BTC purchase at 2× for 14 days. Every step below is proposed, and needs contract review and implementation.
+
+<Strip />
+
+## Four parties, three contracts
+
+| Party | Puts in | Gets |
+| --- | --- | --- |
+| **Depositors** | USDC, into the MarginVault | 77% of base markup, as variable income. Four layers of backstops stand in front of their principal |
+| **Manager** | Its work | 23% of base markup, paying operations first, then protection, then company cash |
+| **Trader** | Their capital now, the balance by maturity | The asset, its full gains and losses, less the agreed price |
+| **Spot market** | Nothing | Where assets are bought and pledged assets are sold |
+
+| Contract | Between | In one line |
+| --- | --- | --- |
+| **Mudarabah** | Depositors and the manager | Depositors fund the vault, the manager runs it, profit is split by a fixed ratio, loss falls on capital |
+| **Murabaha** | The vault and the trader | The vault sells an asset it owns at disclosed cost plus a fixed profit, payable later |
+| **Rahn** | The trader and the vault | The trader pledges the asset as security for the debt |
+
+## Opening
+
+Everything below happens in one transaction, in this order.
+
+1. **Quote.** The trader sees the asset, price, markup in dollars, maturity, execution assumptions, coverage rules and the informational Hyperliquid comparison.
+2. **Checks.** Fresh capital, the [SIFT](/docs/trade/sift) ceiling, portfolio and tier limits, withdrawal priority, oracle, depth and route. A cheaper competing quote is not a reason to refuse.
+3. **Cash.** Acquisition preflight needs `L/(L−1)` times the new financing in temporary purchase cash, which is twice the financing at 2×, until the trader's capital arrives.
+4. **The vault buys.** It pays for the asset on the spot market and owns it.
+5. **The vault sells.** The asset is sold to the trader at cost plus a fixed markup. The trader's capital is the first part of the price, and the rest is a fixed debt.
+6. **The pledge.** The asset is pledged as security and held in the position.
+
+The vault must own the asset before it sells it. The contract records cost and markup separately, because Murabaha requires the cost to be disclosed.
+
+<Anatomy />
+
+```text
+financing = asset_cost × (1 − 1/L)
+markup    = financing × quoted_APR × days / 365
+debt      = financing + markup
+```
+
+Full markup is booked once at origination. It is reversed only by an executed, approved rebate. Closing never charges it twice.
+
+## Coverage and partial sale
+
+```text
+coverage = asset value / full remaining contractual debt
+```
+
+Full remaining debt includes scheduled markup under the separately approved rebate framework. At 2× a partial sale begins at 160% and restores 190%. Only the asset needed to restore coverage is sold, on the open market, and the trader keeps the rest. Remaining dust below $250 of financing closes.
+
+<PartialSale />
+
+The vault sells under a separately reviewed authority, on terms agreed at the sale. No debt is extended to collect markup. Execution, oracle and depth checks remain mandatory on every sale.
+
+## Settlement
+
+After approved rebates and actual close costs, every repayment and sale applies principal first:
+
+```text
+P = remaining principal
+M = remaining markup
+S = net recovered cash after close costs
+
+principal recovered = min(P, max(S, 0))
+principal shortfall = max(0, P − max(S, 0))
+markup collected    = min(M, max(0, S − P))
+trader surplus      = max(0, S − P − M)
+```
+
+Partial sales and repayments reconcile exactly once. Collection stops at the pledged asset, so a trader never owes more than the pledge. A principal shortfall is recorded even when a reserve absorbs it, because a reserve draw does not erase an economic loss. Impairments are processed before distributions, share minting and redemptions.
+
+Renewal is settlement followed by a genuine new purchase and sale at a new quote. There is no rollover.
+
+## Properties to keep
+
+- The vault owns the asset before it sells it.
+- A sale's price, markup and maturity never change after the sale.
+- A pledged asset leaves only to the trader after payment, or to the market. It is never sold to the vault, lent, staked or reused.
+- The trader keeps all surplus above the debt. No mandatory share of profit exists at any tier.
+- Depositor principal and refundable amounts never become protocol protection.
+- Repayment and exit survive origination pauses.
+
+These are design requirements for the proposed engine. The [contracts page](/docs/contracts) separates them from what is built today.
+
+## The leverage ladder
+
+All terms are 14 days, mandatory profit share is 0% at every tier, and leverage goes up to 5×. Higher tiers are gradually opened as their protection is earned and Shariah rulings approved.
+
+| Leverage | Financed APR | Normal depositor share | Trigger / restore | Initial price room | Primary + tail stock | Cap on approved financing |
+| --- | --- | --- | --- | --- | --- | --- |
+| **2×** | **10.0%** | **77.00%** | **160% / 190%** | **19.7%** | **0.4% + 0.6% = 1.0%** | |
+| 2.5× | 11.0% | 74.55% | 145% / 160% | 12.6% | 0.5% + 1.0% = 1.5% | all above 2×: 25% |
+| 3× | 12.5% | 71.60% | 130% / 145% | 12.9% | 1.5% + 7.5% = 9.0% | 3× and up: 15% |
+| 3.5× | 14.0% | 69.29% | 125% / 135% | 10.2% | 2.5% + 7.5% = 10.0% | 3.5× and up: 7.5% |
+| 4× | 16.0% | 66.88% | 120% / 130% | 9.4% | 4.5% + 9.5% = 14.0% | 4× and up: 5% |
+| 4.5× | 18.0% | 65.00% | 116% / 125% | 9.1% | 6.5% + 10.5% = 17.0% | 4.5× and up: 2.5% |
+| 5× | 20.0% | 63.50% | 115% / 123% | 7.2% | 6.5% + 10.5% = 17.0% | 5×: 1% |
+
+`normal depositor share = (0.077 + 0.5 × (APR − 0.10)) / APR`. Stock ratios apply to approved financing, not asset notional or revenue. Caps overlap and count current exposure and committed financing. Rates and triggers are policy choices informed by replay, not a fitted commercial optimum. The 3× trigger at 130% gives traders more price room than 135%, and its 9% stock pays for the resulting stress exposure.
+
+## Not in this design
+
+| Left out | Why |
+| --- | --- |
+| Shorts | Selling what one does not hold needs a prepaid forward (*salam*) with its own market and rulings |
+| Rollover | Extending a debt for an extra charge is riba |
+| Synthetic perps | Nothing is owned, and settlement is in cash |
+| Mandatory trader profit share | It is not established as part of a known sale price |
+| Automatic higher leverage from a good score | Score and tier are separate decisions |

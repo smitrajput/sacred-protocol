@@ -22,12 +22,11 @@ down payment now and the rest by a due date, and the asset stays pledged in the 
 and 30% goes to the **BackstopFund**, which pays shortfalls after the bucket's own loss
 reserve. In term mode nobody but the trader can sell the asset before the due date.
 
-**The design has moved on from this shape.** Since October 2026 the design is one vault for
-all stablecoin deposits (USDC and USDT at launch, accounted in USDC), lending to one desk per
-asset, with a loss reserve and a capital cap per desk; the docs at
-[sacred.markets/docs](https://sacred.markets/docs) describe it. The code here still pairs one
-`Vault` with each `Desk`, and "bucket" below means that pair. Merging the vaults is the next
-contract job.
+**The design has moved on from this shape.** The docs at
+[sacred.markets/docs](https://sacred.markets/docs) describe the current proposal: Earn, Trade and
+Borrow on Arc, with separate vaults, leverage up to 5× opened gradually, and SIFT financing limits. None of that
+is built. This repository still holds the earlier term-mode system, which pairs one `Vault` with
+each `Desk`, and "bucket" below means that pair.
 
 ## 2. Architecture
 

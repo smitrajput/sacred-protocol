@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { faq, links } from "./content";
 import styles from "./landing.module.css";
+import Linked from "./Linked";
 
-// Short answers to the questions people ask first, in four groups. Every answer is folded
-// until its question is opened, and opening one closes the others, so the section stays a
-// list of questions.
-export default function Faq() {
+// Short answers to the questions people ask first, in groups. Every answer is folded until its
+// question is opened, and opening one closes the others, so the section stays a list of
+// questions. `groups` narrows it on a product page.
+export default function Faq({ groups }) {
+  const shown = groups ? faq.filter((g) => groups.includes(g.group)) : faq;
   return (
     <section id="faq" className={styles.section}>
       <div className={`${styles.wrap} ${styles.faq}`}>
@@ -17,13 +19,15 @@ export default function Faq() {
         </div>
 
         <div>
-          {faq.map((g) => (
+          {shown.map((g) => (
             <div key={g.group} className={styles.faqGroup}>
               <h3 className={styles.faqLabel}>{g.group}</h3>
               {g.items.map((item) => (
                 <details key={item.q} name="faq" className={styles.faqItem}>
                   <summary className={styles.faqQ}>{item.q}</summary>
-                  <p className={styles.faqA}>{answer(item)}</p>
+                  <p className={styles.faqA}>
+                    <Linked text={item.a} link={item.link} />
+                  </p>
                 </details>
               ))}
             </div>
@@ -31,18 +35,5 @@ export default function Faq() {
         </div>
       </div>
     </section>
-  );
-}
-
-// An answer with one phrase in it linked, when the item names one.
-function answer({ a, link }) {
-  if (!link) return a;
-  const [before, after] = a.split(link.text);
-  return (
-    <>
-      {before}
-      <a href={link.href}>{link.text}</a>
-      {after}
-    </>
   );
 }

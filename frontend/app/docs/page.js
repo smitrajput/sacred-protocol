@@ -1,17 +1,25 @@
 import Link from "next/link";
 import styles from "./docs.module.css";
-import { pages } from "./nav";
+import { sections } from "./nav";
 
 export const metadata = { title: "Overview" };
 
 // Who the reader is, and the page that answers their first question. Two to a row.
 const paths = [
-  { who: "Stablecoin depositor", go: "depositors", title: "What your USDC does", line: "It buys a crypto asset, BTC or ETH, that a trader has committed to pay for. The markup is yours. Nothing is promised." },
-  { who: "Leverage trader", go: "traders", title: "What a position costs", line: "One fixed markup, known before you open. No funding, no fees, no liquidation price in term mode." },
-  { who: "SCR buyer or staker", go: "scr", title: "What the token does", line: "Backstop, liquidity reserve, one pool. The reserve sale, the fee splits, the allocation." },
-  { who: "Investor", go: "thesis", title: "Why this, why now", line: "A locked-out market, one new primitive, and economics simulated over nine years of prices." },
-  { who: "Engineer", go: "architecture", title: "How it is built", line: "The stack, the pieces, who calls whom, where every USDC goes. Then the addresses, invariants and tests." },
-  { who: "Scholar", go: "shariah", title: "The contracts and the rulings", line: "Mudarabah, murabaha and rahn with sources, and each open ruling with the design's own odds." },
+  { who: "Saver", go: "earn", title: "Put stablecoins to work", line: "Earnings come from fixed financing markup. The return is variable, and it depends on how much of the vault is in use." },
+  { who: "Trader", go: "trade", title: "More buying power, costs upfront", line: "Buy BTC or ETH with up to 5× leverage and one fixed dollar cost, no funding payments and no share of your profit." },
+  { who: "Holder", go: "borrow", title: "USDC against your crypto", line: "Pledge collateral, receive spendable USDC, repay a fixed amount and take your collateral back." },
+  { who: "Prop trader", go: "trade/sift", title: "SIFT: capital follows evidence", line: "Real trades from day one. Qualifying traders can reach $10,000 of financing in 2 weeks and $100,000 in 12." },
+  { who: "Investor", go: "thesis", title: "Thesis", line: "The market, the one new primitive, and the measured tradeoffs behind fixed-price financing." },
+  { who: "Scholar", go: "shariah", title: "The contracts and what needs approval", line: "Each sale, pledge and partnership, the Arc and USDC premise, and the open questions." },
+  { who: "Engineer", go: "architecture", title: "How it is built", line: "Separate vaults, a canonical account ledger, the existing deployment and the proposed engine." },
+  { who: "Getting started", go: "funding", title: "Add funds", line: "Exchange and wallet routes onto Arc, with the exact tokens and networks." },
+];
+
+const products = [
+  { name: "Earn", status: "Proposed. First release.", line: "Deposits finance Trade positions. 77% of base markup goes to depositors." },
+  { name: "Trade", status: "Proposed. First release.", line: "A 14-day fixed sale of BTC or ETH, up to 5×. From 10% annualized on financing, 0% of your profit." },
+  { name: "Borrow", status: "Proposed. After Trade.", line: "A 30-day fixed sale of USDC against collateral, funded by a separate 12-month pool." },
 ];
 
 export default function DocsOverview() {
@@ -19,11 +27,33 @@ export default function DocsOverview() {
     <>
       <h1>Sacred Documentation</h1>
       <p className={styles.lead}>
-        Sacred is an onchain money markets protocol that offers market-leading stablecoin yields and up to 5x leverage
-        on majors in a shariah-fashioned way. It does so by taking capital from the risk-averse savers and giving it to
-        risk-taking traders, thereby letting traders gain leveraged exposure to make gains, at a fixed cost called
-        markup and a capped time, which is then paid back to savers for using their capital. This markup becomes the
-        yield for the savers.
+        Sacred is onchain financing for holding and trading halal assets. It gives people three things to do with their
+        crypto: earn on stablecoins, trade BTC and ETH with more buying power, and access USDC against what they already
+        hold. All three run on sales with a price fixed upfront, rather than loans with a rate that moves.
+      </p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>What it is</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((p) => (
+            <tr key={p.name}>
+              <td>{p.name}</td>
+              <td>{p.line}</td>
+              <td>{p.status}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <p>
+        Everything on these pages describes a proposed design unless it says otherwise. The numbers are research
+        parameters as of 2 November 2026. Nothing here is deployed on Arc, audited or approved by a Shariah board.
       </p>
 
       <h2>Start where your question is</h2>
@@ -39,30 +69,22 @@ export default function DocsOverview() {
         ))}
       </ul>
 
-      <h2>In reading order</h2>
-      <ul className={styles.map}>
-        {pages
-          .filter((p) => p.slug)
-          .map((p) => (
-            <li key={p.href}>
-              <Link href={p.href}>{p.title}</Link>
-              <span>{p.blurb}</span>
-            </li>
-          ))}
-      </ul>
-
-      <h2>Elsewhere</h2>
-      <ul>
-        <li>
-          <a href="/sacred-lightpaper.pdf">The lightpaper</a>: seven pages, for print.
-        </li>
-        <li>
-          <Link href="/app">The app</Link>, against the Arbitrum One deployment.
-        </li>
-        <li>
-          <Link href="/#waitlist">The waitlist</Link>, for a seat when the allow-list opens.
-        </li>
-      </ul>
+      <h2>Everything here</h2>
+      {sections.map((section) => (
+        <div key={section.title}>
+          <h3>{section.title}</h3>
+          <ul className={styles.map}>
+            {section.pages
+              .filter((p) => p.slug)
+              .map((p) => (
+                <li key={p.slug}>
+                  <Link href={`/docs/${p.slug}`}>{p.title}</Link>
+                  <span>{p.blurb}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      ))}
     </>
   );
 }

@@ -2,17 +2,38 @@ export const metadata = { title: "Shariah" };
 
 # Shariah
 
-The design rests on three contracts that all four Sunni schools accept in principle. Ten points still need a board's ruling, and none has been given. This page is the founder's structural analysis with sources, written so a scholar can check each claim against the code, and with the design's own rough odds for each ruling.
+Sacred is built from classical contracts, and no board has reviewed it. This page is the founder's structural analysis with sources, written so that a scholar can check each claim, and it states exactly what still needs approval. Until then nothing here should be read as a ruling, and Sacred makes no certified claim.
 
-## The three contracts
+## Review status
+
+| | |
+| --- | --- |
+| **Shariah board** | Not appointed |
+| **Rulings** | None yet |
+| **Trade and Earn contracts** | Awaiting review |
+| **Borrow premise and sale** | Awaiting review |
+
+## Principles
+
+- **Own before you sell.** The seller owns the asset, with real risk, before the sale.
+- **A known price.** The sale price and profit are fixed at the sale, in dollars or USDC units.
+- **No increase for delay.** No late charge, no compounding and no rollover.
+- **Security stays the owner's.** Pledged assets belong to the buyer, and surplus returns to the buyer.
+- **Capital shares real outcomes.** Investors share actual profit by ratio and bear capital losses, and no return is guaranteed.
+
+## The contracts
 
 | Contract | Where | Rules built into the design | Source |
 | --- | --- | --- | --- |
-| **Mudarabah** | The vault | Profit split by ratio; loss falls on capital; no guarantee; the manager may co-invest | Usmani pp. 36, 47–49 |
-| **Murabaha** | The sale in each position | The seller owns the asset first; cost is disclosed; the price is fixed at the sale and may exceed the cash price; it never rises on default; no roll-over; no stipulated rebate | Usmani pp. 70–71, 91, 98–100; OIC Fiqh Academy Res. 51 and 64 |
-| **Rahn** | The pledge in each position | The sold item may be pledged back to the seller; the pledge stays the buyer's property; any surplus on sale returns to the buyer | Usmani pp. 88–89; Res. 51; Musa, HBKU, 2021 |
+| **Murabaha** | Trade: the sale of BTC or ETH | Seller owns first; cost disclosed; price fixed at the sale; never rises on default; no rollover | Usmani pp. 70–71, 91, 98–100; OIC Fiqh Academy Res. 51, 64; [AAOIFI SS8](https://aaoifi.com/download/24233/) |
+| **Musawamah** | Borrow: the sale of USDC from inventory | Negotiated price; asset exists, is owned and deliverable; price known | [SBP model agreement](https://archive.sbp.org.pk/press/Essentials/Musawamah%20Facility%20Agreement.htm) |
+| **Rahn** | Trade and Borrow: the pledge | The pledge stays the buyer's property; surplus on sale returns to the buyer | Usmani pp. 88–89; Res. 51 |
+| **Mudarabah** | Earn and Funding Borrow | Profit split by ratio; loss falls on capital; no guarantee | Usmani pp. 36, 47–49; AAOIFI SS45 |
+| **Ibra'** | Early settlement | A waiver of unearned markup; binding in Borrow if approved | [BNM SAC](https://www.bnm.gov.my/-/resolutions-of-shariah-advisory-council-bank-negara-malaysia) |
 
-The design is not a down-payment sale (*'urbun*), because nothing is forfeited. It is not an option, because nothing is sold apart from the asset (Res. 63 bars options as a traded right).
+## Why Trade takes no share of profit
+
+Mandatory trader profit share is 0% at every tier. AAOIFI's Murabaha standard, clauses 4/6 to 4/7, requires the sale price and profit to be known at signing and rejects profit set by future variations. [SBP](https://archive.sbp.org.pk/press/Essentials/Essentials%20of%20Islamic.htm) also requires a certain price. A charge that depends on later trading profit is not established as part of a fixed sale. A separate partnership would change how losses fall and needs its own structure, and no income from one is assumed.
 
 ## The 2006 ruling, answered
 
@@ -20,62 +41,81 @@ The Muslim World League's Fiqh Council ruled against margin trading for four rea
 
 | The ruling's reason | This design |
 | --- | --- |
-| Fees charged for delay are riba | The price is fixed once and no charge ever grows. After the due date the asset is simply sold |
-| A loan tied to a sale | There is no loan; the financing is itself a sale |
-| Non-compliant instruments and selling what is not owned | Real assets, bought and owned by the vault before it sells them, within the same transaction |
-| Excessive borrowing and risk-taking | Low leverage ceilings and a loss capped at the pledge |
+| Fees charged for delay are riba | The price is fixed once. No charge grows, and there is no late markup |
+| A loan tied to a sale | There is no loan. The financing is itself a sale |
+| Non-compliant instruments and selling what is not owned | Real assets, bought and owned by the vault before it sells them |
+| Excessive borrowing and risk-taking | Leverage capped at 5×, with higher tiers opened gradually as rulings are approved |
 
-The fourth reason is not fully answered by structure. It is why the leverage ceiling belongs to the board.
+The fourth reason is not fully answered by structure, which is why the leverage ceiling belongs to a board. Precedent exists at 2×: Mawarid Securities in the UAE runs murabaha margin at 2× with forced sale at a 30% maintenance level (Musa, 2021), and Kenanga's Islamic margin charges 10.75 to 11% a year.
+
+## Arc and USDC
+
+Borrow rests on a premise. Sacred **accepts as a working assumption that USDC on Arc qualifies as a commodity**. On Arc, USDC is the native gas token: the thing you spend to use the network. That gives it a use beyond being money, which is the core of the argument, and it is why Arc gives Sacred stronger ground for Shariah approvals than a chain where USDC is only a payment token.
+
+If that holds, selling USDC for a fixed deferred USDC price can be a sale of a commodity rather than a loan of money. That premise and the sale are different questions:
+
+| Question | Status |
+| --- | --- |
+| Is USDC on Arc a commodity? | Assumed, not ruled on. Scholars may reject it |
+| Is this owned-inventory sale, payable in USDC, a non-ribawi sale? | Not approved. Separate from the commodity question |
+| Is the binding rebate permissible, including partial and forced settlement? | Not approved |
+| Are the mudarabah pool and reserve deed acceptable? | Not approved |
+
+Commodity status does not settle the rest. AAOIFI's qard standard covers fungible wealth generally and prohibits stipulated excess, and its Murabaha standard excludes deferred currency, gold and silver transactions. None of the reviewed authorities approves this particular USDC exchange. Arc gas utility alone does not select an approved cash mechanism.
+
+A no-profit qard is a possible fallback. It delivers USDC and recovers the same amount plus independently permissible service costs. It would not fund any of Borrow's modeled investor returns, so it would be a different product.
+
+## What needs review
+
+Nothing below has been ruled on.
+
+### Trade and Earn
+
+1. Whether BTC and ETH can be sold on deferred payment as commodities.
+2. Whether cirBTC and bridged WETH count as possessing the underlying asset.
+3. Whether ownership within one transaction satisfies genuine ownership and possession (*qabd*). The fallback is two transactions with the vault holding between.
+4. The known fixed price and profit, as implemented.
+5. The pledge, and selling part of it before maturity when coverage falls.
+6. Any early-settlement rebate. Binding and discretionary forms differ.
+7. Limited recourse: collection stops at the pledged asset, so a trader never owes more than the pledge.
+8. The leverage ceiling.
+9. The depositor mandate, vintages and conservation offers.
+10. Manager-funded protection and the pilot backstop. The Borrow research found that AAOIFI SS45 places capital-protection reserves in investors' profit, not in the manager's share, and a manager may not guarantee investors' capital in a mudarabah. Whether Trade's manager-funded stock and a backstop from Sacred's raised capital are acceptable needs review, and may change their structure.
+
+### Borrow
+
+1. The Arc and USDC premise above.
+2. The exact sale from owned inventory, repayable in USDC.
+3. The binding rebate formula.
+4. The restricted mudarabah, investor-owned reserve, loss carry and the pilot backstop.
+5. Collateral enforcement, and any keeper or service compensation.
+6. Eligibility of each collateral asset.
+
+Rulings are not independent, so a no on one may change others. Each board candidate is asked about these before engagement.
 
 ## What the design does on purpose
 
-- **Possession before sale.** The vault buys and holds the asset before recording the sale, inside one transaction. Whether that counts as possession (*qabd*) is ruling 4.
-- **No sale back to the vault.** The pledged asset is sold only on the open market. A seller buying back what it sold on credit is a prohibited buy-back. There is no organised tawarruq.
-- **Limited recourse, drafted carefully.** The price stays fixed; the contract limits the *means of collection* to the pledged asset. It is never priced separately: one fixed price, no protection line, no cheaper version without it.
-- **No penalties and no roll-over.** Nothing can add to a balance. A trader who wants to stay in opens a new position, a fresh purchase through the market. Extending a debt for an extra charge is riba (Usmani pp. 98–99).
-- **The early-settlement waiver is policy, not a term.** A rebate for early payment is allowed only if it is not stipulated in the contract (Usmani pp. 99–100; Res. 64).
-- **Stakers as loss-bearing partners.** Those who stand behind shortfalls are paid from the traders' profit share, in USDC, and lose their stake first. A backstop paid for a guarantee would be a paid guarantee, which is barred; a donated, mutual or true loss-sharing backstop is not.
-- **Wording.** The product says "no liquidation price; price drops do not close your position before your due date", not "liquidation-free". It says "you own the asset; it is held in your position", not "protected". Advertising a policy turns it into a term.
-
-## Rulings to clear
-
-Rough judgements from the design work, not a scholar's view, assuming a board aligned with AAOIFI that already accepts crypto as property.
-
-| # | Ruling | Needed for | Estimate | Basis and fallback |
-| --- | --- | --- | --- | --- |
-| 1 | ETH can be sold on deferred payment as a commodity | Both modes | 85–90% | Malaysia's Securities Commission; Amanie's ETH paper |
-| 2 | BTC can be sold on deferred payment | Both modes | 65–75% | Scholars who treat BTC as money would bar this |
-| 3 | Wrapped BTC counts as possessing BTC | Both modes | 60–70% | No published position found |
-| 4 | Owning the asset within one transaction counts as possession | Both modes | 65–75% | Fallback: two transactions, the vault holding the asset between |
-| 5 | Vault terms: weekly exit at share price, a loss reserve, non-transferable shares | Both modes | 85–90% | Standard mudarabah practice |
-| 6 | Early-settlement waiver as a published policy | Both modes | 60–70% | A fixed on-chain formula may look stipulated. Fallback: shorter terms |
-| 7 | Shortfall at the due date waived as policy | Term, if 8 fails | about 75% | Forgiving an insolvent debtor is encouraged |
-| 8 | Limited recourse written into the contract | Term; a launch requirement | 60–70% | No precedent found. Fallback: a mutual shortfall fund (takaful, Res. 238), which may need an insurance licence |
-| 9 | Selling the pledge before the due date when its value falls | Margin mode | 65–75% | Existing Islamic margin products do this at 2x |
-| 10 | Leverage ceiling | Both modes | 2x about 85%; 3x 60–70%; 5x 35–45%; 10x 15–25% | No precedent above 2x |
-
-The rulings are not independent, so the odds should not be multiplied. Rough estimates for whole packages: term mode at 2x, 50 to 60%; term mode at 3x, 40 to 50%; margin mode at 10x, 10 to 20%. If the board says no to any of them, the design changes; most have a known fallback.
-
-SCR adds rulings with no estimate given: the trader's undertaking to donate a share of profit to a mutual fund; the stakers' reward; a mudarabah in which the manager takes no share of the markup; SCR itself and the reserve sale as a spot sale delivered staked; the pool fee.
+- **No sale back to the vault.** Pledged assets are sold on the open market. Buying back what you sold on credit is prohibited.
+- **No organized tawarruq.** Trade buys a real asset the trader wants. Borrow delivers USDC directly, with no simulated commodity movement. [IIFA Resolution 179](https://iifa-aifi.org/en/33707.html) distinguishes individual from organized and inverse tawarruq.
+- **No circular refinancing.** A new sale needs real settlement and independent funding ([IIFA](https://iifa-aifi.org/en/49710.html)).
+- **Careful wording.** Sacred says you own the asset and it is pledged, and it describes backstops by the order they absorb a loss. It never says guaranteed.
 
 ## Precedent and limits
 
-- Precedent exists at 2x: Mawarid Securities in the UAE runs murabaha margin at 2x with forced sale at a 30% maintenance level (Musa, 2021). Kenanga's Islamic margin charges 10.75 to 11% a year.
 - No fatwa covers leverage on crypto, approving or rejecting.
 - Some scholars reject crypto itself. A June 2026 fatwa from Darul Uloom Karachi holds that crypto tokens are not property. A board following it would reject the whole design.
-- The board is chosen with rulings 4, 6, 8 and 10 in hand: candidates are asked their position on these before engagement.
+- If a board says no, the design changes.
 
 ## Not in this design
 
 | Left out | Why | What would bring it back |
 | --- | --- | --- |
-| Shorts | The only classical contract for selling what one does not hold is a prepaid forward (*salam*), which needs its own market and rulings | A later phase |
-| Rolling a position over | Extending a debt for an extra charge is riba | Never |
+| Shorts | The only classical route, a prepaid forward (*salam*), needs its own market and rulings | A later phase |
+| Rollover | Extending a debt for an extra charge is riba | Never |
 | Gold tokens | Gold must be exchanged on the spot | Never |
-| Synthetic perps on promises | Nothing is owned; cash settlement is barred (Res. 40–41, 157, 238) | Not expected |
-| Hedging the vault's risk | Every available hedge is a short or a derivative | Nothing currently |
-| More assets | Each needs a deep spot market and its own ruling | SOL and BNB next |
+| Synthetic perps | Nothing is owned, and settlement is in cash (Res. 40–41, 157, 238) | Not expected |
+| Hedging the vault | Every available hedge is a short or a derivative | Nothing currently |
 
 ## Sources
 
-Muhammad Taqi Usmani, *An Introduction to Islamic Finance*. Mahmoud El-Gamal, *Islamic Finance: Law, Economics, and Practice*. OIC Fiqh Academy Res. 51, 63, 64, 72, 40–41, 157, 238. Muslim World League Fiqh Council on margin trading, 2006. Mubarak Musa, "Shariah Appraisal of Margin Trading", HBKU, 2021. IFSB GN-3 on smoothing; AAOIFI FAS 35 on risk reserves.
+Muhammad Taqi Usmani, *An Introduction to Islamic Finance*. Mahmoud El-Gamal, *Islamic Finance: Law, Economics, and Practice*. OIC Fiqh Academy Res. 40–41, 51, 63, 64, 72, 157, 238. AAOIFI SS8, SS19, SS45. IIFA Res. 158, 179, 248. BNM SAC rulings on ibra and restructuring. Muslim World League Fiqh Council on margin trading, 2006. Mubarak Musa, "Shariah Appraisal of Margin Trading", HBKU, 2021.

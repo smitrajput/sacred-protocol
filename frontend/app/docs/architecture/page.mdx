@@ -1,86 +1,92 @@
-import { Calls, Lifecycle, LossOrder, Money } from "../figures/architecture";
+import { Engine, Vaults } from "../figures/architecture";
 
-export const metadata = { title: "Technical architecture" };
+export const metadata = { title: "Architecture" };
 
-# Technical architecture
+# Architecture
 
-One vault, one desk per asset, a few contracts shared by all, one price reader per asset, and a server that can be switched off. Immutable, no proxies, nothing forked. The contracts on Arbitrum One are the earlier version, a vault paired with each desk; the single vault lending to every desk is the design on this page and the rewrite that ships before launch. This page is the engineer's map: the stack, the pieces, who calls whom, where every USDC goes, a position's states, and the choices behind them. Verified addresses, the invariants with their tests, every dial and how to run it on one machine are on the [contracts page](/docs/contracts).
+This page is the proposed system: two isolated vaults on Arc, with shared libraries. It is a specification. None of it is built on Arc. What exists today is the earlier term-mode system on Arbitrum One and Monad testnet, listed on the [contracts page](/docs/contracts).
+
+<Vaults />
 
 ## The stack
 
-| Layer | Built with | Note |
+| Layer | Proposed | Note |
 | --- | --- | --- |
-| **Chain** | Ethereum, Arbitrum One, Monad | Native USDC, USDT, WBTC and WETH. One desk per asset |
-| **Contracts** | Solidity 0.8.26, Foundry | OpenZeppelin v5.1 for tokens, ownership, reentrancy and the time-lock. Nothing forked or modified |
-| **Spot market** | Uniswap v3 router | Every purchase and every sale of a pledged asset, floored by the price feed |
-| **Prices** | Chainlink asset/USD | Staleness and L2 sequencer checks. Values live positions at the cut-off; never triggers a sale in term mode |
-| **SCR market** | Uniswap v4, one hooked pool | Token and hook adapted from Standard Reserve's verified contracts (MIT); solady |
-| **Ownership** | `TimelockController`, 2-day delay, a multisig | A guardian can pause new positions and new deposits, and cannot unpause. Exits are never pausable |
-| **Verification** | Foundry unit, fuzz, invariant and fork suites; Halmos | 281 tests; eight arithmetic properties attempted symbolically, two proved |
-| **Server** | Python 3.12, FastAPI, web3.py | A keeper, an indexer, a read-only API for points. pytest |
-| **Frontend** | Next.js 15, React 19, wagmi, viem | One data layer naming each read; one panel per role. Vitest and Playwright. These docs are MDX |
+| **Chain** | Arc, chain ID 5042 | USDC is native gas. Candidate assets WETH and cirBTC |
+| **Contracts** | Solidity, Arc Foundry | OpenZeppelin for tokens, ownership and reentrancy |
+| **Prices** | At least two independently operated sources | Fresh to 60 seconds for execution and new risk. Providers are not selected |
+| **Spot routes** | To be chosen | Depth on Arc is unmeasured |
+| **Accounts** | Embedded user-controlled wallet, or MetaMask and Rabby | Privy is the initial candidate. Arc capabilities must be checked one by one |
+| **Funding** | Direct Arc receipt and Circle bridging | [Add funds](/docs/funding) |
+| **Frontend** | Next.js, wagmi, viem | Web first |
 
-## The pieces
+## Isolation
 
-| | Lines | Role |
+**MarginVault** holds Earn deposits, BTC and ETH debt books, tier and vintage accounting, and earned protection. **CashFinanceVault** holds Borrow investors, receivables, investor-owned reserves, queues, loss carry and its emergency permissions.
+
+Shared: reviewed libraries, token adapters, validated feeds, keeper and routing infrastructure, notifications, monitoring and UI. Neither vault gets spending approval over the other. No token or cross-product subsidy enters either forecast. Trade forecasts assume **zero** Borrow income.
+
+## Trade engine
+
+<Engine />
+
+1. **Margin engine** executes genuine purchases and sales, stores debt and pledges, and calls ledger hooks on every economic path.
+2. **Account ledger** keeps unitization, daily observations, exposure integrals, capital-days and a bounded 52-week ring.
+3. **Score engine** computes the weekly [SIFT](/docs/trade/sift) skill label from canonical state. A separate daily transition reads the published ceiling table and repayment checkpoints.
+4. **Capacity controller** enforces account and portfolio limits on every origination, counting pending commitments before external calls.
+5. **Permissionless keepers** supply deterministic checkpoints and trigger reviews and partial sales. They cannot choose a score or rewrite accounting.
+6. **Indexer and UI** display. They have no allocation authority.
+
+Liquidation and settlement do not read the score. Coverage alone triggers a partial sale.
+
+**Vault accounting.** Approved financing, including commitments, is checked against the 95% NAV cap. Originations stop at the 5% idle floor. New financing needs temporary purchase cash of `L/(L−1)` times the financing. Queued withdrawals rank ahead. Risk capacity is weighted:
+
+```text
+eligible_cash ≥ Σ (approved_financing_i × stock_ratio_i)
+```
+
+Primary and tail requirements are checked separately. Protection is manager-owned cash, separate from depositor idle cash and trader capital. Each subscription belongs to a vintage with fixed income entitlements, so a new allocation affects accepted new vintages only.
+
+**Queues.** A bounded canonical request queue is registered per allocation epoch. Deterministic ordering runs through a gas-bounded batch or a proof binding the complete eligible queue, so an operator cannot omit competing requests.
+
+## Borrow engine
+
+Debt is integer **six-decimal USDC**. Arc's native USDC uses 18 decimals for the same balance, so values are normalized by 10¹² and never added together. WETH has 18 decimals and cirBTC 8, and each oracle's scale is normalized with checked arithmetic.
+
+- **Agreed terms are versioned.** A new quote, cap or LTV never changes an existing sale.
+- **Prices.** Feed-specific staleness is the documented heartbeat plus an approved grace. An hourly feed alone cannot meet the 60-second execution requirement.
+- **Freeze.** New risk and unsafe collateral withdrawals stop. Repayment and top-ups continue.
+- **Collateral is never reused**, and its surplus belongs to the borrower.
+
+## Who can do what
+
+| Role | Can | Cannot |
 | --- | --- | --- |
-| `Vault` | ~300 | The one pool: shares, queues, the weekly cut-off, the stablecoin list, the payout reserve, capital lent to each desk inside its cap. Knows nothing about assets or prices |
-| `Desk` | ~330 | One per asset. Positions: open, close, pay off, part pay, settle. Holds the pledged assets and its own loss reserve. Knows nothing about shares |
-| `PositionMath` | ~50 | Pure arithmetic: cost, markup, earned markup, settlement, the payment split, the profit share |
-| `Oracle` | ~50 | Chainlink asset/USD with staleness and L2 sequencer checks |
-| `StakedBackstopFund` | ~230 | SCR staking with cooldown, a 90-day USDC stream, shortfall cover from USDC then a capped sale of staked SCR |
-| `Reserve`, `ReserveSale` | ~190 | The liquidity reserve, and the sale of new SCR into it, delivered staked |
-| Token, `TaxHook`, minter, liquidity manager, fee splitter, registry | ~600 | SCR, its hooked Uniswap v4 pool, its fee and its liquidity |
-| Server | Python | A keeper that settles and runs the cut-off; an indexer; an API serving points. Every exit works with it off |
+| **Timelocked governance** | Change future policy within limits. Borrow risk increases wait 35 days | Change an existing sale or vintage entitlement |
+| **Emergency guardian** | Tighten limits or pause new risk | Award more credit, delete a loss, or stop repayment and safe exits |
+| **Keepers** | Checkpoints, reviews, partial sales, within bounded quotes | Set prices, choose scores, take surplus |
+| **Manager** | Run the vaults, set new offers | Spend protection on operations, or use depositor principal as protection |
 
-The vault and the desks split the work so that each can be read in one sitting. The vault holds USDC and shares and lends to each desk inside that desk's cap; a desk holds one asset's positions and borrows from the vault. Neither reads the other's storage: a desk asks the vault to `lend`, `repay` and `writeOff`, and the vault asks every desk for `bookValue` once a week and sums them into one share price.
+Rule and version hashes are persisted, and every capacity change emits a versioned event.
 
-## Who calls whom
+## Implementation notes
 
-<Calls />
+- Every arithmetic path is bounded and gas-tested. Available financing rounds down.
+- The fixed-point score needs golden-vector parity with the reference model, including boundary tests.
+- Stale or incomplete inputs fail closed. Safe exits survive origination pauses.
+- Deposits cannot repair reputation, open losers stay visible, and wallet splitting cannot evade aggregate caps.
+- Repayments and partial sales release usage exactly once. Reserve shortfalls block expansion.
 
-Depositors call the vault (`requestDeposit`, `requestWithdraw`, `claim`); traders call the desk (`open`, `close`, `payOff`, `partPay`); stakers call the fund; SCR buyers call the reserve sale. Anyone may call `settle` after a due date and `cutoff` once a week, and the keeper is simply the process that does so first, for a fee capped in code. The vault calls the fund for `cover` inside `try/catch` and counts only what arrived, so a failing backstop cannot block a settlement.
+Acceptance: numbers and calculators agree with the canonical parameters, cash ownership and collection timing are explicit, changing depositor terms affects accepted new vintages only, queues and caps are enforced, and contract review, security review and live execution come before activation.
 
-## Where the money goes
-
-<Money />
-
-Every payment to the vault is applied to principal first, then to markup, and a desk's loss reserve takes its slice from that desk's markup only. The desk pays the vault `settlementAmount` on close and pay off, and `min(net, balance)` on settlement, so the vault can never receive more than it is owed. Settlement surpluses and the treasury's cut are credited and claimed rather than pushed, so a blocked USDC recipient cannot block anyone else's exit.
-
-## Life of a position
-
-<Lifecycle />
-
-Cost, markup, down payment and due date are written once, at `open`, and no function changes them. The only field that moves is `repaid`, and it only rises. A change to a dial by the time-lock applies to positions opened afterwards; a live position keeps the terms it was sold on.
-
-## When a sale falls short
-
-<LossOrder />
-
-The order is fixed in code. The trader's layer is implicit: an asset worth less than the balance has already consumed the down payment. The reserve is per desk and stays with the depositors who remain; past it and the fund, a loss is every depositor's, through the one share price. Staked SCR is sold at most 30% of the stake per event, stopping 10% below the pool's average price, and the simulation sizes it at zero when solvency is tested.
-
-## Design choices and why
-
-- **One vault, not one per asset.** The first design gave each asset its own pool. Idle USDC in one pool could not serve demand in another, depositors had to pick an asset's risk, and the payout reserve was split in two. One pool raises utilisation, which is what pays the 9%, and pooled mudarabah is the structure Islamic banks already run. What isolation bought, protection from an asset-specific failure, the cap per desk keeps.
-- **One desk per asset, not one contract and not many.** The vault knows nothing about assets or prices; a desk knows nothing about shares. One contract per position would separate assets physically but adds deployment cost and code; a board may still want it, and it would be a new desk rather than a change to this one.
-- **Immutable, no proxies.** A live position's rules must not change under it. New behaviour ships as a new desk. The admin can only tune parameters for future positions, inside limits written into the code.
-- **Internal accounting only.** The vault tracks idle cash, queued deposits, the reserve and claimable cash itself and never reads `balanceOf(this)`. Donations cannot move the share price, which removes the usual vault inflation attacks.
-- **Epoch queues instead of ERC-4626.** Shares are priced once a week, so instant deposit and redeem cannot exist. Requests are recorded per epoch and settled lazily on claim, which keeps the cut-off cheap however many depositors there are.
-- **The feed values, the market sells.** The feed values live positions at the cut-off and floors every sale the protocol triggers, and every purchase too: without the floor a trader could move the pool, make the vault overpay, and abandon the position. It never decides whether a term position is sold.
-- **The keeper has no rights.** `settle` and `cutoff` are open to anyone. The server is a convenience, and every exit works with it switched off.
-- **Gas is not optimised.** Storage is written plainly for readability. The one loop, `bookValue`, is capped by `maxLive` (at most 500). On an L2 this is cheap.
-
-## Layout
+## Repository
 
 ```
 sacred/
-  contracts/   src/ (Vault, Desk, Oracle, BackstopFund, StakedBackstopFund, Reserve,
-               PositionMath, token/, mocks), test/, script/
-  server/      destiny/ (chain, keeper, indexer, points, api), tests/
-  frontend/    app/ (landing page; app/ with data.js and one panel per role; docs/),
-               lib/ (math, scr, errors, api, contracts), e2e/, abi/
-  abi/         contract ABIs for the server
-  deployments/ local.json, written by the local deploy script
+  contracts/  the earlier term-mode system
+  server/     keeper, indexer and API for that system
+  frontend/   app/ (landing, product pages, docs, /app demo)
+              lib/ (params.js, quote.js, math.js)
 ```
 
-Deployment is two scripts run by one deployer: `DeployToken.s.sol` for the SCR side and the time-lock, then `Deploy.s.sol` once per asset, which today deploys a vault and desk pair. Both check their inputs against the chain before sending anything. The [contracts page](/docs/contracts) has the addresses, the rules the code keeps with the test behind each, every dial and its limit, and the commands to run it all locally.
+Two pieces of this repository are ahead of the contracts: `frontend/lib/params.js` holds the proposed parameters, and `frontend/lib/quote.js` the arithmetic the site and tests use.

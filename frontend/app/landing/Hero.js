@@ -1,12 +1,11 @@
 import Link from "next/link";
 import shared from "../shared/shared.module.css";
-import { hero, links } from "./content";
+import { action, hero, links } from "./content";
 import styles from "./landing.module.css";
 
-// The opening screen: three verbs across one line, centred, with nothing competing for
-// attention. Read the top row alone and it is the headline; read down and each column is the
-// pitch for one product. The closing line and two actions sit beneath. The worked position
-// lives under How it works, beside the steps it illustrates.
+// The opening: three verbs across one line, centred. Read the top row alone and it is the
+// headline; read down and each column is the pitch for one product. The closing line, which
+// leads to the Shariah reasoning, and two actions sit beneath.
 export default function Hero() {
   const [before, word, after] = hero.closing;
   return (
@@ -21,16 +20,16 @@ export default function Hero() {
       </h1>
       <p className={styles.heroClosing}>
         {before}
-        <em>{word}</em>
+        <Link href={hero.closingHref}>{word}</Link>
         {after}
       </p>
       <div className={styles.ctas}>
-        <a href={links.waitlist} className={`${shared.btn} ${shared.btnPrimary}`}>
-          Join waitlist
-        </a>
-        <Link href={links.docs} className={`${shared.btn} ${shared.btnGhost}`}>
-          Read the docs
+        <Link href={action.primary.href} className={`${shared.btn} ${shared.btnPrimary}`} data-track="interest">
+          {action.primary.label}
         </Link>
+        <a href={links.explore} className={`${shared.btn} ${shared.btnGhost}`}>
+          Explore Sacred
+        </a>
       </div>
     </section>
   );

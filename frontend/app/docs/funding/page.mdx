@@ -1,0 +1,71 @@
+export const metadata = { title: "Add funds" };
+
+# Add funds
+
+Sacred runs on Arc, Circle's EVM-compatible chain where USDC is the native gas token. Whatever route you use, supported incoming assets arrive as USDC on Arc, in your Available balance. You then choose what to do with it.
+
+This page describes the planned flow. Sacred is not live, so no route below is open yet. Exchange and network availability changes; check your exchange's withdrawal page before sending.
+
+## Three steps
+
+1. **Create an account or connect a wallet.** Sign in with your email, Apple ID or Google account to get a wallet you control, or connect MetaMask or Rabby.
+2. **Add funds.** Choose a route, and the app shows the exact token, network, address and fees.
+3. **Earn, trade or borrow.** Funds appear as Available once they arrive. Moving them to a product is always your own step.
+
+## Supported routes
+
+| From | Token | Network | Route | Notes |
+| --- | --- | --- | --- | --- |
+| **Wallet on Arc** (MetaMask, Rabby) | USDC | Arc | Direct | Add Arc as a network, below |
+| **Wallet elsewhere** | USDC | A chain on Circle's bridge list, below | Circle bridge | Each route is tested before it opens |
+| **Binance** | USDC | Arc, where withdrawals are open | Exchange withdrawal | Binance opened Arc deposits on 16 Sep 2026 and said withdrawals would follow once deposits were sufficient. Otherwise withdraw to a supported chain and bridge |
+| **Bybit** | USDC | Arc, where withdrawals are open | Exchange withdrawal | Bybit opened Arc deposits on 16 Sep 2026, with withdrawals available once liquidity requirements are met. Otherwise withdraw to a supported chain and bridge |
+| **Other exchanges** | USDC | A chain on Circle's bridge list | Exchange withdrawal, then bridge | Use the exchange's network list |
+| **Any** | USDT | | Not at launch | Conversion to USDC may be added once tested. TRON USDT needs a separate route |
+| **Any** | WETH, cirBTC | Arc | Direct or Circle bridge | For Borrow collateral, once enabled. These stay as collateral and are not converted |
+
+Exchange status is from their [September announcements](https://www.binance.com/en/support/announcement/detail/60d9115a95ed4855ad70af192e996aef) ([Bybit](https://announcements.bybit.com/en/article/bybit-supports-usdc-deposits-and-withdrawals-via-the-arc-network--artac1046c627b6/)), and may have changed since. Sacred does not link to your exchange account.
+
+## Bridge source chains
+
+[Circle's App Kit](https://docs.arc.io/app-kit/references/supported-blockchains) lists Bridge for these chains: Arbitrum, Avalanche, Base, Codex, Cronos, EDGE, Ethereum, HyperEVM, Injective, Ink, Linea, Monad, Morph, OP Mainnet, Pharos, Plasma, Plume, Polygon PoS, Sei, Solana, Sonic, Unichain, World Chain, X Layer and XDC.
+
+The list is per chain. It does not confirm every route into Arc, so Sacred will only offer a route after testing it.
+
+## Adding Arc to your wallet
+
+| Setting | Value |
+| --- | --- |
+| Network name | Arc |
+| RPC URL | `https://rpc.mainnet.arc.io` |
+| Chain ID | `5042` |
+| Currency symbol | USDC |
+| Explorer | `https://explorer.arc.io` |
+
+In MetaMask: **Settings → Networks → Add network → Add a network manually**. Values are from [Arc's documentation](https://docs.arc.io/arc/references/connect-to-arc). Some wallets may label the gas balance as ETH; it is still USDC.
+
+## Token details
+
+| Token | Decimals | Address on Arc | Status |
+| --- | --- | --- | --- |
+| USDC | 6 (ERC-20 interface) | `0x3600000000000000000000000000000000000000` | Native gas token and Sacred's settlement asset |
+| WETH | 18 | `0x128cC466B61f542da60c70e3aA11c10e19B84EDB` | Candidate. Bridged from Ethereum |
+| cirBTC | 8 | `0x171A4217b86A807A64eB94757Db6849fb4bDbAA0` | Candidate. Circle wrapped Bitcoin |
+
+Addresses are from [Arc's registry](https://docs.arc.io/arc/references/contract-addresses). Verify them before use.
+
+## Before you send
+
+- Match the token **and** the network. Funds sent on an unsupported network may be unrecoverable.
+- Send a small test amount first.
+- Network and exchange fees are yours. Sacred plans to sponsor routine gas inside the app and will show net amounts.
+
+## Withdrawing
+
+Money in Available can leave at any time, to your own wallet or to your exchange's current deposit address, if that exchange accepts Arc deposits or the bridge route is open. Money in a product must first become available:
+
+| In | To become available |
+| --- | --- |
+| **Earn** | Idle cash first, then the [daily queue](/docs/earn#withdrawals) |
+| **Trade** | Repay or sell. Pledged capital cannot leave a position |
+| **Borrow** | Repay to release collateral, or withdraw within limits |

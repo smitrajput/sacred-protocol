@@ -1,89 +1,165 @@
+import { LossOrder } from "../figures/architecture";
+
 export const metadata = { title: "Risk" };
 
 # Risk
 
-We would rather tell you where the money stops than pretend it never does. In term mode the vault carries a crash, and its losses arrive in clumps. In margin mode the vault carries only sudden gaps.
+How your funds are protected, what was tested, and what each result shows.
 
-## The order of loss
+## How your funds are protected
 
-A term position is never sold before its due date, so there is no liquidation price. If its asset sells for less than the balance at settlement, the gap is absorbed in this order, and it moves down only when the layer above is used up.
+Your funds are protected by 4 layers of backstops before a loss touches your principal.
 
-1. **The trader's down payment.** It is inside the asset's value: the first third of a fall on a 3x position is the trader's.
-2. **The desk's loss reserve.** Each desk keeps its own, built from 5% of its markup until it holds 3% of what the desk has financed.
-3. **The backstop fund's USDC**, fed by 10% of traders' net profit and held to 8% of the financed amount before stakers are paid; then **staked SCR**, sold up to a cap, once the token is live, and counted as zero when solvency is tested.
-4. **Every depositor of the vault**, through the one share price, in proportion. The manager's own deposit loses with them.
+<LossOrder />
 
-Desks share depositors. A shortfall on the BTC desk that gets past the BTC reserve and the fund lowers the share price for everyone, whichever desk their USDC was working on. What limits an asset-specific failure is the cap: no desk may finance more than 60% of the vault's capital. Beyond its deposit the manager loses only its fee.
+Each pool stands alone. A loss in Earn's vault reaches neither Borrow's pool nor the company's operating cash. Borrow has its own four layers: the borrower's collateral, the primary and tail reserve sleeves, and the pilot backstop during its pilot.
 
-## Term mode, 14-day positions, 2020 to 2026
+**Protection does not start at zero.** The pilot backstop, a small portion of the capital Sacred raises from investors, protects the pilot phase of both Earn and Borrow while primary and tail protection build.
 
-| Position | Positions ending short | Average gap cost a year | Worst year (2020) | Worst loss on a full book |
-| --- | --- | --- | --- | --- |
-| BTC 2x | 0.0% | 0.0% | 0.0% | 0% |
-| **BTC 3x** | 0.6% | 1.0% | 5.1% | 5% |
-| BTC 4x | 1.5% | 4.0% | 11.5% | 12% |
-| **ETH 2x** | 0.1% | 0.0% | 0.0% | 0% |
-| ETH 3x | 1.4% | 3.9% | 13.9% | 14% |
-| ETH 4x | 3.2% | 9.3% | 21.9% | 22% |
+Four controls sit around that order:
 
-Costs are a share of the amount financed, against a markup of 15.5% to 17% a year. The last column is a vault fully used on that one asset, positions spread evenly, in March 2020. Losses clump: almost all BTC losses fall in 2020 to 2022 and none in 2023 to 2026, so a calm stretch says little. This table is why term mode is 3x for BTC and 2x for ETH, and why 5x needs margin mode.
-
-## Margin and evergreen, with a forced partial sale
-
-| Position | Forced sale within 30 days | Within 365 days | Gap cost a year, pessimistic | With a 60-minute outage | Worst year |
-| --- | --- | --- | --- | --- | --- |
-| Evergreen BTC 2x | 2% | 30% | 0.03% | 0.19% | 0.4% |
-| Evergreen BTC 3x | 8% | 47% | 0.13% | 0.53% | 1.4% |
-| Evergreen ETH 2x | 4% | 42% | 0.05% | 0.16% | 0.5% |
-| Margin BTC 5x, 30 days | about 40% | | 0.12% | 2.3% | |
-| Margin ETH 5x, 30 days | about 53% | | 0.29% | 2.7% | |
-
-Base case: the sale executes at the next minute's close less 0.3%. Pessimistic: at the lowest price of the next 5 minutes, less 1%. Outage: nobody can sell for 60 minutes, then the lowest price of that hour, less 1%. At a 110% sale level restored to 125%, no evergreen position ended in a shortfall in the base case.
-
-Keeper reliability is the risk to engineer, not leverage itself. Forced sales are frequent at 5x and 10x and traders must expect them; of unmanaged 10x positions, 38% on BTC and 49% on ETH were sold within a week.
-
-## The whole system, 1,000 five-year paths
-
-| Test | Result |
+| | |
 | --- | --- |
-| Term only, BTC 3x and ETH 2x, with the launch economics | Payout at or above 9% in every month; depositors lose in 0.02% of years, worst year 0.5% |
-| Margin mode added, BTC and ETH 3x to 5x | Payout at or above 9% in 99.6% of months, bull and bear; no year with a depositor loss in the base case |
-| A 60-minute outage on every forced sale | Payout unchanged; depositors lose in 1.5% of years, worst year 7.1%. With a 3% fund buffer in place of 8%: 6% of years |
-| Idle cash earns 4% in a sukuk wrapper | No month under 9%; average 9.6% |
-| Demand elasticity from 0 to 1.5 | Payout unchanged; fees move under 5% |
-| Bear demand at 0.15 of bull, as GMX and Aave fell in 2022 | Payout unchanged; fees fall to about a fifth |
+| **Wallet control** | You hold your own keys, through an embedded wallet you can export or a wallet you connect |
+| **Contract security** | New contracts go through independent review before launch, followed by a small bounded pilot |
+| **Collateral controls** | Pledged assets are never lent, staked or reused. Coverage limits, price checks and depth caps govern every sale |
+| **Withdrawal conditions** | Withdrawals rank ahead of new financing. Earn pays from idle cash, then a daily queue. Repayment and exit stay open during pauses |
 
-Method: a stationary block bootstrap of historical days, mean block 90 days, after a one-year warm-up. Each simulated position takes the outcome of the real position opened on the matching historical day, so the fat tails are the real ones. Regimes by BTC against its 200-day average: bull 47% of days at +107% a year, chop 23% at +10%, bear 31% at −32%. The longest bear spell ran 312 days.
+The layers absorb trading losses. Failures of a contract, an oracle, USDC or the chain sit outside them, and are listed under [known risks](#known-risks-across-all-three-products).
 
-## Rising and falling markets
+### Reviews and audits
 
-| | Rising | Falling |
+| | |
+| --- | --- |
+| **Smart-contract audit** | Not yet |
+| **Shariah review** | Not yet |
+| **Risk research and test results** | Below |
+
+## Reading the numbers
+
+Three kinds of number appear below and they are different things:
+
+| Kind | What it is | Example |
 | --- | --- | --- |
-| Depositor yield | Markup at high utilisation | Markup at lower utilisation |
-| Backstop fund | 10% of traders' net profit | Little or nothing |
-| Liquidity reserve | SCR sales, buy fees and a tenth of the profit share | Sell fees only; sales close because buyers leave |
+| **Historical loss** | What a replay of past prices produced | No principal loss at 2× in the Binance normal replay |
+| **Planning allowance** | A budget line for expected loss | 5 bps a year on financing |
+| **Policy cushion** | Cash chosen to absorb losses | 1% of approved financing |
 
-The reserve and the fund are built in good times and sized to last through bad ones. Both are seeded from the raise, because neither can be built in a bear.
+None of them is a statistically certified lifetime guarantee. Nothing here was run on Arc. The results are price history from centralized exchanges.
 
-## Known risks
+## Earn and Trade
+
+### The final tiers
+
+| Leverage | Trigger / restore | Initial price room | Protection stock | Status |
+| --- | --- | --- | --- | --- |
+| 2× | 160% / 190% | 19.7% | 1.0% | Opens first |
+| 2.5× | 145% / 160% | 12.6% | 1.5% | Opens gradually |
+| 3× | 130% / 145% | 12.9% | 9.0% | Opens gradually |
+| 3.5× | 125% / 135% | 10.2% | 10.0% | Opens gradually |
+| 4× | 120% / 130% | 9.4% | 14.0% | Opens gradually |
+| 4.5× | 116% / 125% | 9.1% | 17.0% | Opens gradually |
+| 5× | 115% / 123% | 7.2% | 17.0% | Opens gradually |
+
+Stocks are chosen from `1.10 × the larger one or three-month-block four-hour annual ES99`, rounded up, with floors of 1%, 1.5% and 9% at 2×, 2.5× and 3×. Nested financing caps limit the share above 2× ([ladder](/docs/trade/mechanism#the-leverage-ladder)). There is no diversification credit.
+
+### The full hourly history
+
+Binance BTC and ETH, January 2018 to September 2026, about 76,000 overlapping 14-day cohorts per asset and configuration. Missing timestamps are kept as outages, so adverse windows are not deleted.
+
+| Scenario, 2× | Result |
+| --- | --- |
+| Normal, 1 hour | No principal loss |
+| Four-hour delay, 3% friction, Binance | No principal loss |
+| Four-hour delay, 3% friction, OKX ETH | **Six losing daily cohorts, worst individual loss 3.42%.** Maximum annual book loss 0.835% of nominal ETH capacity, about 0.418% on an equal BTC and ETH book |
+| Bybit, July 2021 onward | No normal-case principal loss |
+| 24-hour outage, 5% friction, Binance | **Worst individual loss 21.71% BTC, 27.99% ETH.** Worst rolling year 14.45% of peak financing |
+
+The 24-hour case is a separate emergency. The 1% routine stock does not cover it.
+
+Partial sales are ordinary. In replay, 9.4%, 11.2% and 14.3% of 2× positions entered in bull, sideways and bear conditions saw a forced sale.
+
+Normal annual principal-loss rates are zero at 2× and 2.5×, and about 0.107%, 0.68% and 1.18% of actual financing at 3×, 4× and 5×.
+
+### The realistic-delay panel
+
+224 re-verified minute archives: 105 systematic monthly dates plus seven stress dates, for each asset. Each observation starts hypothetically exactly at the trigger and takes the worst fall over the detection minute plus five more, with 1% exit friction. It is a gap test, not a continuous replay or a liquidation frequency.
+
+| Maximum shortfall on stress dates | BTC | ETH |
+| --- | ---: | ---: |
+| 3× at 130% | 0% | 0% |
+| 4× at 120% | 1.07% | 4.80% |
+| 5× at 115% | 5.19% | 8.77% |
+
+The largest stress-date gaps were 16.71% on BTC and 19.85% on ETH. Every tier had zero hypothetical shortfall on the systematic dates. Windows are not independent, and these frequencies cannot be annualized.
+
+### A saturated mix
+
+At the most concentrated mix the caps allow, with correlated losses summed before aggregation, worst rolling annual loss is 0.186% in the one-hour case and 0.856% in the four-hour case, against total approved capacity. ES99 is 0.336% and 1.489%. The 2.6% stock exceeds those modeled cases. The 24-hour emergency still loses 16.53% in the worst historical rolling year.
+
+Month resampling produced 30,000 one-year paths from 103 complete months. Those are not 30,000 independent years.
+
+### What SIFT adds, and what it does not
+
+Account-level limits sit on top of the position-level ones, and they answer different questions.
+
+| | Coverage | Account drawdown |
+| --- | --- | --- |
+| **Measures** | One position's asset against its debt | One account's unit NAV against its high-water mark |
+| **Trigger** | 160% at 2× | 10% pauses growth, 20% halves capacity, 30% freezes it |
+| **Effect** | Partial sale of the asset | Less or no new financing. Existing sales unchanged |
+
+- **Common shocks.** Many wallets buying BTC are one correlated liquidation. A transparent score cannot replace aggregate asset and route limits. Production limits must come from execution evidence, and 1%-of-financing protection is not a bound on an arbitrary crash.
+- **Sticky limits.** Risk ceilings and freezes have no automatic recovery in v1.
+- **Identity.** Wallet splitting is limited by no double pledge, one newcomer budget and aggregate caps, not by knowing who is who.
+- **Oracles.** Canonical daily prices and rounds are versioned settings still to be chosen. Stale or missing data fails closed for new financing.
+- **Selection can backfire.** Aggressive selection can leave capital idle and reduce income.
+
+## Borrow
+
+Borrow's policy is **45% entry, 62.5% liquidation and 50% restoration**, the last two measured against full contractual debt. The 62.5% and 50% figures are controls chosen by judgment. The tests below describe how they behaved against history.
+
+| Test, 2018 to 2026, 30-day sales at 8% | BTC annual loss on financing | ETH annual loss on financing | Equal book |
+| --- | ---: | ---: | --- |
+| Binance one hour, 0.1% friction | 0 | 0 | No shortfall |
+| Binance four-hour path, 3% | 0 | 0 | No shortfall |
+| OKX four-hour path, 3% | 0 | 0.02462% | Worst year **0.101%**, ES99 **0.162%** |
+| Binance 24-hour path, 5% | 1.4886% | 1.5044% | Worst year **12.24%**, ES99 **18.55%** |
+
+Sources are Binance, OKX and Bybit, with sampled minute gaps. Kraken lacks comparable history and no replay is claimed for it. The Bybit window excludes March 2020. At the 62.5% trigger, gross collateral is 1.6 times full debt, leaving 37.5% of further price fall before debt exceeds collateral, less slippage and costs.
+
+**What the 1% reserve covers.** It is about 6.2 times the four-hour ES99, which is a judgment margin. The day-long emergency would need about 19% of financing, so it remains uncovered. Investors bear it.
+
+**Sale frequency.** In healthy-repayment replay, 8.99% of BTC and 19.31% of ETH daily cohorts saw a price liquidation.
+
+**Route controls.** A route's fixed-debt book cannot exceed 25% of independently measured USDC bid depth within five minutes at 1% slippage. Common bridge, oracle or custodian exposure counts together.
+
+**Maturity concentration.** At most 5% of approved financing due in one day, and 30% in seven.
+
+**Price controls.** New-risk pricing must be 60 seconds fresh or better, with two independently operated cross-checks. Over 1% disagreement, or USDC outside 0.98 to 1.02, freezes new risk. Debt health prices USDC at `max(1, validated USDC/USD)`, so a depeg cannot create borrowing power. Repayment and top-ups stay open. Enforcement needs valid prices and bounded quotes.
+
+**Governance.** Risk increases carry a 35-day timelock, apply prospectively and stay within the mandate. Reductions and pauses can be immediate.
+
+## Known risks across all three products
 
 | Risk | What could happen | What limits it |
 | --- | --- | --- |
-| Contract bug | Loss of deposits or pledged assets | Audits, deposit and desk caps, a seed phase with the manager's own capital. No audit has happened yet |
-| Stale or wrong price feed | Cut-off, settlement and opening revert while stale; a wrong price misprices one cut-off | Staleness and sequencer checks; the time-lock can point the desk at a new oracle |
-| Thin market at settlement | The sale reverts below the floor and the position stays live | Retry; position size cap; no auction fallback yet |
-| Sandwiching | Up to the sale tolerance on opens and protocol-triggered sales | The feed floor; the trader's own limit; a 0.3% to 0.5% tolerance; profit measured at feed prices |
-| Wrapped BTC | The wrapper fails or loses its peg | Choice of wrapper; the BTC desk's cap, at most 60% of the vault |
-| USDC | A freeze or a broken peg hits the whole vault | None inside this design |
-| Another listed stablecoin | USDT or a later addition depegs between deposit and the swap to USDC | The list is short and board-screened; the vault holds no other stablecoin for long, because deposits are swapped to USDC on arrival |
-| Withdrawal wait | Depositors wait two or three cut-offs when idle cash is short or a position's cover is thin | Instant withdrawals against idle cash otherwise; the utilisation cap; withdrawals rank ahead of new positions; the liquidity reserve |
-| Admin keys | A captured multisig could, after two days, swap in a lying oracle or a hostile fund for future business | Time-lock delay; hard limits; no function moves a pledged asset or a depositor's cash |
-| Regulation | How UAE law classes this product is not settled; a token from a UAE entity falls under Dubai's virtual-asset rules | Legal counsel before launch |
-| Shariah | A board declines a key ruling; some scholars reject crypto itself | The fallbacks on the [Shariah page](/docs/shariah) |
+| Contract bug | Loss of deposits or pledged assets | Audits, caps and a bounded pilot. No audit has happened |
+| Stale or wrong price | Bad sales, or new risk at a wrong price | Freshness and cross-checks. Enforcement needs valid prices |
+| Thin Arc markets | Sales fail or fill badly | Depth caps and route limits. Arc depth is unmeasured, and a route is at zero capacity until proven |
+| Keeper delay | Sales arrive late | A 60-second target, unmeasured. Keepers are permissionless |
+| Wrapper or bridge failure | cirBTC or WETH loses value or redemption | Independent wrapper checks and route caps. BTC and ETH prices cannot prove backing |
+| USDC freeze or depeg | Circle can block an address. A depeg hits every pool | New-risk bands. Nothing inside the design fixes a freeze |
+| Arc outage | No sales or exits during a halt | Nothing inside the design |
+| Withdrawal wait | Earn depends on settlement. Borrow investors are committed for 12 months | Withdrawal priority, idle floors and maturity limits |
+| Admin keys | A captured key changes future settings | Timelocks, bounded limits, and pauses that protect exits |
+| Regulation | Eligibility differs by country. Leverage is restricted in some, including Türkiye | Legal review before each market |
+| Shariah | A board declines a key structure | The design changes. See [Shariah](/docs/shariah) |
 
 ## Unknown or untested
 
-- Behaviour with hundreds of live positions on a real chain, and many desks drawing on one vault and one fund.
-- Economic attacks that combine deposit timing, cut-off timing and price moves. The invariant suite samples these but proves nothing.
+- Live depth, spreads, MEV, keeper and oracle behavior on Arc.
+- Real borrower repayment and real trader behavior.
+- Depositor willingness to accept conservation terms.
 - Anything a professional audit would find.
-- A crash worse than March 2020. The past does not bound the future.
+- A crash worse than the history above. The past does not bound the future.

@@ -1,6 +1,6 @@
 /*
-  Styles for the landing page sections. Tokens come from app/globals.css; buttons and the
-  sheet from app/shared/shared.module.css; the live position adds Position.module.css.
+  Styles for the landing and product pages. Tokens come from app/globals.css; buttons and the
+  sheet from app/shared/shared.module.css.
 
   The page reads as one document: a 4px rhythm, hairlines between sections, serif for display
   and prose, sans for labels, mono for every figure. One accent, used sparingly.
@@ -48,12 +48,6 @@
   text-wrap: pretty;
 }
 
-.body {
-  color: var(--ink-2);
-  max-width: var(--measure);
-  text-wrap: pretty;
-}
-
 .small {
   font-family: var(--font-sans);
   font-size: 0.9rem;
@@ -63,20 +57,7 @@
   text-wrap: pretty;
 }
 
-.num {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-}
-
 .afterList {
-  margin-top: 1.25rem;
-}
-
-.afterRows {
-  margin-top: 2rem;
-}
-
-.caption {
   margin-top: 1.25rem;
 }
 
@@ -86,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 1rem;
   height: 4.25rem;
   border-bottom: 1px solid var(--rule);
 }
@@ -99,37 +80,215 @@
 
 .navLinks {
   display: none;
-  gap: 1.75rem;
+  align-items: center;
+  gap: 1.5rem;
   font-family: var(--font-sans);
   font-size: 0.9rem;
   color: var(--ink-2);
 }
 
-.navLinks a {
+.navLinks a,
+.navMore button {
   text-decoration: none;
   transition: color 0.2s var(--ease-out);
 }
 
-.navLinks a:hover {
+.navLinks a:hover,
+.navMore button:hover {
   color: var(--ink);
 }
 
-@media (min-width: 768px) {
+.navMore {
+  position: relative;
+}
+
+.navMore button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.navCaret {
+  width: 0.4em;
+  height: 0.4em;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -0.1em;
+  transition: rotate 0.2s var(--ease-out);
+}
+
+.navCaret[data-open] {
+  rotate: 225deg;
+  translate: 0 0.1em;
+}
+
+.navPanel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  z-index: 20;
+  min-width: 10rem;
+  margin: 0;
+  padding: 0.4rem;
+  list-style: none;
+  background: var(--paper);
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--radius);
+  box-shadow: 0 18px 40px -18px rgba(45, 35, 15, 0.28);
+}
+
+.navPanel[hidden] {
+  display: none;
+}
+
+.navPanel a {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  color: var(--paper-ink);
+}
+
+.navPanel a:hover {
+  background: var(--paper-rule);
+}
+
+.navActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navActions > a {
+  height: 2.5rem;
+  padding-inline: 0.9rem;
+  font-size: 0.875rem;
+}
+
+.navSecondary {
+  display: none;
+}
+
+.menuButton {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: none;
+  cursor: pointer;
+}
+
+.menuButton span,
+.menuButton span::before,
+.menuButton span::after {
+  display: block;
+  width: 1rem;
+  height: 1.5px;
+  background: var(--ink);
+  transition:
+    transform 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out);
+}
+
+.menuButton span {
+  position: relative;
+}
+
+.menuButton span::before,
+.menuButton span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+
+.menuButton span::before {
+  transform: translateY(-5px);
+}
+
+.menuButton span::after {
+  transform: translateY(5px);
+}
+
+.menuButton span[data-open] {
+  background: transparent;
+}
+
+.menuButton span[data-open]::before {
+  transform: rotate(45deg);
+}
+
+.menuButton span[data-open]::after {
+  transform: rotate(-45deg);
+}
+
+.mobileMenu {
+  display: grid;
+  gap: 0.5rem;
+  padding-block: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-sans);
+}
+
+.mobileMenu[hidden] {
+  display: none;
+}
+
+.mobileMenu ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mobileMenu li a {
+  display: block;
+  padding-block: 0.7rem;
+  font: 400 1.25rem / 1.2 var(--font-serif);
+  text-decoration: none;
+}
+
+.mobileLabel {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+@media (min-width: 900px) {
   .navLinks {
     display: flex;
   }
+  .navSecondary {
+    display: inline-flex;
+  }
+  .menuButton,
+  .mobileMenu {
+    display: none;
+  }
 }
 
-/* ---- Hero: a ledger of three verbs, centred, filling the first screen ---- */
+/* ---- Hero: a ledger of three verbs, centred, with room around it on a wide screen ---- */
 
 .hero {
-  min-height: calc(100svh - 4.25rem);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding-block: clamp(4rem, 10vh, 7rem);
+  padding-block: clamp(2rem, 5vh, 3.5rem);
+}
+
+@media (min-width: 720px) {
+  .hero {
+    min-height: calc(88svh - 4.25rem);
+  }
 }
 
 /*
@@ -204,10 +363,10 @@
 
 /* The one thing the three lines share, set off by a short rule. */
 .heroClosing {
-  margin-top: 2.5rem;
-  font: 400 clamp(1.25rem, 1.05rem + 0.8vw, 1.7rem) / 1.3 var(--font-serif);
-  letter-spacing: -0.01em;
-  color: var(--ink-2);
+  margin-top: clamp(2rem, 5vh, 3.25rem);
+  font: 400 clamp(1.8rem, 1.3rem + 1.9vw, 3rem) / 1.2 var(--font-serif);
+  letter-spacing: -0.015em;
+  color: var(--ink);
 }
 
 .heroClosing::before {
@@ -219,9 +378,18 @@
   background: var(--rule-strong);
 }
 
-.heroClosing em {
+.heroClosing a {
   font-style: italic;
   color: var(--accent);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  text-underline-offset: 0.14em;
+  transition: text-decoration-color 0.2s var(--ease-out);
+}
+
+.heroClosing a:hover {
+  text-decoration-color: var(--accent);
 }
 
 .ctas {
@@ -233,7 +401,7 @@
 
 .hero .ctas {
   justify-content: center;
-  margin-top: 2.5rem;
+  margin-top: 2rem;
 }
 
 /* Each column of the ledger rises in turn, then the closing line, then the actions. */
@@ -260,208 +428,6 @@
     opacity: 0;
     translate: 0 10px;
   }
-}
-
-/* ---- Steps and contracts (Leverage and Shariah) ---- */
-
-.how {
-  display: grid;
-  gap: 3rem;
-  margin-top: 3rem;
-}
-
-@media (min-width: 960px) {
-  .how {
-    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
-    gap: 5rem;
-    align-items: start;
-  }
-}
-
-.steps {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  counter-reset: step;
-  border-top: 1px solid var(--rule);
-}
-
-.step {
-  display: grid;
-  grid-template-columns: 3rem minmax(0, 1fr);
-  gap: 1rem;
-  padding-block: 1.25rem;
-  border-bottom: 1px solid var(--rule);
-  color: var(--ink-2);
-  font-size: 1.0625rem;
-  text-wrap: pretty;
-}
-
-.step::before {
-  counter-increment: step;
-  content: counter(step);
-  font: 400 1.6rem / 1.3 var(--font-serif);
-  color: var(--accent);
-}
-
-.contractRows {
-  border-top: 1px solid var(--rule);
-}
-
-.contractRow {
-  display: grid;
-  align-content: start;
-  gap: 0.2rem;
-  padding-block: 1.1rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-.contractName {
-  font: 600 1.15rem / 1.3 var(--font-serif);
-}
-
-.contractBetween {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  color: var(--ink-3);
-}
-
-.contractLine {
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-
-/* ---- Safety: the loss order beside the backtests ---- */
-
-.safetyGrid {
-  display: grid;
-  gap: 3.5rem;
-  margin-top: 3rem;
-}
-
-@media (min-width: 960px) {
-  .safetyGrid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 5rem;
-  }
-}
-
-.layers {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 3px;
-  counter-reset: layer;
-}
-
-/* Each layer is tinted with the accent, fading as the loss moves down. */
-.layer {
-  display: grid;
-  grid-template-columns: 2.25rem minmax(0, 1fr);
-  gap: 0 1rem;
-  align-items: start;
-  padding: 1rem 1.25rem;
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--accent) var(--tint), transparent);
-}
-
-.layer:nth-child(1) {
-  --tint: 22%;
-}
-.layer:nth-child(2) {
-  --tint: 15%;
-}
-.layer:nth-child(3) {
-  --tint: 10%;
-}
-.layer:nth-child(4) {
-  --tint: 6%;
-}
-.layer:nth-child(5) {
-  --tint: 3%;
-}
-
-.layer::before {
-  counter-increment: layer;
-  content: counter(layer);
-  grid-row: 1 / 3;
-  font: 400 1.4rem / 1.2 var(--font-serif);
-  color: var(--accent-deep);
-}
-
-.table {
-  width: 100%;
-  margin-top: 1.5rem;
-  border-collapse: collapse;
-  font-family: var(--font-sans);
-}
-
-.table th {
-  padding: 0 1rem 0.6rem 0;
-  text-align: left;
-  font-weight: 400;
-  font-size: 0.85rem;
-  color: var(--ink-3);
-  border-bottom: 1px solid var(--rule-strong);
-}
-
-.table td {
-  padding: 0.85rem 1rem 0.85rem 0;
-  border-bottom: 1px solid var(--rule);
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.95rem;
-  color: var(--ink-2);
-}
-
-.table td:first-child {
-  font: 600 1.05rem / 1.3 var(--font-serif);
-  color: var(--ink);
-}
-
-.table td:last-child,
-.table th:last-child {
-  padding-right: 0;
-}
-
-/* ---- Shariah: four objections, four answers ---- */
-
-.pairs {
-  display: grid;
-  gap: 2.25rem 3rem;
-  margin-top: 3rem;
-}
-
-@media (min-width: 768px) {
-  .pairs {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-}
-
-.objection {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  color: var(--ink-3);
-}
-
-.answer {
-  font: 400 clamp(1.25rem, 1.05rem + 0.8vw, 1.55rem) / 1.3 var(--font-serif);
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-}
-
-.caveat {
-  margin-top: 3rem;
-  max-width: var(--measure);
-  color: var(--ink-2);
-  text-wrap: pretty;
-}
-
-.caveat em {
-  color: var(--ink);
 }
 
 /* ---- Waitlist: words left, the form on the sheet right ---- */
@@ -495,12 +461,6 @@
   }
 }
 
-.optional {
-  font-weight: 400;
-  color: var(--paper-mute);
-  opacity: 0.75;
-}
-
 .waitlistDone {
   display: grid;
   gap: 1rem;
@@ -509,6 +469,53 @@
 .waitlistCopy {
   color: var(--paper-mute);
   text-wrap: pretty;
+}
+
+.waitlistShare {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.multi {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.multi label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.5rem;
+  padding: 0.3rem 0.85rem;
+  border: 1px solid var(--paper-edge);
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.multi label:has(input:checked) {
+  border-color: var(--paper-ink);
+  background: var(--paper-rule);
+}
+
+.multi input {
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.otherLinks {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
 }
 
 .waitlistLink {
@@ -568,91 +575,7 @@
   color: var(--accent);
 }
 
-/* ---- Why: three columns, one figure each, the problem then the answer ---- */
-
-.why {
-  display: grid;
-  gap: 2.5rem;
-  margin-top: 3rem;
-  border-top: 1px solid var(--rule);
-}
-
-@media (min-width: 860px) {
-  .why {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 3.5rem;
-  }
-}
-
-.whyCol {
-  display: grid;
-  align-content: start;
-  gap: 1rem;
-  padding-top: 1.5rem;
-}
-
-.whyWho {
-  font-family: var(--font-sans);
-  font-size: 0.9rem;
-  color: var(--ink-3);
-}
-
-.figure {
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 0.2rem 0.75rem;
-  font: 400 clamp(3.5rem, 2.5rem + 3vw, 5rem) / 1 var(--font-serif);
-  letter-spacing: -0.03em;
-  color: var(--accent);
-  font-variant-numeric: tabular-nums;
-}
-
-.figure span {
-  font: 400 1rem / 1.3 var(--font-sans);
-  letter-spacing: 0;
-  color: var(--ink-2);
-}
-
-.problem,
-.answerText {
-  text-wrap: pretty;
-}
-
-.problem {
-  margin-top: 0.5rem;
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--ink-3);
-}
-
-.answerText {
-  color: var(--ink);
-  font-size: 1.1rem;
-  line-height: 1.5;
-}
-
-.problem::before,
-.answerText::before {
-  display: block;
-  margin-bottom: 0.3rem;
-  font: 400 0.75rem / 1 var(--font-sans);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.problem::before {
-  content: "Today";
-}
-
-.answerText::before {
-  content: "With Sacred";
-  color: var(--accent);
-}
-
-/* ---- Yield: the path of one dollar ---- */
+/* ---- Numbered steps: how money gets in, and each product page ---- */
 
 .flow {
   list-style: none;
@@ -666,7 +589,7 @@
 
 @media (min-width: 960px) {
   .flow {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--steps, 3), minmax(0, 1fr));
     gap: 2rem;
   }
 }
@@ -694,18 +617,6 @@
   color: var(--accent);
 }
 
-/* On a wide screen an arrow carries the eye from one stop to the next. */
-@media (min-width: 960px) {
-  .stop:not(:last-child)::after {
-    content: "→";
-    position: absolute;
-    right: -1.6rem;
-    top: 1.5rem;
-    font: 400 1.4rem / 1 var(--font-serif);
-    color: var(--rule-strong);
-  }
-}
-
 .stopTitle {
   font: 600 1.15rem / 1.3 var(--font-serif);
 }
@@ -714,95 +625,6 @@
   color: var(--ink-2);
   font-size: 0.975rem;
   line-height: 1.5;
-}
-
-/* ---- Leverage: the steps and the two modes beside the live position ---- */
-
-.leverage {
-  display: grid;
-  gap: 3rem;
-  margin-top: 3rem;
-}
-
-@media (min-width: 960px) {
-  .leverage {
-    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
-    gap: 4.5rem;
-    align-items: start;
-  }
-  .positionCol {
-    position: sticky;
-    top: 2rem;
-  }
-}
-
-.modes {
-  margin-top: 1.25rem;
-}
-
-.modes td {
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  white-space: normal;
-  vertical-align: top;
-  text-wrap: pretty;
-}
-
-.modes td:first-child {
-  font: 400 0.85rem / 1.5 var(--font-sans);
-  color: var(--ink-3);
-  white-space: nowrap;
-}
-
-/* ---- Shariah: the three contracts across ---- */
-
-.contractGrid {
-  display: grid;
-  gap: 0;
-  margin-top: 3rem;
-  border-top: 1px solid var(--rule);
-}
-
-@media (min-width: 768px) {
-  .contractGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 3rem;
-  }
-  .contractGrid .contractRow {
-    border-bottom: 0;
-    padding-top: 1.5rem;
-  }
-}
-
-/* A table whose cells are sentences, not figures. */
-.prose td {
-  font-family: var(--font-sans);
-  font-size: 0.925rem;
-  line-height: 1.5;
-  vertical-align: top;
-  text-wrap: pretty;
-}
-
-.prose td:first-child {
-  font: 600 1rem / 1.4 var(--font-serif);
-}
-
-/* ---- Safety: each layer named and defined ---- */
-
-.layerName {
-  display: block;
-  font: 600 1.1rem / 1.3 var(--font-serif);
-  color: var(--ink);
-}
-
-.layerWhat {
-  display: block;
-  margin-top: 0.3rem;
-  font-family: var(--font-sans);
-  font-size: 0.925rem;
-  line-height: 1.5;
-  color: var(--ink-2);
-  text-wrap: pretty;
 }
 
 /* ---- FAQ: the heading held left, four folded lists right ---- */
@@ -901,4 +723,395 @@
   .faqItem[open] > .faqA {
     animation: rise 0.4s var(--ease-out) both;
   }
+}
+
+/* ---- Products: copy and four answers beside a worked example ---- */
+
+.product {
+  display: grid;
+  gap: 3rem;
+}
+
+@media (min-width: 960px) {
+  .product {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 5rem;
+    align-items: start;
+  }
+
+  .product[data-reverse] {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  }
+
+  .product[data-reverse] > :first-child {
+    order: 2;
+  }
+
+  .productPanel {
+    position: sticky;
+    top: 2rem;
+  }
+}
+
+.facts {
+  margin: 2rem 0 0;
+  border-top: 1px solid var(--rule);
+}
+
+.facts > div {
+  display: grid;
+  gap: 0.15rem 1.5rem;
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+@media (min-width: 540px) {
+  .facts > div {
+    grid-template-columns: 9.5rem minmax(0, 1fr);
+  }
+}
+
+.facts dt {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--ink-3);
+}
+
+.facts dd {
+  margin: 0;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.facts dd a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.quoteTable {
+  width: 100%;
+  margin-block: 1rem;
+  border-collapse: collapse;
+}
+
+.quoteTable th {
+  padding-bottom: 0.5rem;
+  font-weight: 400;
+  font-size: 0.85rem;
+  text-align: right;
+  color: var(--paper-mute);
+}
+
+.quoteTable td {
+  padding-block: 0.65rem;
+  border-top: 1px solid var(--paper-rule);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.quoteTable th:first-child,
+.quoteTable td:first-child {
+  text-align: left;
+}
+
+.flowList {
+  list-style: none;
+  margin: 1rem 0;
+  padding: 0;
+}
+
+.flowList li {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 1rem;
+  padding: 0.7rem 0 0.7rem 1.5rem;
+}
+
+.flowList li::before {
+  content: "";
+  position: absolute;
+  left: 0.2rem;
+  top: 1.05rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.flowList li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: calc(0.475rem - 0.5px);
+  top: 1.6rem;
+  bottom: -1.05rem;
+  width: 1px;
+  background: var(--paper-edge);
+}
+
+.flowList b {
+  font-variant-numeric: tabular-nums;
+}
+
+.flowList small {
+  grid-column: 1 / -1;
+  font-size: 0.85rem;
+  color: var(--paper-mute);
+}
+
+.assetChoice {
+  padding-inline: 0.9rem;
+}
+
+label.slider {
+  margin-top: 1.1rem;
+}
+
+.slider input {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.sliderHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--paper-mute);
+  font-size: 0.9rem;
+}
+
+.sliderHead b {
+  color: var(--paper-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.quoteLine {
+  margin-bottom: 0.5rem;
+  text-wrap: pretty;
+}
+
+/* ---- SIFT: a raised panel inside Trade ---- */
+
+.sift {
+  margin-top: clamp(3rem, 6vw, 4.5rem);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border-radius: var(--radius);
+  background: var(--ground-raised);
+}
+
+.siftHead {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 960px) {
+  .siftHead {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 4rem;
+    align-items: end;
+  }
+}
+
+.siftHead .eyebrow {
+  margin-bottom: 0.75rem;
+}
+
+.siftTitle {
+  font: 400 clamp(1.7rem, 1.25rem + 1.6vw, 2.4rem) / 1.12 var(--font-serif);
+  letter-spacing: -0.015em;
+}
+
+.siftLead {
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.stages {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin: 2.25rem 0 0;
+  padding: 0;
+}
+
+@media (min-width: 720px) {
+  .stages {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+
+.stages li {
+  display: grid;
+  align-content: start;
+  gap: 0.2rem;
+  padding-top: 0.9rem;
+  border-top: 2px solid var(--accent);
+}
+
+.stages b {
+  font: 400 clamp(1.6rem, 1.3rem + 1vw, 2.1rem) / 1.15 var(--font-serif);
+  letter-spacing: -0.015em;
+}
+
+.stageRule {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  color: var(--accent-deep);
+}
+
+.stageNote {
+  margin-top: 1rem;
+  max-width: 72ch;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink-3);
+  text-wrap: pretty;
+}
+
+.cuts {
+  margin-top: 1.5rem;
+  max-width: 72ch;
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.sift .textLink {
+  margin-top: 1.25rem;
+}
+
+/* ---- Funding routes ---- */
+
+.routes {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 720px) {
+  .routes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3rem;
+  }
+}
+
+.routeLabel {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.6rem 0;
+  padding: 0;
+}
+
+.chips li {
+  padding: 0.35rem 0.8rem;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  background: var(--paper);
+}
+
+.textLink {
+  margin-top: 2rem;
+  font-family: var(--font-sans);
+}
+
+.textLink a,
+.otherLinks a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* ---- Product pages ---- */
+
+.twoUp {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 2.5rem;
+}
+
+@media (min-width: 960px) {
+  .twoUp {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 5rem;
+    align-items: start;
+  }
+}
+
+
+.pageHero {
+  display: grid;
+  gap: 2.5rem;
+  padding-block: clamp(2.5rem, 6vw, 4.5rem);
+}
+
+@media (min-width: 960px) {
+  .pageHero {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 4.5rem;
+    align-items: center;
+  }
+}
+
+.notice {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--ink-3);
+}
+
+.detailTable {
+  width: 100%;
+  margin-top: 2rem;
+  border-collapse: collapse;
+}
+
+.detailTable th {
+  width: 34%;
+  padding: 0.85rem 1.5rem 0.85rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+  color: var(--ink-3);
+}
+
+.detailTable td {
+  padding-block: 0.85rem;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.riskList {
+  margin: 1.5rem 0 0;
+  padding-left: 1.1rem;
+  max-width: var(--measure);
+  color: var(--ink-2);
+}
+
+.riskList li + li {
+  margin-top: 0.4rem;
+}
+
+.riskList li::marker {
+  color: var(--accent);
 }

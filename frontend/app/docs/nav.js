@@ -1,35 +1,53 @@
-// The docs' table of contents, in reading order: the order an investor does diligence in. The
-// layout draws the sidebar from it and each page's previous/next links come from the flattened
-// list. Slugs are folders under app/docs.
+// The docs' table of contents. Three products, each with its own section; what they share comes
+// after them. The layout draws the sidebar from it and each page's previous/next links come from
+// the flattened list. Slugs are folders under app/docs.
 
 export const sections = [
   {
-    title: "The case",
+    title: "Start here",
     pages: [
-      { slug: "", title: "Overview", blurb: "One screen: what Sacred is, where it stands, and where to read next." },
-      { slug: "thesis", title: "Thesis", blurb: "The market that is locked out, the one new primitive, and what it grows into." },
-      { slug: "mechanism", title: "Mechanism", blurb: "A position from opening to its end, with every number, and the rules that never bend." },
-      { slug: "economics", title: "Economics", blurb: "What traders pay, what depositors earn, what the protocol keeps, and the simulation the dials were cut from." },
-      { slug: "risk", title: "Risk", blurb: "The order of loss, nine years of backtests, the Monte Carlo, and what remains at risk." },
-      { slug: "shariah", title: "Shariah", blurb: "The contracts and their sources, the 2006 ruling answered, and each open ruling with its odds." },
-      // Status and roadmap is hidden while it is rewritten. Its page lives at app/docs/_status (the
-      // underscore keeps Next from routing it); rename the folder back to status and restore this line:
-      // { slug: "status", title: "Status and roadmap", blurb: "What is built and deployed, what is not, the gates for each phase, and the open decisions." },
+      { slug: "", title: "Overview", blurb: "One screen: the three products, where they stand, and where to read next." },
+      { slug: "thesis", title: "Thesis", blurb: "The market, the one new primitive, and what fixed-price financing does and does not offer." },
+      { slug: "funding", title: "Add funds", blurb: "Every supported route onto Arc: exchanges, wallets, tokens and networks." },
+      { slug: "support", title: "Support", blurb: "How to reach us, and what we will never ask you for." },
     ],
   },
   {
-    title: "Your part in it",
+    title: "Earn",
     pages: [
-      { slug: "depositors", title: "Depositors", blurb: "One vault and its desks, the 9% target and its reserve, the share price, withdrawals, what can be lost." },
-      { slug: "traders", title: "Traders", blurb: "The cost, the three ways a position ends, the three modes, and what to expect from a forced sale." },
-      { slug: "scr", title: "SCR: holders, stakers, reserve buyers", blurb: "The token's three jobs, the reserve sale, the fee splits, the allocation, and the attacks the design closes." },
+      { slug: "earn", title: "How Earn works", blurb: "Where the return comes from, the modeled range, fees, withdrawals and what protects a deposit." },
+      { slug: "earn/economics", title: "Returns and allocation", blurb: "The markup split, demand cases, conservation terms, earned protection and scale." },
+    ],
+  },
+  {
+    title: "Trade",
+    pages: [
+      { slug: "trade", title: "How Trade works", blurb: "A position up to 5×, its fixed cost, partial sales, financing limits and the market benchmark." },
+      { slug: "trade/sift", title: "SIFT", blurb: "How financing follows evidence: the growth curve, qualifying days, repayment checkpoints and the limits nothing bypasses." },
+      { slug: "trade/mechanism", title: "Trade mechanics", blurb: "Purchase, ownership, sale, pledge, partial sale and settlement, and the leverage ladder." },
+    ],
+  },
+  {
+    title: "Borrow",
+    pages: [
+      { slug: "borrow", title: "How Borrow works", blurb: "USDC against your crypto: capacity, costs, repayment and liquidation." },
+      { slug: "borrow/mechanism", title: "Borrow mechanics", blurb: "Inventory, fixed sale, delivery, pledge, rebate and settlement." },
+      { slug: "borrow/economics", title: "Pricing and reserves", blurb: "How quotes are set, what investors keep, reserve formation and company costs." },
+      { slug: "borrow/investors", title: "Funding Borrow", blurb: "The 12-month mandate, monthly profit, runoff, reserve ownership and loss carry." },
+    ],
+  },
+  {
+    title: "Safety and Shariah",
+    pages: [
+      { slug: "risk", title: "Risk", blurb: "How your funds are protected, what was tested and what it showed." },
+      { slug: "shariah", title: "Shariah", blurb: "The contracts, the Arc and USDC premise, and exactly what still needs approval." },
     ],
   },
   {
     title: "Under the hood",
     pages: [
-      { slug: "architecture", title: "Technical architecture", blurb: "The stack, the pieces, who calls whom, where every USDC goes, a position's states, and the design choices." },
-      { slug: "contracts", title: "Contracts and code", blurb: "Verified Arbitrum One addresses, the rules each contract keeps, every dial, and how to run it all." },
+      { slug: "architecture", title: "Architecture", blurb: "Separate vaults, shared infrastructure, the SIFT ledger and who may do what." },
+      { slug: "contracts", title: "Contracts and code", blurb: "What exists today, what is proposed, verified addresses and how to run it." },
       { slug: "glossary", title: "Glossary", blurb: "The words, used the same way everywhere." },
     ],
   },

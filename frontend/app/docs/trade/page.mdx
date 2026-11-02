@@ -1,0 +1,104 @@
+import { Quote } from "../figures/trade";
+
+export const metadata = { title: "How Trade works" };
+
+# How Trade works
+
+Buy BTC or ETH with your own capital plus Sacred financing. You agree one fixed dollar cost before you buy, there are no funding payments, and Sacred takes no share of your profit. Leverage goes up to 5×. Higher tiers are gradually opened as their protection is earned and Shariah rulings approved.
+
+This is a proposed design. It is not live, audited or Shariah-approved.
+
+## A position at 2×
+
+Sacred finances permitted spot-asset purchases through genuine sales. At 2×, $5,000 of your capital and $5,000 of financing buy $10,000 of asset. The 10% annualized quote becomes a fixed $19.18 over 14 days. With the assumed $11 execution cost, the total is $30.18.
+
+<Quote />
+
+| Line | Amount | How it is set |
+| --- | --- | --- |
+| Asset purchase | $10,000.00 | Your capital plus financing |
+| Your capital | $5,000.00 | Paid at purchase |
+| Financing | $5,000.00 | `asset cost × (1 − 1/leverage)` |
+| Fixed markup | $19.18 | `financing × 10% × 14 ÷ 365`, fixed in dollars at the sale |
+| Assumed execution | $11.00 | 5 bps in, 5 bps out, $1 fixed. Route assumptions, not measured Arc fills |
+| **Total cost at constant price** | **$30.18** | |
+| You owe by day 14 | $5,019.18 | Financing plus markup |
+
+The APR is a quoting convention. What you agree to is a dollar price. It does not move with utilization, funding or your result.
+
+**Your first position is smaller.** A new account starts with up to $500 of financing, so its first full position is $500 of your capital, $500 of financing and $1,000 of asset: $1.92 of markup and about $2 of assumed execution, $3.92 in total. The $10,000 example is what a larger earned ceiling buys. [SIFT](/docs/trade/sift) sets that ceiling: at a funded public release, a qualifying trader can reach $10,000 of financing in 2 weeks, $50,000 in 6 and $100,000 in 12. Each step needs your own capital beneath the financing, available vault capacity and clean risk, and growth pauses or cuts when those fail.
+
+## What you pay, and what you do not
+
+| | |
+| --- | --- |
+| **Markup** | Fixed at the sale |
+| **Execution** | Actual route costs, shown in the quote |
+| **Share of your profit** | 0%, at every leverage tier |
+| **Funding payments** | None |
+| **Late markup** | None |
+
+Mandatory profit share is 0% because a Murabaha sale needs a known price and profit at signing. A charge that depends on later trading results is not established as part of that price ([AAOIFI SS8](https://aaoifi.com/download/24233/), clauses 4/6 to 4/7).
+
+There is no product minimum for deposits or positions. Small positions carry a larger share of the fixed execution cost.
+
+## How a position stays safe
+
+Every position is measured by **coverage**: asset value divided by the full remaining debt. At 2× a partial sale begins at **160%** coverage and sells enough asset to restore **190%**. Because of the markup and entry cost, that first trigger sits about **19.7%** below the entry price.
+
+A partial sale is a reduction in size. It leaves you with less asset, less debt and your remaining equity. On the $10,000 position, before sale costs and any approved rebate:
+
+| | Asset value | Debt | Coverage | Your equity |
+| --- | --- | --- | --- | --- |
+| Opening | $9,995 | $5,019 | 199% | $4,976 |
+| Asset falls 19.7% | $8,031 | $5,019 | 160% | $3,011 |
+| After the partial sale of $1,673 | $6,358 | $3,346 | 190% | $3,011 |
+
+If price keeps falling, later partial sales repeat at the same levels until the debt is repaid. If the asset sells for less than the debt, the gap is a principal shortfall. **You can never owe more than you pledged.** Collection stops at the pledged asset, so the shortfall freezes your account for new financing and is absorbed under the order on the [risk page](/docs/risk), rather than collected from you.
+
+Execution is a design target of 60 seconds from detection to sale. It has not been measured on Arc.
+
+## Ending a position
+
+The term is 14 days, and all of it is fixed at the sale.
+
+- **Repay** the remaining debt and take the asset to your wallet.
+- **Sell** the asset. The debt is repaid from the proceeds and you keep the rest.
+- **At maturity** the debt is due. There is no automatic renewal and no late markup. Staying in means settling and making a genuine new purchase at a new quote.
+
+Any rebate for settling early needs separate approval, so quotes assume the full markup until it has that approval.
+
+## How the cost compares
+
+Each quote shows the Hyperliquid cost for the same exposure as information. A cheaper quote elsewhere does not stop a valid trade, and Sacred makes no promise of being cheapest.
+
+History on BTC and ETH, $10,000 held 14 days, 2,446 daily windows with Hyperliquid's current base fee applied to past funding:
+
+| Regime at entry | Windows | Hyperliquid mean cost | Sacred mean cost | Sacred in aggregate |
+| --- | --- | --- | --- | --- |
+| Bull | 795 | $105.53 | $30.34 | 71.3% cheaper |
+| Sideways | 1,190 | $54.09 | $30.19 | 44.2% cheaper |
+| Bear | 461 | $28.27 | $30.26 | 7.0% more expensive |
+| All | 2,446 | $65.94 | $30.25 | 54.1% cheaper |
+
+The recent picture is weaker: across the 518 windows of 2026, Sacred is 3.0% more expensive in aggregate. The break-even is simple: Hyperliquid funding has to average about 5.94% a year for the $10,000 example to be 5% cheaper on Sacred. These are hold-to-term cost comparisons. They ignore partial sales and say nothing about trader results.
+
+## Leverage up to 5×
+
+Higher tiers are gradually opened as their protection is earned, execution supports them and Shariah rulings are approved. A better SIFT score never unlocks one.
+
+| Leverage | Financed APR | Partial sale / restore | Price room | Cost on $10,000 |
+| --- | --- | --- | --- | --- |
+| **2×** | **10.0%** | **160% / 190%** | **19.7%** | **$30.18** |
+| 2.5× | 11.0% | 145% / 160% | 12.6% | $36.32 |
+| 3× | 12.5% | 130% / 145% | 12.9% | $42.96 |
+| 3.5× | 14.0% | 125% / 135% | 10.2% | $49.36 |
+| 4× | 16.0% | 120% / 130% | 9.4% | $57.03 |
+| 4.5× | 18.0% | 116% / 125% | 9.1% | $64.70 |
+| 5× | 20.0% | 115% / 123% | 7.2% | $72.37 |
+
+Higher tiers cost more and leave less room. At 5×, a 7.2% fall is about a 36% loss of your initial capital before the first partial sale. Full terms are in [Trade mechanics](/docs/trade/mechanism#the-leverage-ladder).
+
+## What can go wrong for you
+
+You can lose your capital, though never more than you pledged. A fall takes equity first, and a fast one can sell part of your position at a poor price. Partial sales are common at higher leverage and can happen during a move that later reverses. A route, oracle or chain outage can delay exits. BTC and ETH on Arc are wrapped or bridged tokens (cirBTC, WETH), which add custody and bridge risk beyond the spot price. The [risk page](/docs/risk) has the evidence.

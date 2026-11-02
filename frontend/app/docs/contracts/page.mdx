@@ -5,13 +5,24 @@ export const revalidate = 60;
 
 # Contracts and code
 
-Find below the earlier version of the system deployed on Arbitrum One and on Monad testnet, verified on Arbiscan and MonadScan, the latest ones to be deployed on Ethereum, Arbitrum One and Monad; nothing is audited. The pieces, who calls whom and where the money goes are drawn on the [architecture page](/docs/architecture). This page is the reference: addresses, the rules the code keeps with the test behind each, every dial and its limit, the test suites, and how to run it all on one machine.
+Two systems appear in these docs, and only one exists.
 
-## Addresses
+| | Proposed | Existing |
+| --- | --- | --- |
+| **What** | MarginVault, SIFT ledger and capacity controller, CashFinanceVault | Term-mode vault, desk, price reader, funds, token side |
+| **Where** | Arc, not deployed | Arbitrum One, Monad testnet |
+| **Economics** | Everything in these docs | The first design's dials, listed below |
+| **Status** | Specified, not built | Verified on block explorers. Not audited |
+
+**The proposed engine is pending implementation.** It has no addresses, no tests and no audit. The controls in [Architecture](/docs/architecture) are requirements, not code. The inspected `contracts/src/Desk.sol` is a term-mode implementation and not this system. No test count below applies to it.
+
+The rest of this page documents the existing deployment.
+
+## Existing addresses
 
 ### Arbitrum One
 
-SCR side
+Token side, from the earlier design. It plays no part in the current product, and the token is a placeholder that is not on offer.
 
 | Contract | Address |
 | --- | --- |
@@ -46,7 +57,7 @@ ETH desk and its vault (WETH, 2x max)
 
 Monad testnet (chain 10143): the same contracts, deployed by `script/DeployMonadTestnet.s.sol` on 2026-10-14 and verified on MonadScan. Every SCR-side contract but the pool hook sits at the same address as on Arbitrum One. The testnet has no native USDC, WBTC or WETH, no Chainlink feeds and no Uniswap v3, so the desks trade against test stand-ins: tokens anyone can mint, price feeds anyone can set (seeded at BTC $83,180 and ETH $2,499 from Chainlink on Arbitrum One), and a router that swaps at the set price. The oracles accept a year-old price, since the feeds only move when someone sets them. The SCR pool runs on the Monad-maintained Uniswap v4 `PoolManager`. Testnet prices are not a reference.
 
-SCR side
+Token side, from the earlier design
 
 | Contract | Address |
 | --- | --- |
@@ -94,11 +105,11 @@ Test stand-ins
 
 <LiveChain />
 
-The deployed version is the first design's: a vault paired with each desk, so two vaults exist. The design is now one vault lending to every desk, with a loss reserve and a capital cap per desk ([architecture](/docs/architecture)). That rewrite ships with the launch re-cut, and these addresses change with it.
+The deployed version pairs a vault with each desk, so two vaults exist.
 
 Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new positions and new deposits, and cannot unpause. Exits are never pausable by anyone.
 
-## The rules the code keeps, and where each is tested
+## The rules the existing code keeps, and where each is tested
 
 | Rule | How | Test |
 | --- | --- | --- |
@@ -113,37 +124,25 @@ Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a
 | Every USDC is counted exactly once | Four counters; the vault never reads its own balance, so donations cannot move the share price | `invariant_vaultIsFullyBacked` |
 | The admin cannot leave coded limits or touch live positions | Bounds in every setter; position terms are stored at opening | `test_admin_cannotExceedHardLimits` |
 
-## Every dial
+## Deployed dials
 
-The time-lock can move a dial for future business, never past its limit, never for a live position. The deployed code carries the first design's values; the launch column is what ships with the re-cut, and the rows marked "new code" need a contract change, not a dial.
+The values the existing code carries. Current design parameters are on the product pages and in `frontend/lib/params.js`.
 
-| Dial | Deployed today | At launch | Limit in code |
-| --- | --- | --- | --- |
-| Base rate | 10% a year | 15.5% a year up to 85% utilisation, rising to 30% at the 92% cap (new code) | Base plus surcharge at most 50% |
-| Surcharge, above 2x | 1% a year | 1.5% on term positions, 0.5% on margin positions | |
-| Leverage ceiling | BTC 3x, ETH 2x | Term unchanged; margin 3x to 5x | Fixed per desk at deployment; can only be lowered |
-| Term | 7 or 14 days | 7 or 14 days; up to 30 in margin mode | 1 to 30 days |
-| Position size | 100,000 USDC | 100,000 USDC | |
-| Minimum down payment | 100 USDC | 100 USDC | At most 10,000 |
-| Live positions per desk | 200 | No limit (new code) | At most 500 |
-| Sale tolerance against Chainlink | 1% | 0.3% to 0.5% | At most 5% |
-| Keeper fee | 1 USDC | Indexed to gas at the call (new code) | At most 20 |
-| Profit share | 30% of each winning position, to the fund | 10% of net profit, losses carried 90 days, measured at feed prices (new code) | Fixed |
-| Markup split | 100% to depositors | 85% depositors, 10% manager, 5% loss reserve (new code) | |
-| Payout | Whatever was earned | 9% target; reserve up to 6% of deposits; surplus split equally once full (new code) | |
-| Cut-off period | 7 days | 7 days; instant withdrawals against idle cash while no position's cover is under 110% (new code) | Fixed |
-| Utilisation cap | 85% | 92%, with deposits admitted only above 85% and returned under 70% for 28 days (new code) | At most 95% |
-| Reserve slice of markup | 10% | 5% | At most 50% |
-| Reserve target | 5% of the vault | 3% of what the desk has financed, kept per desk (new code) | At most 20% |
-| Manager minimum | 5% of the vault | 5% of the vault | At most 20% |
-| Desk cap | None: one vault per desk | 60% of the vault's capital per desk (new code) | |
-| Stablecoins accepted | USDC | USDC and USDT, swapped to USDC on arrival (new code) | A board-screened list |
-| Fund: treasury share, reserve share, stream, cooldown, window | 20%, 15%, 90 days, 14 days, 7 days | 30%, 10% until the reserve's target, 90 days, 14 days, 7 days; an 8% USDC buffer before stakers are paid (new code) | Fixed |
-| Fund: shortfall sale cap and discount | 30% of stake, 10% below average | 30% of stake, 10% below average | At most 30% each |
-| Reserve sale: discount, ceiling, price | 4%, 10%, 30-minute average floored at reserve cash per token | 4%, sell tax plus one point, 24-hour average floored at 90% of the 7-day low (new code) | |
-| Liquidity reserve target | 10% of registered vaults | 10% of the vault | At most 50% |
+| Dial | Deployed |
+| --- | --- |
+| Base rate | 10% a year |
+| Surcharge above 2x | 1% a year |
+| Leverage ceiling | BTC 3x, ETH 2x |
+| Term | 7 or 14 days |
+| Position size | 100,000 USDC |
+| Minimum down payment | 100 USDC |
+| Profit share | 30% of each winning position, to the fund |
+| Markup split | 100% to depositors |
+| Cut-off period | 7 days |
+| Utilisation cap | 85% |
+| Stablecoins accepted | USDC |
 
-## Tests
+## Tests of the existing code
 
 | Suite | What it covers | Result |
 | --- | --- | --- |
@@ -170,4 +169,3 @@ cd frontend && npm run dev                                                      
 
 The local deployment is the whole system with mocks for USDC, WBTC, the feed and the spot market, and a real `PoolManager`. The deployer holds 1,000,000 USDC and the genesis SCR, and must deposit 5% into the vault before anyone else can. Tests: `forge test` in `contracts/` (libraries cloned per the README), `pytest` in `server/`, `npm test && npm run test:e2e` in `frontend/`.
 
-Points are computed from events alone, so anyone can reproduce them: traders from `Paid` events, depositors from shares held at each `Cutoff` at that cut-off's price.

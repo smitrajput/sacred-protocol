@@ -1,0 +1,90 @@
+export const metadata = { title: "How Earn works" };
+
+# How Earn works
+
+Earn puts USDC to work financing Trade positions. Traders pay a fixed markup for financing, and depositors receive a share of it. The return is earned and variable, and it depends on how much of the vault is in use. Your funds are protected by 4 layers of backstops before a loss touches your principal.
+
+This is a proposed design. It is not live, audited or Shariah-approved.
+
+## Where the return comes from
+
+The vault buys BTC or ETH on the spot market and sells it to a trader at cost plus a fixed markup. Whether the trader wins or loses, the markup is the same. Depositors receive income from that markup, never a share of trader profit, and never interest on a loan.
+
+Idle cash earns nothing. It waits in the vault, unlent and outside any pool.
+
+## What you can expect
+
+Depositor yield is earned and variable. At $10m of active NAV, 90% productive use produces approximately 7.14% hypothetical APY.
+
+| Modeled case | Share of vault in use | Share of markup | Cash APR | Hypothetical APY |
+| --- | ---: | ---: | ---: | ---: |
+| Strong demand | 90% | 77% | 6.91% | **7.14%** |
+| Moderate demand | 75% | 77% | 5.76% | **5.92%** |
+| Weak demand | 50% | 70% | 3.49% | **3.55%** |
+
+These are demand assumptions, not forecasts. APR is cash income over NAV. APY compounds an equivalent 14-day reinvestment and is not a payout promise. All figures come before any loss that reaches principal.
+
+**The pilot will look different.** The illustrative first pilot is a $50,000 vault with a $25,000 financing ceiling. Fully used, that is 50% of the vault and about 3.85% APR before losses and timing effects.
+
+Scores and tiers change nothing here. SIFT allocates financing, and financing capacity is not guaranteed. If too little qualifying demand exists, cash stays idle and the return falls. At a funded public release, newcomers are limited to 5% of the deployable envelope, and the 1% account limit means $10,000, $50,000 and $100,000 of financing need vaults of at least $1m, $5m and $10m. See [SIFT](/docs/trade/sift#how-scarce-financing-is-allocated).
+
+## Fees
+
+| | |
+| --- | --- |
+| **Base markup** | 77% to depositors, 23% to the manager |
+| **Markup above 10%** | 50% to depositors, 50% to the manager, on any higher tier later activated |
+| **Other Earn fees** | None proposed |
+
+The manager's share pays actual essential operations once. All remaining cash fills primary protection, then tail protection, then 12 months of company operating cash. Only later cash can be distributed. See [Returns and allocation](/docs/earn/economics).
+
+## Weak-demand terms
+
+If trailing 30-day use falls below 60%, new deposits may be offered 70% of base markup. Normal offers return when use recovers to 70%.
+
+- **Existing depositors keep their terms.** A 77% vintage stays at 77% until it runs off.
+- **New terms need your acceptance**, under an approved mandate. You can decline and withdraw.
+- **Nothing is retroactive.** Offers begin on day 31 and changed receipts on day 45 in the model.
+
+This keeps the vault solvent in a long quiet market. At 50% use, keeping 77% pays 3.91% APY and loses $12,831 a year after budget, and 70% pays 3.55% and retains $22,068. It requires tracked deposit vintages, which are proposed and not built.
+
+## Withdrawals
+
+Withdrawals rank ahead of new financing.
+
+1. **From idle cash.** At 90% use, 10% of the vault is idle and available for withdrawals.
+2. **Through the daily queue.** Requests beyond that wait in a persistent queue, filled as positions settle.
+
+With evenly staggered 14-day maturities, a 50% withdrawal takes approximately 7 days and full runoff 14 days. That depends on positions actually settling. The vault stops new financing at a 5% idle floor and never finances more than 95% of NAV.
+
+Idle cash is depositor principal. It is not protocol protection.
+
+## What protects a deposit
+
+Your funds are protected by 4 layers of backstops before a loss touches your principal. A loss meets them in order:
+
+1. **The trader's capital.** It sits under the financing. A 2× position first sells at about a 19.7% fall.
+2. **Primary protection**, target 0.4% of approved financing, earned from Sacred's income.
+3. **Tail protection**, target 0.6% of approved financing, earned the same way.
+4. **The pilot backstop**, a small portion of the capital Sacred raises from investors, set aside to protect the pilot phase.
+
+Only a loss larger than all four reaches depositors, through active NAV, in proportion.
+
+**Protection does not start at zero.** Primary and tail protection build from manager cash, and at $10m and 90% use the $95,000 target takes about 15 months of budget in the model. The pilot backstop stands behind the vault while they build. No token or Borrow income supports any layer.
+
+The 1% target is a chosen cushion, not a certified guarantee. A day-long outage can lose far more. See [Risk](/docs/risk).
+
+## Your position in the vault
+
+Deposits are recorded by subscription vintage, with fixed income entitlements. Active NAV counts idle cash and financed positions, less recognized impairment, and impairments are processed before distributions and redemptions. Positions are proposed to be non-transferable, because the vault mostly holds debts, and a debt may not be traded above or below its face value. You leave by withdrawing.
+
+## Depositing
+
+Deposits are USDC on Arc. See [Add funds](/docs/funding) for routes. Accepting Earn's mandate is an explicit step when you allocate from your available balance.
+
+## Keep in mind
+
+- Your funds are protected by 4 layers of backstops before a loss touches your principal. No return is guaranteed.
+- Returns can be far below the modeled range if traders do not come.
+- Withdrawals can take days and depend on settlement.
+- Contract bugs, USDC problems, oracle failures and chain outages can cause loss beyond trading risk.

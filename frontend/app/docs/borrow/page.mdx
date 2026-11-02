@@ -1,0 +1,87 @@
+import { BorrowFlow } from "../figures/borrow";
+
+export const metadata = { title: "How Borrow works" };
+
+# How Borrow works
+
+Borrow gives you spendable USDC against crypto you already hold. Trade finances a purchase; Borrow releases cash while your collateral stays yours. Under the hood it is a sale at a fixed price, known in dollars before you accept.
+
+Borrow comes after Trade and stays disabled until its contracts are approved and its collateral routes are proven. Its capacity today is zero, and the launch price is not set. Figures below use an **8% annualized reference**, which is an audited model input and not a quote.
+
+<BorrowFlow />
+
+## A worked example
+
+Amina pledges collateral worth $10,000:
+
+| Step | Amount |
+| --- | --- |
+| USDC she receives and can spend | 4,500 USDC |
+| Fixed amount due on day 30 | 4,529.59 USDC |
+| Amount to close on day 7 | 4,506.90 USDC |
+| Future markup waived on day 7 | 22.68 USDC |
+| Collateral value that triggers liquidation | $7,247.34 |
+
+The collateral remains hers, it is never reused, and any surplus from a sale of collateral returns to her. No late markup or compounding exists.
+
+## Limits
+
+| Term | Proposed setting |
+| --- | --- |
+| **Supported collateral** | WETH and cirBTC on Arc are the candidates. Each is listed in [Arc's registry](https://docs.arc.io/arc/references/contract-addresses), and neither is enabled until its backing, feeds and depth are verified |
+| **Borrowing capacity** | Up to 45% of your collateral's value |
+| **Term** | 30 days. 90 and 180 days are disabled |
+| **Per borrower** | $1,000 to the lower of $5,000 or 2% of approved financing |
+| **Pilot total** | Up to $250,000, at most $125,000 per collateral route |
+
+These are ceilings, not available capacity. Each route activates at the lowest of its policy cap, its approved backing and feed capacity, and 25% of independently measured USDC bid depth within five minutes at 1% slippage. No qualified route means zero capacity.
+
+The per-borrower limit needs identity aggregation to mean what it says. Address-only limits are weaker, because one person can hold many addresses.
+
+## Costs
+
+The price is a fixed sale amount: `principal × (1 + quote × days ÷ 365)`. Pay early and a proposed binding rebate cancels the unused days:
+
+```text
+cash settlement = q × (1 + r × min(d, T) / 365)
+binding rebate  = q × r × max(T − d, 0) / 365
+```
+
+| | |
+| --- | --- |
+| **Rate** | Not set. The reference is 8% annualized, fixed once you accept |
+| **Late charge** | None. No compounding and no automatic renewal |
+| **Liquidation cost** | Actual execution costs and any separately approved bounded service compensation. No penalty revenue |
+| **Network** | Arc transaction costs, paid in USDC |
+
+Sacred does not claim to be the cheapest. On $10,000 for 30 days, dated observations from late October 2026 cost about $36.99 on Aave V3 Core, $30.25 base on Aave's Arc V4 before any personal risk premium, and $41.00 on a large Morpho USDC/WBTC market. Sacred would cost $65.75 at 8%, $61.64 at 7.5% or $49.32 at 6%. Those variable rates can move, and Sacred's price cannot once accepted. New quotes are set against market costs, with the lowest sustainable price as the objective. See [Pricing and reserves](/docs/borrow/economics).
+
+## Repaying and getting your collateral back
+
+Repay in part or in full at any time, in USDC. Each repayment retires a proportional slice of the sale. When the debt reaches zero your collateral is released. You can also withdraw collateral while borrowing, if fresh prices show principal LTV of 45% or less after the withdrawal, your full debt is healthy and nothing is overdue.
+
+At maturity the full remaining debt is due. Healthy accounts get a 24-hour cure at no extra cost. After that the collateral is sold to settle the debt. A new sale is available only after real settlement, with its own underwriting and funding. An old debt is never rolled into a new one.
+
+## Liquidation
+
+```text
+debt LTV = full remaining debt / collateral value
+health   = 0.625 × collateral value / full remaining debt
+```
+
+Liquidation starts when debt LTV reaches **62.5%**, a 27.5% fall from the example's opening value. Sacred sells only the collateral needed to bring debt LTV back to **50%**, or to retire the debt if that is impossible or would leave under $250 of principal. The rebate applies to forced settlement exactly as it does to voluntary settlement, so a liquidation does not cost you the unused days. Surplus collateral and proceeds return to you.
+
+You can add collateral or repay to avoid it. Those actions stay open even when new borrowing is frozen.
+
+Enforcement requires valid independent prices and a bounded executable quote. The cure period never suspends a price-triggered liquidation.
+
+In replay of the 30-day reference, 9.0% of BTC and 19.3% of ETH daily cohorts saw some price liquidation, and on average 3.2% and 7.2% of initial collateral was sold. The [risk page](/docs/risk#borrow) has the method.
+
+## Keep in mind
+
+- Collateral can be partly sold during a fall that later reverses.
+- WETH and cirBTC on Arc carry bridge or custodian risk that BTC and ETH prices do not show.
+- Circle can block USDC at an address.
+- Borrow's funding pool is separate from Earn. Losses in one do not reach the other.
+
+The contract sequence is in [Borrow mechanics](/docs/borrow/mechanism). What this sale still needs to be approved is on the [Shariah page](/docs/shariah#borrow).

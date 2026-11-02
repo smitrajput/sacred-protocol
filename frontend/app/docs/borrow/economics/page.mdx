@@ -1,0 +1,104 @@
+export const metadata = { title: "Borrow: pricing and reserves" };
+
+# Pricing and reserves
+
+New Borrow offers are priced against the market, aiming at the lowest sustainable borrower price and the highest investor profit share the product can support. **8% with a 75% investor share is the audited reference.** It is not a launch quote. Both launch values are unset until an offer is approved. Sacred has a measurable selection process, not evidence of an optimal or cheapest price.
+
+These are research scenarios as of 2 November 2026. All of them exclude Trade income, token income and any yield on idle cash.
+
+## How profit is divided
+
+Use `F` for actual time-weighted financing, `A` for approved capacity including commitments, `r` for the new-sale quote and `p` for the agreed investor share.
+
+```text
+planning net investment result = F × (r − 0.05% annual loss allowance)
+distributable profit = positive surplus after direct costs and all loss restoration
+manager              = (1 − p) × distributable profit
+LP entitlement       = p × distributable profit
+IRR retention        = min(20% × LP entitlement, max(0, 1% × A − eligible IRR))
+company operating profit = manager revenue − company operating costs
+```
+
+IRR is the **investment risk reserve**. It belongs to investors, and it is funded from their profit entitlement. It is not company money and it is not a guarantee.
+
+| Of each 100 of distributable profit | 75% reference | 80% candidate |
+| --- | --- | --- |
+| Investor cash | 60 | 64 |
+| Investor-owned IRR | 15 | 16 |
+| Manager, held in escrow | 25 | 20 |
+
+Once the reserve reaches target, investors receive their full agreed share in cash, and retention resumes only if it is needed. Manager allocations stay in escrow until final vintage true-up, and any overallocation returns to investors. The 5 bps allowance is a budget assumption, not a second cash reserve.
+
+## Protection
+
+The target is **1% of approved financing**, including commitments: 0.4% primary and 0.6% tail. Those are two sleeves of one investor-owned stock, and each contribution splits 40/60. Unused approved capacity still needs protection.
+
+The reserve starts empty in the pilot, when the pilot backstop, a small portion of the capital Sacred raises from investors, stands behind it. Growth beyond the pilot needs the full target, and depletion pauses new risk until the stock and any loss are restored. The 1% is a judgment, about 6.2 times the largest modeled operating-stress ES99. It does not cover a day-long outage, as the [risk page](/docs/risk#borrow) shows.
+
+## Reference results
+
+**A steady $10m book at the 8%/75% reference**, with $9m approved capacity, $90,000 reserve target, $125,000 yearly costs and a 5 bps allowance. Utilization is a chosen demand sensitivity.
+
+| | Strong | Moderate | Weak |
+| --- | ---: | ---: | ---: |
+| Productive utilization | 85% | 70% | 50% |
+| Gross annual markup | $680k | $560k | $400k |
+| Cash APR while building the reserve | 4.05% | 3.34% | 2.39% |
+| Illustrative 30-day reinvested APY | 4.13% | 3.39% | 2.41% |
+| Cash APY after target, no replenishment | 5.19% | 4.25% | 3.02% |
+| Annualized reserve contribution capacity | $101,363 | $83,475 | $59,625 |
+| Company surplus or deficit | $43,938 | $14,125 | −$25,625 |
+| Standalone break-even capital | $7.40m | $8.98m | $12.58m |
+
+**The first closed vintage, with zero realized losses**, including ramp and runoff, and no reinvestment:
+
+| | 85% peak | 70% peak | 50% peak |
+| --- | ---: | ---: | ---: |
+| Investor cash distributions | $378,082 | $308,384 | $220,274 |
+| Unused reserve returned | $90,000 | $77,096 | $55,068 |
+| Total return on original capital | 4.68% | 3.85% | 2.75% |
+| Annualized cashflow return | 4.76% | 3.91% | 2.78% |
+| Company cash after costs | $31,027 | $3,493 | −$33,219 |
+
+The $90,000 target is reached on day 352 at 85% use. Lower use needs year two. A full exit returns the stock, leaving zero protection for that departing vintage, and the $10m scenarios cannot use other vintages' reserves.
+
+Costs exclude initial development, legal and audits. The company needs $125,000 of first-year funding, because manager allocations sit in escrow, and $187,500 keeps the six-month floor intact.
+
+## The price tradeoff
+
+Raising the investor share moves company revenue. It creates no new income.
+
+| $10m, 85% use, steady budget | Investor cash APR | Company net | First-vintage company net |
+| --- | ---: | ---: | ---: |
+| 8% / 75%, reference | 4.05% | $43,938 | $31,027 |
+| 7.5% / 80%, conditional candidate | 4.05% | $1,650 | −$7,979 |
+| 6% / 80%, lower-price sensitivity | 3.24% | −$23,850 | −$31,384 |
+
+At 70% use, 7.5%/80% loses $20,700 a year. Lower prices need shown demand, more scale or verified lower costs. The alternative vintage figures are projections, not new liquidation or reserve replays.
+
+**New-offer rule.** Compare all-in costs over the same tenor, validate demand, and require conservative company cost coverage for mature offers. A capped pilot deficit must be fully budgeted from company cash with the runway floor intact, never from investor principal or the reserve. Investor share is fixed at vintage subscription and each sale price at acceptance. New quotes never amend old debts or investor rights.
+
+## How competitors compare
+
+To compare fairly, normalize an APR as `F × r × 30 / 365` and an APY as `F × ((1 + APY)^(30/365) − 1)`, then add applicable fees.
+
+| $10,000 for 30 days | Dated rate | Cost |
+| --- | --- | ---: |
+| Aave V3 Core, 31 Oct 2026 | 4.50% APR | $36.99 |
+| Aave Arc V4, 31 Oct 2026, before personal risk premium | 3.68% base APR | $30.25 |
+| Morpho USDC/WBTC, 30-day mean, 2 Nov 2026 | 5.104% APY | $41.00 |
+| Sacred at 8% / 7.5% / 6% | Fixed once accepted | $65.75 / $61.64 / $49.32 |
+
+Sources: [Aave rate review](https://governance.aave.com/t/risk-stewards-slope2-increases-on-aave-v3-and-aave-v4-2026-10-31/25970), [Morpho market data](https://api.morpho.org/v0/blue/markets/1:0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49/apy-averages). These dated observations are not firm offers. No cheapest-price claim follows from them.
+
+## What transfers from other protocols
+
+Official docs reviewed 2 November 2026.
+
+| Reference | Adopted or adapted | Excluded |
+| --- | --- | --- |
+| [Aave V3.7](https://aave.com/docs/aave-v3/overview) | Separate LTV and liquidation thresholds, caps, scoped freezes. V3.7 removed the old Isolation Mode, so Sacred has its own isolated books | Variable or compounding interest, inherited mature-market LTVs, automatic liquidation penalty |
+| [Morpho](https://docs.morpho.org/learn/concepts/midnight/liquidations/) | Per-market risk, health and maturity triggers, allocation caps, roles and timelocks | Freely tradable debt exits, conventional fixed-rate contracts by default |
+| [Compound Comet](https://github.com/compound-finance/comet/blob/main/SPEC.md) | Separate entry and liquidation factors, cash versus reserves, scoped guardians | The interest engine, debt absorption without an approved structure |
+| [Sky](https://developers.skyeco.com/protocol/core/vow/) | Cover losses before distributing surplus, executable collateral sales, circuit breakers | Token recapitalization, savings and RWA income |
+| [SparkLend](https://docs.spark.finance/products/sparklend) | Bounded allocations, asset restrictions, liquidity and maturity monitoring | Borrowed savings rates, instant-exit promises, ecosystem credit lines |

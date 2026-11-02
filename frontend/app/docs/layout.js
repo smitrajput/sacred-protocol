@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { action } from "../landing/content";
 import Brand from "../shared/Brand";
 import shared from "../shared/shared.module.css";
 import styles from "./docs.module.css";
@@ -18,11 +19,8 @@ export default function DocsLayout({ children }) {
           <Link href="/docs">Docs</Link>
         </span>
         <div className={styles.barRight}>
-          <a href="/sacred-lightpaper.pdf" className={styles.barLink}>
-            Lightpaper
-          </a>
-          <Link href="/app" className={`${shared.btn} ${shared.btnPrimary}`}>
-            Launch app
+          <Link href={action.primary.href} className={`${shared.btn} ${shared.btnPrimary}`}>
+            {action.primary.label}
           </Link>
         </div>
       </header>
@@ -33,8 +31,8 @@ export default function DocsLayout({ children }) {
           <article className={styles.prose}>{children}</article>
           <DocsPager />
           <p className={styles.foot}>
-            Sacred is pre-launch. No Shariah board has reviewed it, nothing is audited, and every number is a proposal
-            or a backtest result, not a promise. These pages are not an offer to sell anything.
+            Sacred is pre-launch. No Shariah board has reviewed it, nothing is audited, and every number is a proposal,
+            a model or a backtest result, not a promise. These pages are not an offer to sell anything.
           </p>
         </main>
       </div>

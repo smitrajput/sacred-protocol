@@ -1,7 +1,7 @@
-// The Desk's launch defaults and the leverage ceilings offered per asset. Used wherever the
-// contracts cannot be read: the landing page's worked position and the app's preview. The code
-// deployed on Arbitrum One (contracts/src/Desk.sol) still carries the first design's dials,
-// 10% plus 1% above 2x; the launch re-cut is on the docs' economics page.
+// The earlier term-mode Desk's defaults and the leverage ceilings offered per asset, for the demo
+// app's preview where the contracts cannot be read. The code deployed on Arbitrum One
+// (contracts/src/Desk.sol) carries the first design's dials. The current proposed parameters are
+// in lib/params.js.
 
 export const DESK_DEFAULTS = {
   baseRateBps: 1_550n, // 15.5% a year while the bucket is at or under 85% financed

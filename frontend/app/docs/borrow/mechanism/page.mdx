@@ -1,0 +1,66 @@
+import { BorrowStates } from "../../figures/borrow";
+
+export const metadata = { title: "Borrow mechanics" };
+
+# Borrow mechanics
+
+Borrow is a fixed-price sale of USDC from inventory owned by the pool's investors, payable later in USDC and secured by pledged collateral. It rests on a premise and on contracts that are not yet approved. This page states the sequence those approvals would cover.
+
+## The sequence
+
+1. **Inventory.** Investors hold USDC under a restricted mandate. Sacred records which capital is committed, and acts as their manager and agent. The USDC is not company money.
+2. **Pledge.** The borrower deposits approved collateral and grants a pledge and an enforcement mandate. The pool does not acquire economic ownership of it.
+3. **Sale.** The borrower accepts a quote: a principal amount now, a fixed sale price, a maturity and a rebate rule.
+4. **Delivery.** The pool transfers USDC to the borrower's wallet and records the debt in one step. The borrower can spend it freely. No simulated commodity movement is inserted.
+5. **Rebate and settlement.** Payment within the term cancels unused markup under a binding *ibra*. Debt reaches zero and the collateral returns.
+
+```text
+fixed debt at sale         = F × (1 + r × T / 365)
+cash settlement            = q × (1 + r × min(d, T) / 365)
+binding rebate             = q × r × max(T − d, 0) / 365
+remaining contractual debt = (remaining principal − q) × (1 + r × T / 365)
+health factor              = 0.625 × collateral value in USDC / full remaining debt
+```
+
+`F` is principal, `r` the annualized quote, `T` the term in days and `q` principal retired on day `d`.
+
+Cash plus waiver extinguishes that slice's full fixed debt. This is Sacred's proposed linear formula, using a contractual approach supported by [Bank Negara Malaysia's Shariah Advisory Council](https://www.bnm.gov.my/-/resolutions-of-shariah-advisory-council-bank-negara-malaysia). BNM has not certified the formula.
+
+## Why musawamah
+
+Sacred uses **musawamah**, a negotiated-price sale, for pool inventory without documented acquisition cost. **Murabaha** needs genuine cost disclosure, and a $1 peg is not a lot's cost. Murabaha applies only to lots with documented acquisition cost. This is the shape of the [SBP model agreement](https://archive.sbp.org.pk/press/Essentials/Musawamah%20Facility%20Agreement.htm), which covers sales from an institution's existing inventory, separates acquisition from sale and allows collateral.
+
+## A sale's states
+
+<BorrowStates />
+
+An independently funded new sale may follow real settlement. Prearranged circular refinancing is excluded, because [IIFA](https://iifa-aifi.org/en/49710.html) rejects replacing an old debt with a larger one for extra time. "Evergreen" here can only mean persistent collateral, reminders and fresh independent transactions.
+
+If debt stays unpaid, collateral is enforced, or approved hardship forbearance applies at unchanged debt. There is no compounding, no late profit and no forced paper renewal.
+
+## Liquidation
+
+When debt LTV reaches 62.5%, a keeper sells a bounded amount of collateral, applies proceeds to the rebated settlement amount, and restores 50% or closes the debt. The order of recovery is:
+
+1. Approved execution costs
+2. The secured sale obligation, with the approved rebate
+3. Surplus back to the borrower
+
+Unrecovered principal is recorded promptly. It falls on investor-owned reserves, primary then tail, and then on the pool. Keeper rewards need an approved service arrangement. Model costs are 0.10% plus $2 in normal conditions, 3% plus $10 in four-hour stress and 5% plus $10 in day-long emergency, on $5,000 of financing. They are assumptions, not observed Arc fills or penalty revenue.
+
+## Collateral rules
+
+- Never rehypothecated, staked or lent.
+- Withdrawals need fresh prices, no unpaid maturity, principal LTV of 45% or less afterwards and a healthy full debt. Debt-free withdrawals need no price check.
+- Adding collateral and repaying stay open during an origination freeze.
+- Repayment in BTC or ETH needs an approved spot conversion at an actual settlement quote, and does not reset the debt.
+
+## Later terms
+
+| Setting | State |
+| --- | --- |
+| 90 and 180-day terms | Disabled. 8.5% and 9% are old illustrations, not selected quotes |
+| 50 / 65 / 55 LTV policy | Disabled candidate. Needs new approval |
+| Automatic renewal | Excluded |
+
+Longer terms carry more liquidation risk and need matching investor maturities. In replay, 90 and 180-day cohorts saw price liquidation about 29% and 46% of the time on BTC, against 9% at 30 days.

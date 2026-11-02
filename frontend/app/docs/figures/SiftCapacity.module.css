@@ -1,0 +1,83 @@
+/* The capacity panel in the SIFT docs: a sheet of paper with two controls and three bars. */
+
+.panel {
+  margin-block: 2rem;
+}
+
+.panel h3 {
+  margin: 0;
+}
+
+.controls {
+  display: grid;
+  gap: 1.25rem;
+  padding-top: 1.25rem;
+}
+
+.rangeHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: var(--paper-mute);
+}
+
+.rangeHead b {
+  color: var(--paper-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.range {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.bars {
+  display: grid;
+  gap: 0.9rem;
+  margin: 1.25rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--paper-rule);
+}
+
+.bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.3rem 1rem;
+}
+
+.bar dt {
+  color: var(--paper-mute);
+}
+
+.bar dd {
+  margin: 0;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.track {
+  grid-column: 1 / -1;
+  height: 0.4rem;
+  background: var(--paper-rule);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s var(--ease-out);
+}
+
+.result {
+  margin: 1.25rem 0 0.5rem;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}

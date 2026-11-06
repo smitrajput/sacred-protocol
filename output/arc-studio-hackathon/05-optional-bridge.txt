@@ -1,22 +1,7 @@
-REVIEW GATE: Execute only after Claude Fable review has been incorporated and REVIEW_STATUS.json says READY_FOR_IMPLEMENTATION with an approved hash matching spec.md. If the gate is absent or pending, stop before code generation/deployment and report the pending review. Read PLANS.md and COMMIT_PLAN.md.
+Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
 
-COMMIT DISCIPLINE: This milestone contains multiple small checkpoints. For each, implement one coherent behavior with relevant tests, inspect the actual diff and git diff --check/stat, stage only that checkpoint, commit it, record its SHA/tests/Studio trace, then continue. No catch-all commit with 1,000+ changed lines. Separate dependencies/generated artifacts. If Studio cannot commit granularly, stop after each checkpoint for export/local commit; do not accumulate the full app. Do not claim a Git commit without a SHA.
+CURRENT CHECKPOINT: 05a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
 
-Work in the SAME Sacred Arc Studio project. This is a testnet-only pilot due November 7, 2026 at 9:30 AM IST. Preserve existing working files and tests. Generate, test and deploy changes through Studio. Do not import the old Sacred contracts as protocol truth. Read attached spec.md when available. Implement only this milestone; report changed files, executed tests, failures, and real transaction evidence. Never claim an unexecuted check passed.
+05a — Only run after core04a passed and before 01:30 AM IST cutoff. Implement released cirBTC bridging via actual Bridge Kit + supported viem adapter; pin tested versions. ArcTestnet domain26→EthereumSepolia domain0; official token ID and destination token are spec §6. Flow: full repayment receipt → asset release → fresh quote/approval/source tx → attestation → destination mint/receipt. Persist resumable source hash; retries never burn twice. Use whole-token decimal strings and show fees/finality/chain state. A bridge failure leaves repaid assets under user control. Enable only after a real successful rehearsal with source+destination receipts and destination balance delta. Stop after 60minutes if unsuccessful and leave feature disabled.
 
-Run ONLY if core verification passed and time remains before the bridge cutoff. Implement the following optional extension behind a feature flag. Timebox actual transfer rehearsal to 60 minutes; otherwise leave feature disabled and leave the optional feature disabled. Do not change protocol accounting or collateral custody.
-
-Optional Bridge Kit extension
-
-Only begin after the core end-to-end flow passes. Use standalone `@circle-fin/bridge-kit` and its supported viem adapter, pinning versions after a real smoke test. Flow: **repay → receipt → release cirBTC → bridge → destination receipt**. These are separate transactions in one guided UI. Bridge failure must leave protocol repayment complete and tokens under user control.
-
-Verified sandbox route: **Arc Testnet domain 26 → Ethereum Sepolia domain 0**. Official cirBTC token ID:
-
-```text
-0x7c27b7b6485f3ea49b7d1a439e288d3c3116f533302afabb7e372dfc0770cc7d
-Sepolia cirBTC: 0x3a3fe695f684bf9b9e43cf43c2b895ea5e392bb3
-```
-
-Live Iris registry and a signed fee quote succeeded during research; no transfer was performed. A quoted 0.0001 cirBTC transfer had a 0.2 native-USDC protocol fee, excluding gas, for that short-lived quote. Fetch a fresh quote; never hardcode it. Base Sepolia was not enabled for this token. [Registry](https://iris-api-sandbox.circle.com/v2/cctpx/tokens?tokenid=0x7c27b7b6485f3ea49b7d1a439e288d3c3116f533302afabb7e372dfc0770cc7d), [SDK quickstart](https://docs.arc.io/app-kit/quickstarts/bridge-tokens-across-blockchains), [expanded assets](https://developers.circle.com/cctp/expanded-assets).
-
-Require one real BridgeKit transfer, source receipt, attestation, destination receipt and increased destination balance before enabling the feature. Use whole-token decimal strings in the SDK. Standard finality without forwarding is the verified quote path; fund destination Sepolia ETH for self-mint. Persist bridge state by source transaction and wallet; resume attestation/mint instead of burning again. Show signature/source/attesting/destination/completed/recoverable-error states. Stop after a 60-minute unsuccessful rehearsal and leave this optional feature disabled.
+At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.

@@ -1,35 +1,9 @@
-REVIEW GATE: Execute only after Claude Fable review has been incorporated and REVIEW_STATUS.json says READY_FOR_IMPLEMENTATION with an approved hash matching spec.md. If the gate is absent or pending, stop before code generation/deployment and report the pending review. Read PLANS.md and COMMIT_PLAN.md.
+Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
 
-COMMIT DISCIPLINE: This milestone contains multiple small checkpoints. For each, implement one coherent behavior with relevant tests, inspect the actual diff and git diff --check/stat, stage only that checkpoint, commit it, record its SHA/tests/Studio trace, then continue. No catch-all commit with 1,000+ changed lines. Separate dependencies/generated artifacts. If Studio cannot commit granularly, stop after each checkpoint for export/local commit; do not accumulate the full app. Do not claim a Git commit without a SHA.
+CURRENT CHECKPOINT: 01a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
 
-Work in the SAME Sacred Arc Studio project. This is a testnet-only pilot due November 7, 2026 at 9:30 AM IST. Preserve existing working files and tests. Generate, test and deploy changes through Studio. Do not import the old Sacred contracts as protocol truth. Read attached spec.md when available. Implement only this milestone; report changed files, executed tests, failures, and real transaction evidence. Never claim an unexecuted check passed.
+01a — Implement NAV-priced deposits and share/cap accounting in contracts/src/MarginVault.sol plus focused tests. Spec §4 is authoritative: NAV=recorded idle+principal; no reserves/claims/uncollected markup in NAV. Require accepted mandate, minShares, empty withdrawal queue, impairment gate and safe zero-supply/zeroNAV handling. Use a minimal test engine stub until real engine wiring exists. Test one behavior through public entry points before advancing.
+01b — Add FIFO request/reservation/claim and worthless-share handling. Queue priority blocks new finance. Entire residual worth0 can be burned only under accepted dust terms; a partial payout0 on a valuable head waits without burning. ZeroNAV advances worthless queued requests, not profitable claims. Bound 16 processed/64 live requests. Keep at least one share while any position is live, including P=0/M>0, so later markup has owners. Claim never reduces NAV twice; stale feed does not block reserved claims.
+01c — Add treasury-only actual-token seedProtection and separate primary/tail/backstop buckets; 0.4%/0.6% targets use immutable ceiling. No share mint for seeds. Implement engine-only principal/markup/loss accounting; losses draw primary→tail→backstop→LP, retain gross shortfall evidence. Keep manager excess locked. Test conservation and unauthorized callers.
 
-Implement MarginVault, policy manifest, interfaces and its meaningful tests. Keep the TradeEngine as a narrow interface until the next stage. Include segregated accounting, fixed initial cohort, reserves and FIFO. Use USDC six-decimal integer accounting. Use OpenZeppelin safe transfers and reentrancy protection.
-
-Smart contract specification
-
-Use two main contracts plus narrow adapters. Freeze policy parameters and dependency addresses at deployment. Guardian may pause funding/originations; repayment, claims and debt-free release remain available. No proxy, collateral rescue, arbitrary call or unrestricted manager withdrawal.
-
-### MarginVault
-
-Own USDC, internal nontransferable shares, queue and segregated protection balances. Expose `deposit`, `closeFunding`, `requestWithdraw`, `processWithdrawals(maxRequests)`, `claim`, `vaultState` and engine-only accounting methods. Funding closes once, before the first trade. Every deposit accepts the fixed 77/23 mandate hash.
-
-Track separately: depositor idle cash, outstanding principal, manager cash, primary reserve, tail reserve, pilot backstop and claimable withdrawals. Direct donations do not change recorded NAV or mint shares. Cash reserved for claims, reserves, manager or trader is never lendable.
-
-After required loss resolution:
-
-```text
-LP_NAV = depositorIdleCash + outstandingPrincipal
-```
-
-Exclude uncollected markup and pledged assets from NAV. Principal is already represented by its receivable. Initial funding shares mint 1:1 in micro-USDC units. Realized LP markup increases share value; uncovered principal losses reduce it. No late subscriptions.
-
-Before every withdrawal cash reservation, including immediate redemption, or manager distribution, scan the bounded live positions using fresh conservative net collateral values. If any value is below its remaining principal, revert `AccountingNeedsSettlement(id)` until that eligible position is closed and its loss recorded. Stale prices block those reservations and distributions; wallet repayment, debt-free release and claims of already-reserved cash still work. Never apply this gate to claim(). This bounded settlement gate is the pilot's impairment treatment.
-
-Origination requires: no unfilled withdrawal queue; temporary gross purchase cash available; net depositor idle cash after opening ≥5% of NAV; outstanding principal plus commitments ≤95% of NAV and the configured pilot financing ceiling; per-account cap respected. Reserve commitments before external calls. Primary and tail targets must each be funded: **0.4% and 0.6% of the immutable approved financing ceiling**, respectively. Seed these with separately identified test treasury contributions. This fixes the target basis for the pilot; never take targets from depositor principal. [Earn rules](https://sacred.markets/docs/earn).
-
-For the demo, essential operational expense is zero. Route the manager's collected share first to replenish primary, then tail, then retain the excess as locked manager cash. Defer company cash targets and distributions. Final losses draw primary → tail → separate pilot backstop → LP NAV. Record gross economic shortfall even when reserves absorb it.
-
-**FIFO withdrawals:** requests lock shares; locked shares remain in supply until filled. One global queue; no cancel/reinsert shortcut. Always process the oldest unfilled request first, including partial fills. An idle request may be filled immediately through this same processor. Carry the head and unfilled shares across daily UTC epoch boundaries; incoming repayment may continue funding the current head, without resetting priority. Bound each call to 16 requests. New finance stays blocked while any request remains unfilled.
-
-At each fill, compute `burnShares = min(headUnfilledShares, floor(depositorIdleCash * totalShares / LP_NAV))` and `payout = floor(burnShares * LP_NAV / totalShares)`. Require positive NAV, burnShares and payout; recompute after every fill. Burn those shares, move payout from depositor idle to claimable, then advance only when the head is complete. Claims are pull transfers and do not reduce NAV again. Reject zero-share and zero-value fills. Bound live requests and require positive available shares. Display queue status and claimable cash independently.
+At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.

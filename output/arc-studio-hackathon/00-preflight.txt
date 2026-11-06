@@ -1,63 +1,9 @@
-REVIEW GATE: Execute only after Claude Fable review has been incorporated and REVIEW_STATUS.json says READY_FOR_IMPLEMENTATION with an approved hash matching spec.md. If the gate is absent or pending, stop before code generation/deployment and report the pending review. Read PLANS.md and COMMIT_PLAN.md.
+Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
 
-COMMIT DISCIPLINE: This milestone contains multiple small checkpoints. For each, implement one coherent behavior with relevant tests, inspect the actual diff and git diff --check/stat, stage only that checkpoint, commit it, record its SHA/tests/Studio trace, then continue. No catch-all commit with 1,000+ changed lines. Separate dependencies/generated artifacts. If Studio cannot commit granularly, stop after each checkpoint for export/local commit; do not accumulate the full app. Do not claim a Git commit without a SHA.
+CURRENT CHECKPOINT: 00a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
 
-Work in the SAME Sacred Arc Studio project. This is a testnet-only pilot due November 7, 2026 at 9:30 AM IST. Preserve existing working files and tests. Generate, test and deploy changes through Studio. Do not import the old Sacred contracts as protocol truth. Read attached spec.md when available. Implement only this milestone; report changed files, executed tests, failures, and real transaction evidence. Never claim an unexecuted check passed.
+00a — Create the Vite React TS + Foundry scaffold and typed Arc config/manifest template only. Scope: package/build config, contracts/foundry.toml, deployments/arc-testnet.json. Pin chain 5042002, USDC 6 decimals and cirBTC 8 decimals from spec §3; verify live chain and contract identity. Record missing role addresses/funds truthfully. Stop after scaffold validation.
+00b — Use the Uniswap skill. Pin upstream v4 core/periphery, then implement V4SpotVenue and its tests in contracts/. Use existing PoolManager0x8366a39CC670B4001A1121B8F6A443A643e40951 and §3's verified periphery addresses. Initialize/seed the hookless fee3000/tickSpacing60 USDC/cirBTC pool at the measured affordable demo scale. Authenticate unlock callback and settle/take deltas exactly; test both directions, minOut, deadlines, callback spoofing and unauthorized payer/recipient. Provide fork and actual testnet smoke evidence. Stop at a coherent behavior if dependencies/adapter/seeding cannot fit one turn.
+00c — Add the minimal api/health service and deployment configs. Preferred Netlify UI + HF Docker API/keeper; prove account entitlement and reachable health response. If HF unavailable, use spec's Netlify Functions + external keeper fallback. Report actual URLs/limitations, then stop.
 
-Create the Sacred project and perform this bounded preflight. Use Vite/React/TypeScript plus Foundry and prove the real API hosting path. Build only the scaffold, dependencies, venue and smoke test now; retain the results for later stages. Stop at 90 minutes if the Uniswap gate cannot pass and activate the documented real-token inventory fallback.
-
-Build decision
-
-Build **one working cirBTC financing market on Arc Testnet**, authored, tested and deployed in **one persistent Arc Studio project**. Deliver Earn, Trade and Activity, a small real API, and a keeper. Use an upstream Uniswap v2 pool for purchases and collateral sales. Add cirBTC bridging only after the core demo passes.
-
-Implementation priorities: **complete the financing lifecycle → verify accounting and custody → connect real spot execution → optionally release and transfer repaid assets across chains**. Identity namespaces are deferred because they are not required for this financing workflow.
-
-**Preserve from Sacred:** actual purchase before resale; 2× exposure; fixed 14-day sale; 10% annualized markup on financed principal; principal-first recovery; 77/23 split of collected markup; 160% coverage trigger and 190% restoration; limited recourse; withdrawal priority. The current repository contracts implement an older design and must not become the specification. [Current mechanism](https://sacred.markets/docs/trade/mechanism), [economics](https://sacred.markets/docs/earn/economics), [existing code status](https://sacred.markets/docs/contracts).
-
-**Explicit pilot simplifications:** one asset, one funding cohort, nontransferable internal shares, at most 32 live positions and 64 live withdrawal requests; no Borrow, SCR token, full SIFT, higher leverage, vintages, upgrades, embedded wallets or mandatory profit share. Deposits close permanently before trading starts. Remaining shareholders receive subsequently realized LP earnings; redeemed shares relinquish future earnings. Queued shares remain exposed until filled. These accounting choices fill gaps in the public design and keep this build small.
-
-Use the existing visual identity, public copy and design as references. Write fresh implementation in Studio. README must distinguish pre-existing design/site/assets from new hackathon code. Keep reuse and new implementation work clearly documented.
-
-Preflight and deployment configuration
-
-Within **90 minutes**, establish the supported API hosting path, acquire official test tokens, compile the mixed Solidity versions, and demonstrate a real Uniswap buy and sell. Record results in `PREFLIGHT.md`. Scale position size to actual available liquidity rather than assuming a faucet allocation.
-
-```text
-network: Arc Testnet
-chainId: 5042002
-rpc: https://rpc.testnet.arc.io
-explorer: https://explorer.testnet.arc.io
-USDC ERC20: 0x3600000000000000000000000000000000000000
-USDC ERC20 decimals: 6
-native gas USDC decimals: 18
-cirBTC: 0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF
-cirBTC decimals: 8
-term: 1209600 seconds
-annualMarkupBps: 1000
-lpMarkupBps: 7700
-triggerBps: 16000
-restoreBps: 19000
-maxExecutionFrictionBps: 100  (proposed demo bound, includes AMM fee/impact)
-maxOracleAge: 60 seconds
-maxLivePositions: 32
-```
-
-Verify chain ID, bytecode and token decimals before enabling transactions. Native USDC and ERC20 USDC expose the **same balance**; never add them. Reserve wallet gas. Measure settlement using contract balance deltas; a user's USDC balance also pays gas. [Arc network](https://docs.arc.io/arc/references/connect-to-arc), [addresses](https://docs.arc.io/arc/references/contract-addresses), [USDC precision](https://www.arc.io/blog/building-with-usdc-on-arc-one-token-two-interfaces).
-
-Published pilot references are $500/account, $25,000 financing ceiling and $250 financing dust. For the standard demo use contribution/financing of $500, so a partial sale can leave more than $250 principal. If faucet liquidity requires small positions, deploy a **visibly labeled small-value demo configuration**, with financing ceiling sized to funding and dust lowered explicitly, for example $1. Record every override in the manifest and UI. Do not silently apply the $250 dust rule to a $10 position and expect a partial sale. [SIFT pilot](https://sacred.markets/docs/trade/sift).
-
-Keep 14-day economics in the main deployment. Demonstrate maturity using Foundry time-warp tests. A separate short-term live instance is optional and must display its actual immutable duration and resulting markup.
-
-### Real swap integration
-
-Pin unmodified upstream **Uniswap v2 core**, preserving licenses/version. Deploy factory and one USDC/cirBTC pair in Studio, seed it, and record token ordering, reserves and transaction hashes. Upstream core uses Solidity 0.5.16; compile it separately from new 0.8.x contracts using pinned build configuration. New contracts use a narrow fixed-pair adapter with canonical 997/1000 fee math, actual pair `swap`, exact input, min output and deadlines. No arbitrary target/calldata or native ETH/WETH route. Test both token orderings. [Upstream factory](https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Factory.sol).
-
-Describe this accurately as **self-deployed upstream Uniswap v2 on Arc Testnet**. Official Arc mainnet deployments and API support do not establish testnet availability. [Uniswap deployments](https://developers.uniswap.org/docs/protocols/v4/deployments), [API networks](https://developers.uniswap.org/docs/trading/swapping-api/supported-chains).
-
-If this fails its 90-minute gate, stop pursuing Uniswap. Implement only then an inventory-funded `TestInventoryVenue` behind the same interface: real official test tokens move atomically at an explicit demo quote. Preserve the financing demo and document the actual execution venue. Never present a fake swap receipt as an integration.
-
-### Oracle choice
-
-Use a clearly labeled, admin-controlled **DemoPriceGuard** on testnet, returning price in micro-USDC per whole cirBTC plus timestamp. Enforce positive price and age ≤60 seconds. Production-shaped interface allows a future independent oracle; production oracle selection is outside this build. Sacred proposes two independent sources, which this fixture does not provide. [Architecture](https://sacred.markets/docs/architecture).
-
-For the liquidation demonstration, move the actual seeded AMM price with a real scenario swap, then update the demo reference price consistently. Lowering only the displayed feed is insufficient. The ordinary keeper cannot change prices. Display “testnet scenario price” beside coverage.
+At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.

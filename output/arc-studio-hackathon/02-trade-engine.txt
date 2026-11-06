@@ -1,52 +1,11 @@
-REVIEW GATE: Execute only after Claude Fable review has been incorporated and REVIEW_STATUS.json says READY_FOR_IMPLEMENTATION with an approved hash matching spec.md. If the gate is absent or pending, stop before code generation/deployment and report the pending review. Read PLANS.md and COMMIT_PLAN.md.
+Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
 
-COMMIT DISCIPLINE: This milestone contains multiple small checkpoints. For each, implement one coherent behavior with relevant tests, inspect the actual diff and git diff --check/stat, stage only that checkpoint, commit it, record its SHA/tests/Studio trace, then continue. No catch-all commit with 1,000+ changed lines. Separate dependencies/generated artifacts. If Studio cannot commit granularly, stop after each checkpoint for export/local commit; do not accumulate the full app. Do not claim a Git commit without a SHA.
+CURRENT CHECKPOINT: 02a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
 
-Work in the SAME Sacred Arc Studio project. This is a testnet-only pilot due November 7, 2026 at 9:30 AM IST. Preserve existing working files and tests. Generate, test and deploy changes through Studio. Do not import the old Sacred contracts as protocol truth. Read attached spec.md when available. Implement only this milestone; report changed files, executed tests, failures, and real transaction evidence. Never claim an unexecuted check passed.
+02a — Implement independent DemoPriceGuard and scripts/push-price.ts + scripts/run-price-scenario.ts. Positive microUSDC/cirBTC price, nonfuture timestamp, age86400s, separate price admin. Ordinary keeper has no update role. Scenario moves actual v4 pool then explicitly updates fixture; no spot-derived automatic solvency price. Record expiry/refresh instructions.
+02b — Implement TradeEngine open and wire vault/venue. E contribution; C=2E gross vault purchase, P=E. Vault owns/acquires actual asset before sale+pledge and collection of E. Fixed14day markup10% annualized; initial coverage≥190%; friction300bps includes fee/impact/reference deviation. Require gross2P cash, all caps/idle floor/reserve targets and no queue. Roll back on any failure. UI preview stays offchain.
+02c — Add repay/repayAndRelease. Anyone may pay from their own wallet; assets/surplus always go to recorded trader. Principal first, cumulative77/23 split only on collected markup. No late accrual/profit share. Partial repay retains pledge; full repay releases even after feed expiry.
+02d — Add trader close, permissionless rebalance and settleMatured. Use §4's exact formula, including numerator×10000, ceiling atom rounding, minOut/deadline and captured independent reference. Trigger160%, restore190%. Dust/exhaustion infeasible partials fully close; actual proceeds/loss waterfall/limited recourse. Position at155% demo coverage partially restores;140% policy-scale position closes fully. No keeper-selected excessive quantity.
+02e — Run accounting/custody invariants, fuzz and Arc fork tests; deploy the passing contracts through Studio. Record actual roles, addresses, hashes, deploymentBlock and immutable parameters in deployments/arc-testnet.json. Test with real official tokens. Report failures as failures.
 
-Implement TradeEngine, venue adapter wiring and DemoPriceGuard; connect the existing vault. Compile all contracts and execute the lifecycle/accounting tests, fixing failures before UI work. Terms are 2x, 14 days, 10% annualized fixed markup on financed principal, 77/23 collected markup, 160% trigger/190% restore. Main policy dust 250 USDC; explicit small-value demo overrides must be visible.
-
-### TradeEngine
-
-Expose `previewOpen`, `open`, `repay`, `repayAndRelease`, owner `close`, permissionless `rebalance`, permissionless `settleMatured`, `getPosition`, and bounded active IDs. Position fields: trader, cost, original/remaining principal, original/remaining markup, collateral quantity, timestamps, cumulative markup allocations, status and terms hash. Debt and position ownership are nontransferable in this pilot.
-
-**Opening sequence, one atomic transaction:**
-
-1. For trader contribution `E`, gross cost `C=2E`, financed principal `P=E`. Validate policy, feed, route, slippage, contribution allowance and commitments. Enforce an onchain acquisition floor: `expectedAtoms=floor(C*10^8/priceMicroUSDC)` and `oracleMinOut=floor(expectedAtoms*(10000-maxExecutionFrictionBps)/10000)`. Require nonzero output, use the stricter of this floor and trader minOut, and require initial coverage at least 190%.
-2. The vault must have **C cash**, not merely P. Buy actual cirBTC using vault cash and verify quantity received into vault custody or its narrowly authorized purchasing agent.
-3. Record acquisition before resale. Transfer the acquired asset into engine pledge custody; record the disclosed sale and trader beneficial ownership. Collect E from the trader into the vault. Any failure reverts the entire transaction.
-4. Net vault cash falls P; outstanding principal rises P. Emit acquisition, sale and pledge events with quantities and terms. A receipt token alone is not asset acquisition.
-
-```text
-M = floor(P * 1000 * termSeconds / (10000 * 365 days))
-D = P + M
-maturity = openedAt + termSeconds
-```
-
-Use full-precision integer arithmetic. Fix markup once; no late growth, compounding, rollover or trader-profit share. Pilot early rebate is zero and disclosed in the accepted terms. All amounts are integer token units.
-
-**Cash waterfall:** for actual receipt `S`, pay `p=min(P,S)`, then `m=min(M,S-p)`, then return `S-p-m` to trader. Update principal and markup once. Ordinary partial repayment keeps remaining collateral pledged and does not create a loss. Full repayment releases all collateral even if the oracle is stale.
-
-Allocate markup cumulatively per position: `LP allocation = floor(totalMarkupCollected*7700/10000) - previousLPAllocation`; manager receives the rest of this payment. Never split principal or trader surplus. This prevents repayment-fragment rounding gains.
-
-**Owner close / maturity:** sell remaining collateral through the actual venue with guarded min output; apply actual USDC proceeds. On final closure, gross principal shortfall is remaining principal not recovered by the sale. Draw segregated reserves in order, write off the residual principal and all unpaid markup, clear debt, return surplus and mark closed. No external recourse. Repeated settlement must fail. `settleMatured` is callable only after immutable maturity.
-
-### Coverage and partial sale
-
-```text
-V = floor(collateralAtoms * priceMicroUSDC / 10^8)
-D = remainingPrincipal + remainingMarkup
-eligible if V*10000 <= D*16000
-target after partial sale: V_after*10000 >= D_after*19000
-```
-
-With target `R=1.9` and execution-friction bound `f=0.01`, gross oracle value to sell is `g=(R*D-V)/(R*(1-f)-1)`. Compute the equivalent integer formula and round collateral input **up**. The adapter enforces actual output ≥ the oracle value sold ×(1−f), plus any stricter user bound. Deadlines are mandatory. The engine determines the permitted quantity; a keeper cannot choose an arbitrary oversized liquidation.
-
-Apply actual proceeds principal first and verify actual post-sale coverage. Quantity rounding tolerance is at most one collateral atom's oracle value plus one micro-USDC, documented in tests. If the required quantity exhausts collateral, the target is infeasible, or remaining principal would be below configured dust, close fully. Debt zero also closes/releases. Slippage or stale-price failure leaves state unchanged and retryable. Keepers pay gas from their own gas-funded wallet; no fee from depositor principal.
-
-### Exact acceptance vectors
-
-- E=500 USDC → C=1,000, P=500; 14-day M=**1.917808**, D=**501.917808**. Fully collected markup allocates LP **1.476712**, manager **0.441096**.
-- At V=803.0684928, coverage is 160%. Ignoring friction, sell value **167.305936** to reach exactly 190%. The deployed calculation must include its friction bound, token rounding and actual output.
-- Final close P=500, M=1.917808, actual proceeds=480: gross principal loss20; markup0. Primary4, tail6, backstop5 cover15; LP loses5. Gross loss remains20 in events.
-- FIFO: A deposits300, B200; P50 opening leaves450 idle. A requests300 shares and fills first. B requests200;150 fill,50 stay queued. New finance is blocked. Repayment returns50 principal plus the realized LP markup to the remaining shares; claims must not debit NAV a second time. Use small-value demo dust for this fixture.
+At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.

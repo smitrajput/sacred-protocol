@@ -1,0 +1,53 @@
+{
+  "checkedAt": "2026-11-06T09:47:53.437663+00:00",
+  "chainId": 5042002,
+  "blockNumber": 71009777,
+  "gasPriceWei": 20000000000,
+  "contracts": {
+    "PoolManager": {
+      "address": "0x8366a39CC670B4001A1121B8F6A443A643e40951",
+      "codeBytes": 24009
+    },
+    "PositionManager": {
+      "address": "0x6049c9a0e26405C0985f9E3685C87d0aE917f82B",
+      "codeBytes": 23877,
+      "poolManager": "0x0000000000000000000000008366a39cc670b4001a1121b8f6a443a643e40951"
+    },
+    "V4Quoter": {
+      "address": "0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94",
+      "codeBytes": 6118,
+      "poolManager": "0x0000000000000000000000008366a39cc670b4001a1121b8f6a443a643e40951"
+    },
+    "StateView": {
+      "address": "0xF3334192D15450CdD385c8B70e03f9A6bD9E673b",
+      "codeBytes": 3531,
+      "poolManager": "0x0000000000000000000000008366a39cc670b4001a1121b8f6a443a643e40951"
+    },
+    "UniversalRouter": {
+      "address": "0x4fcA4a51Ab4F23A7447b3284fBd7D73289A89Fb1",
+      "codeBytes": 24546
+    },
+    "Permit2": {
+      "address": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
+      "codeBytes": 9152
+    }
+  },
+  "pools": [
+    {
+      "currency1": "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",
+      "fee": 500,
+      "tickSpacing": 10,
+      "poolId": "0xf775c49a5149d5d85f0667782c0b5ccde7fbaeeac0cdbe0ea3b47eea8d7829ea",
+      "slot0Raw": "0x0000000000000000000000000000000000000000e9c8f5150d56c8909ca406e6fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff8e8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001f4",
+      "liquidity": 151438096
+    },
+    {
+      "currency1": "0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF",
+      "fee": 3000,
+      "tickSpacing": 60,
+      "poolId": "0xf4e18ec272549ab0140d43d33a7ba93768ecaec4dee4a7fb4f2c9af00950cde4",
+      "slot0Raw": "0x0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "liquidity": 0
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+Build Sacred: a testnet cirBTC spot-financing app with Earn, Trade and Activity. Work in this same Arc Studio app. This message contains the requirements for the selected checkpoint; no attachment is needed. Generate and test through Studio, preserve working files, and use real testnet evidence. Deadline November 7, 2026, 9:30 AM IST; target submission 7:30 AM.
+
+CHECKPOINT 00b. Use the Uniswap skill. First pin dependencies and validate the v4 interface; stop for local commit. On “Continue 00b adapter”, implement the fixed-pool adapter and tests; stop. On “Continue 00b smoke”, fund/seed at the affordable scale and prove real buy/sell. Report missing funds/access before any dependent transaction.
+
+```text
+network: Arc Testnet
+chainId: 5042002
+rpc: https://rpc.testnet.arc.io
+explorer: https://explorer.testnet.arc.io
+USDC ERC20: 0x3600000000000000000000000000000000000000
+USDC ERC20 decimals: 6
+native gas USDC decimals: 18
+cirBTC: 0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF
+cirBTC decimals: 8
+term: 1209600 seconds
+annualMarkupBps: 1000
+lpMarkupBps: 7700
+triggerBps: 16000
+restoreBps: 19000
+maxExecutionFrictionBps: 300  (total bound includes fee, price impact and reference deviation)
+maxOracleAge: 86400 seconds (explicit testnet fixture, with refresh runbook)
+maxLivePositions: 32
+```
+
+### Real swap integration
+
+Use the existing v4 PoolManager on **chain 5042002**; do not deploy v2. On Nov 6, block 71009777, read-only checks confirmed code at all six addresses below, matching `poolManager()` getters on the periphery and nonzero liquidity in the USDC/EURC 500-fee pool. The proposed cirBTC 3000-fee pool was uninitialized. Save this evidence; preflight still needs a real swap and source/runtime identity verification. The public Uniswap table labels these addresses **Arc mainnet (5042)**, so code presence alone is not a testnet provenance claim. [Deployment table](https://developers.uniswap.org/docs/protocols/v4/deployments).
+
+```text
+PoolManager: 0x8366a39CC670B4001A1121B8F6A443A643e40951
+PositionManager: 0x6049c9a0e26405C0985f9E3685C87d0aE917f82B
+V4Quoter: 0x8Dc178eFB8111BB0973Dd9d722ebeFF267c98F94
+StateView: 0xF3334192D15450CdD385c8B70e03f9A6bD9E673b
+UniversalRouter: 0x4fcA4a51Ab4F23A7447b3284fBd7D73289A89Fb1
+Permit2: 0x000000000022D473030F116dDEE9F6B43aC78BA3
+PoolKey: currency0=USDC, currency1=cirBTC, fee=3000, tickSpacing=60, hooks=0
+poolId: 0xf4e18ec272549ab0140d43d33a7ba93768ecaec4dee4a7fb4f2c9af00950cde4
+```
+
+Pin upstream v4 core/periphery dependencies and compatible Solidity/EVM configuration. Initialize and seed a full-range position through PositionManager; align ticks to spacing. Use token atoms when calculating sqrtPriceX96 (token1 atoms/token0 atoms), not human-unit prices. Preserve upstream licenses. Universal Router is not needed by the financing adapter.
+
+`V4SpotVenue` implements a narrowly scoped `IUnlockCallback`: fixed immutable pool key/PoolManager/authorized engine; exact-input swaps in both directions; callback callable only by that PoolManager during an active operation; derive direction from the fixed currencies; settle negative input delta with `sync → transfer → settle`, `take` positive output delta to the authorized receiver; validate complete input consumption, minOut, deadline and zero outstanding deltas. Restrict callback data to the pending operation and expected amounts. No arbitrary payer, recipient, pool or calldata. Measure actual balance deltas. Use Quoter through read-only simulation for frontend quotes. Inventory venues belong only in unit tests.
+
+**Demo sizing:** preferred E=10 USDC, C=20, P=10; ceiling=100, per-account cap=10, dust=1, friction=300 bps. Scale these four monetary parameters together if needed; first fallback E=0.10, ceiling=1, cap=0.10, dust=0.01. Keep whole-token atom precision meaningful. Compute seed and gas requirements from available balances before deployment. The app displays the actual immutable configuration.
+
+A full-range 0.3% pool needs reserve/trade ≥ `(0.997 × (1−f))/(f−0.003)`: **141.0043× at 1%**, **35.8182× at 3%**. Thus a 20-USDC buy still needs about **716.37 USDC per side** at 3%, before safety margin. A 0.20-USDC buy needs about **7.17 USDC per side**; target ≥10 per side and prove the scenario on a fork. Vault funding, treasury protection, trader contributions and gas are additional to pool liquidity. Narrow ranges are deferred: they can run out of liquidity during the required price move.
+
+Preflight must quote and execute buy, normal close and the prepared coverage sale at the final scale. Include input fees, atom rounding and price deviation in the same 300-bps budget. The initial 190% test stays in force: at 14 days and 10% markup, maximum mathematical friction is about 463.56 bps; the implementation caps configurable friction at **460 bps**, with 300 for the demo. A larger slippage allowance is not a liquidity substitute.
+The authorized engine address must be bound exactly once by the deployment owner, before enabling swaps, or predicted with a verified deterministic deployment. For pre-engine smoke tests use a separate test adapter/harness; never leave the production adapter open to arbitrary callers. Scaffold unit/fork tests are not live receipts.
+
+Stop after the selected checkpoint. Report changed files, commands and actual results, failures and any deployed addresses/transaction hashes. Local Git review/commit happens between checkpoints. Do not claim an unexecuted check passed.

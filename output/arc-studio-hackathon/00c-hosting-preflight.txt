@@ -1,0 +1,11 @@
+Build Sacred: a testnet cirBTC spot-financing app with Earn, Trade and Activity. Work in this same Arc Studio app. This message contains the requirements for the selected checkpoint; no attachment is needed. Generate and test through Studio, preserve working files, and use real testnet evidence. Deadline November 7, 2026, 9:30 AM IST; target submission 7:30 AM.
+
+CHECKPOINT 00c. Implement only a minimal real GET /health API and hosting configuration. Do not build the financial UI or pretend contracts exist yet.
+
+Frontend on Netlify. Preferred API plus later keeper: one Node TypeScript process in a Hugging Face Docker Space, binding0.0.0.0:7860. Verify current account entitlement and whether the hardware sleeps before promising continuous scheduling. No paid resource purchase without the user's authorization.
+
+If HF access is unavailable, host the same read handlers as Netlify Functions. The keeper then runs as an external operator process for rehearsal, with a permissionless wallet-action fallback in the app. Do not introduce another provider.
+
+Keep credentials in host secret stores. Report a real accessible health URL and its response, or the exact missing account step. A static frontend response is not a backend deployment.
+
+Stop after the selected checkpoint. Report changed files, commands and actual results, failures and any deployed addresses/transaction hashes. Local Git review/commit happens between checkpoints. Do not claim an unexecuted check passed.

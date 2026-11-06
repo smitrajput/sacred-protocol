@@ -1,9 +1,16 @@
-Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
+Build Sacred, a testnet app for USDC Earn and cirBTC spot financing on Arc. Use Vite, React, TypeScript and Foundry.
 
-CURRENT CHECKPOINT: 00a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
+CHECKPOINT 00a — scaffold only.
 
-00a — Create the Vite React TS + Foundry scaffold and typed Arc config/manifest template only. Scope: package/build config, contracts/foundry.toml, deployments/arc-testnet.json. Pin chain 5042002, USDC 6 decimals and cirBTC 8 decimals from spec §3; verify live chain and contract identity. Record missing role addresses/funds truthfully. Stop after scaffold validation.
-00b — Use the Uniswap skill. Pin upstream v4 core/periphery, then implement V4SpotVenue and its tests in contracts/. Use existing PoolManager0x8366a39CC670B4001A1121B8F6A443A643e40951 and §3's verified periphery addresses. Initialize/seed the hookless fee3000/tickSpacing60 USDC/cirBTC pool at the measured affordable demo scale. Authenticate unlock callback and settle/take deltas exactly; test both directions, minOut, deadlines, callback spoofing and unauthorized payer/recipient. Provide fork and actual testnet smoke evidence. Stop at a coherent behavior if dependencies/adapter/seeding cannot fit one turn.
-00c — Add the minimal api/health service and deployment configs. Preferred Netlify UI + HF Docker API/keeper; prove account entitlement and reachable health response. If HF unavailable, use spec's Netlify Functions + external keeper fallback. Report actual URLs/limitations, then stop.
+Create the project/build configuration, a minimal working app shell, contracts/foundry.toml and deployments/arc-testnet.json. The manifest must distinguish verified addresses from undeployed Sacred contracts. Leave unknown roles/addresses unset.
 
-At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.
+Network: Arc Testnet, chain ID 5042002.
+RPC: https://rpc.testnet.arc.io
+Explorer: https://explorer.testnet.arc.io
+USDC ERC20: 0x3600000000000000000000000000000000000000, 6 decimals.
+cirBTC: 0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF, 8 decimals.
+Native gas is USDC with 18 decimals: it is the same USDC balance, not additional funds. Use ERC20 units for protocol accounting.
+
+Verify chain ID, token bytecode and decimals with read-only calls. Run the scaffold's build/typecheck and Foundry compilation. No application contracts, swaps or liquidity funding are needed in this checkpoint.
+
+Stop after 00a. Report changed files, exact checks and observed results. The next checkpoint will arrive as a separate message. No attachment is needed.

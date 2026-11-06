@@ -1,0 +1,51 @@
+Build Sacred: a testnet cirBTC spot-financing app with Earn, Trade and Activity. Work in this same Arc Studio app. This message contains the requirements for the selected checkpoint; no attachment is needed. Generate and test through Studio, preserve working files, and use real testnet evidence. Deadline November 7, 2026, 9:30 AM IST; target submission 7:30 AM.
+
+CURRENT CHECKPOINT 02d: implement trader close, permissionless rebalance and maturity settlement in the existing TradeEngine; preserve tested open/repay behavior. Stop. On “Continue 02e”, complete invariants/fork tests, deploy the passing contracts through Studio and record real manifest/role/deployment evidence.
+
+Cross-contract requirements: immutable 2x exposure, 14-day term, 10% annualized markup fixed at open, 77/23 split of collected markup only, no late growth or trader-profit share. NAV=recorded depositor idle+outstanding principal; exclude reserves, claims and uncollected markup. Opening requires gross2P cash, empty withdrawal queue, >=5% net idle/NAV and <=95% principal+commitments/NAV plus ceiling/account caps. Reserves must meet 0.4%/0.6% of immutable ceiling. All tests use public entry points and independent expectations. Guardian may pause new deposits/originations; repayment, release and reserved claims remain available.
+
+**Repayment callers:** the trader or any payer may repay on the trader’s behalf. Pull funds only from msg.sender; collateral and surplus always return to the recorded trader. `repayAndRelease` requires full remaining debt. Owner `close` means position trader, not protocol admin.
+
+**Cash waterfall:** for actual receipt `S`, pay `p=min(P,S)`, then `m=min(M,S-p)`, then return `S-p-m` to trader. Update principal and markup once. Ordinary partial repayment keeps remaining collateral pledged and does not create a loss. Full repayment releases all collateral even if the oracle is stale.
+
+Allocate markup cumulatively per position: `LP allocation = floor(totalMarkupCollected*7700/10000) - previousLPAllocation`; manager receives the rest of this payment. Never split principal or trader surplus. This prevents repayment-fragment rounding gains.
+
+**Owner close / maturity:** sell remaining collateral through the actual venue with guarded min output; apply actual USDC proceeds. On final closure, gross principal shortfall is remaining principal not recovered by the sale. Draw segregated reserves in order, write off the residual principal and all unpaid markup, clear debt, return surplus and mark closed. No external recourse. Repeated settlement must fail. `settleMatured` is callable only after immutable maturity.
+
+### Coverage and partial sale
+
+```text
+V = floor(collateralAtoms * priceMicroUSDC / 10^8)
+D = remainingPrincipal + remainingMarkup
+eligible if V*10000 <= D*16000
+target after partial sale: V_after*10000 >= D_after*19000
+```
+
+With R=1.9 and total friction f=0.03, gross reference value to sell is `g=(R*D−V)/(R*(1−f)−1)`. Integer implementation, with `B=10000`, `Rb=19000`, `fb=300`:
+
+```text
+denominator = Rb*(B-fb) - B*B
+gMicroUSDC = ceil((Rb*D - B*V)*B / denominator)
+sellAtoms = ceil(gMicroUSDC*10^8 / priceMicroUSDC)
+```
+
+Use full-precision mulDiv rounding up and a positive denominator. The extra numerator `*B` is essential. For zero debt release; for ineligible coverage reject before subtracting. Enforce actual output ≥ reference value of the rounded atoms ×(1−f), and any stricter user bound. Capture the independent reference once per operation. The engine selects quantity; a keeper cannot choose an oversized sale.
+
+Partial sale needs both `g < V` and worst-case remaining principal `P−(1−f)*g >= dust`. For P500/dust250/f1%, the approximate feasible trigger band is **145.6751%–160%**; for P10/dust1/f3%, **112.0824%–160%**, before atom rounding. The latter lower bound is not 103%: that ignores financing dust. Use 155% for the live scenario. Below the feasible band, or when input exhausts collateral, close fully using actual proceeds. If actual execution would violate dust despite the conservative estimate, revert the partial path and retry a full close; never finalize a below-dust partial position.
+
+Apply actual proceeds principal first and verify actual post-sale coverage ≥190% against the captured reference. Document an atom-rounding tolerance bounded by one collateral atom's reference value plus one micro-USDC. Slippage/expired feed failures leave state unchanged. Ordinary keepers pay gas from a limited operational wallet; no fee from depositor principal.
+
+Prepare scenario-wallet cirBTC from measured full-range pool reserves: an approximately 25% price drop needs roughly 15.5% of the cirBTC reserve sold (before fee correction). Derive the exact size from a fork rehearsal with current reserves; also reserve cirBTC for the position itself. One scenario transaction moves the pool and a second operator transaction sets the consistent demo fixture.
+
+### Exact acceptance vectors
+
+- Policy-scale fixture: E=500 USDC → C=1,000, P=500; 14-day M=**1.917808**, D=**501.917808**. Fully collected markup allocates LP **1.476712**, manager **0.441096**.
+- At V=803.0684928, coverage is 160%. Ignoring friction, sell value **167.305936** to reach exactly 190%. The deployed calculation must include its friction bound, token rounding and actual output.
+- Policy-scale reserve fixture with ceiling1,000: final close P=500, M=1.917808, actual proceeds=480: gross principal loss20; markup0. Primary4, tail6, backstop5 cover15; LP loses5. Gross loss remains20 in events.
+- FIFO: A deposits300, B200; P50 opening leaves450 idle. A requests300 shares and fills first. B requests200;150 fill,50 stay queued. New finance is blocked. Repayment returns50 principal plus the realized LP markup to the remaining shares; claims must not debit NAV a second time. Use small-value demo dust for this fixture.
+
+- Preferred demo: E10 → M0.038356, D10.038356; collected markup LP0.029534, manager0.008822. These are independent fixed expectations for tests, not UI hardcodes.
+- Add live-deposit share pricing, zero-payout residual, partial-zero-payout wait, zero-NAV burn/reset, 155% partial sale and 140% policy-scale full-close cases.
+Keep the separate DemoPriceGuard: positive microUSDC per cirBTC, timestamp not future, max age86400s, designated price admin and daily refresh runbook. Capture it once per call; pool spot is only venue diagnostics. Use the fixed authenticated v4 adapter. Prove minOut/deadline, expired feed, unauthorized/repeated calls, conservation, pause-safe repayment/claim and P=0/M>0 last-share behavior. Mature14-day contracts with Foundry time-warp tests; do not silently change live term.
+
+Stop after the selected checkpoint. Report changed files, commands and actual results, failures and any deployed addresses/transaction hashes. Local Git review/commit happens between checkpoints. Do not claim an unexecuted check passed.

@@ -1,11 +1,61 @@
-Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
+Build Sacred: a testnet cirBTC spot-financing app with Earn, Trade and Activity. Work in this same Arc Studio app. This message contains the requirements for the selected checkpoint; no attachment is needed. Generate and test through Studio, preserve working files, and use real testnet evidence. Deadline November 7, 2026, 9:30 AM IST; target submission 7:30 AM.
 
-CURRENT CHECKPOINT: 02a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
+CURRENT CHECKPOINT 02a: implement DemoPriceGuard and the explicit refresh/scenario scripts. Stop. On “Continue 02b”, implement and test atomic acquisition/sale/pledge opening and wire the existing vault/venue. On “Continue 02c”, add repay, repayAndRelease and cumulative markup allocation. Close/rebalance/maturity implementation follows in a separate settlement message.
 
-02a — Implement independent DemoPriceGuard and scripts/push-price.ts + scripts/run-price-scenario.ts. Positive microUSDC/cirBTC price, nonfuture timestamp, age86400s, separate price admin. Ordinary keeper has no update role. Scenario moves actual v4 pool then explicitly updates fixture; no spot-derived automatic solvency price. Record expiry/refresh instructions.
-02b — Implement TradeEngine open and wire vault/venue. E contribution; C=2E gross vault purchase, P=E. Vault owns/acquires actual asset before sale+pledge and collection of E. Fixed14day markup10% annualized; initial coverage≥190%; friction300bps includes fee/impact/reference deviation. Require gross2P cash, all caps/idle floor/reserve targets and no queue. Roll back on any failure. UI preview stays offchain.
-02c — Add repay/repayAndRelease. Anyone may pay from their own wallet; assets/surplus always go to recorded trader. Principal first, cumulative77/23 split only on collected markup. No late accrual/profit share. Partial repay retains pledge; full repay releases even after feed expiry.
-02d — Add trader close, permissionless rebalance and settleMatured. Use §4's exact formula, including numerator×10000, ceiling atom rounding, minOut/deadline and captured independent reference. Trigger160%, restore190%. Dust/exhaustion infeasible partials fully close; actual proceeds/loss waterfall/limited recourse. Position at155% demo coverage partially restores;140% policy-scale position closes fully. No keeper-selected excessive quantity.
-02e — Run accounting/custody invariants, fuzz and Arc fork tests; deploy the passing contracts through Studio. Record actual roles, addresses, hashes, deploymentBlock and immutable parameters in deployments/arc-testnet.json. Test with real official tokens. Report failures as failures.
+Cross-contract requirements: immutable 2x exposure, 14-day term, 10% annualized markup fixed at open, 77/23 split of collected markup only, no late growth or trader-profit share. NAV=recorded depositor idle+outstanding principal; exclude reserves, claims and uncollected markup. Opening requires gross2P cash, empty withdrawal queue, >=5% net idle/NAV and <=95% principal+commitments/NAV plus ceiling/account caps. Reserves must meet 0.4%/0.6% of immutable ceiling. All tests use public entry points and independent expectations. Guardian may pause new deposits/originations; repayment, release and reserved claims remain available.
 
-At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.
+```text
+network: Arc Testnet
+chainId: 5042002
+rpc: https://rpc.testnet.arc.io
+explorer: https://explorer.testnet.arc.io
+USDC ERC20: 0x3600000000000000000000000000000000000000
+USDC ERC20 decimals: 6
+native gas USDC decimals: 18
+cirBTC: 0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF
+cirBTC decimals: 8
+term: 1209600 seconds
+annualMarkupBps: 1000
+lpMarkupBps: 7700
+triggerBps: 16000
+restoreBps: 19000
+maxExecutionFrictionBps: 300  (total bound includes fee, price impact and reference deviation)
+maxOracleAge: 86400 seconds (explicit testnet fixture, with refresh runbook)
+maxLivePositions: 32
+```
+
+### Reference-price fixture
+
+Keep **DemoPriceGuard**, separate from the trading pool. Positive micro-USDC price per whole cirBTC, timestamp not in the future, age ≤86,400 seconds; immutable max age and separate price-admin role. Pool spot can be manipulated within a transaction, so a guard band does not make it an independent liquidation oracle. StateView supplies venue diagnostics, not solvency truth.
+
+Ship `scripts/push-price.ts` and `scripts/run-price-scenario.ts` in Studio. The designated operator refreshes the explicit demo reference before rehearsal/submission and at least daily while the demo remains live; document this in the handoff, and show expiry/maintenance state in the UI. The script reads back price, timestamp and receipt; no silent refresh from pool spot. The scenario harness first moves the real pool, then the operator deliberately updates the fixture to the prepared consistent value. Ordinary keepers have no pricing authority. Full repayment, debt-free release and reserved claims remain available after expiry. This is an admin-controlled testnet fixture, not Sacred's proposed two-source production oracle.
+
+### TradeEngine
+
+Expose `open`, `repay`, `repayAndRelease`, owner `close`, permissionless `rebalance`, permissionless `settleMatured`, `getPosition`, and bounded active IDs. Position fields: trader, cost, original/remaining principal, original/remaining markup, collateral quantity, timestamps, cumulative markup allocations, status and terms hash. Debt and position ownership are nontransferable in this pilot.
+
+**Opening sequence, one atomic transaction:**
+
+1. For trader contribution `E`, gross cost `C=2E`, financed principal `P=E`. Validate policy, feed, route, slippage, contribution allowance and commitments. Enforce an onchain acquisition floor: `expectedAtoms=floor(C*10^8/priceMicroUSDC)` and `oracleMinOut=floor(expectedAtoms*(10000-maxExecutionFrictionBps)/10000)`. Require nonzero output, use the stricter of this floor and trader minOut, and require initial coverage at least 190%.
+2. The vault must have **C cash**, not merely P. Buy actual cirBTC using vault cash and verify quantity received into vault custody or its narrowly authorized purchasing agent.
+3. Record acquisition before resale. Transfer the acquired asset into engine pledge custody; record the disclosed sale and trader beneficial ownership. Collect E from the trader into the vault. Any failure reverts the entire transaction.
+4. Net vault cash falls P; outstanding principal rises P. Emit acquisition, sale and pledge events with quantities and terms. A receipt token alone is not asset acquisition.
+
+```text
+M = floor(P * 1000 * termSeconds / (10000 * 365 days))
+D = P + M
+maturity = openedAt + termSeconds
+```
+
+Use full-precision integer arithmetic. Fix markup once; no late growth, compounding, rollover or trader-profit share. Pilot early rebate is zero and disclosed in the accepted terms. All amounts are integer token units.
+
+**Repayment callers:** the trader or any payer may repay on the trader’s behalf. Pull funds only from msg.sender; collateral and surplus always return to the recorded trader. `repayAndRelease` requires full remaining debt. Owner `close` means position trader, not protocol admin.
+
+**Cash waterfall:** for actual receipt `S`, pay `p=min(P,S)`, then `m=min(M,S-p)`, then return `S-p-m` to trader. Update principal and markup once. Ordinary partial repayment keeps remaining collateral pledged and does not create a loss. Full repayment releases all collateral even if the oracle is stale.
+
+Allocate markup cumulatively per position: `LP allocation = floor(totalMarkupCollected*7700/10000) - previousLPAllocation`; manager receives the rest of this payment. Never split principal or trader surplus. This prevents repayment-fragment rounding gains.
+
+**Owner close / maturity:** sell remaining collateral through the actual venue with guarded min output; apply actual USDC proceeds. On final closure, gross principal shortfall is remaining principal not recovered by the sale. Draw segregated reserves in order, write off the residual principal and all unpaid markup, clear debt, return surplus and mark closed. No external recourse. Repeated settlement must fail. `settleMatured` is callable only after immutable maturity.
+Use the existing fixed-pool V4SpotVenue from preflight. Callback authentication, actual balance deltas, minOut and deadline are mandatory. In 02b/02c leave settlement entry points explicitly unavailable until implemented; do not install permissive stubs. Full markup expectations: P500 -> M1.917808, LP1.476712, manager0.441096; P10 -> M0.038356, LP0.029534, manager0.008822 USDC.
+
+Stop after the selected checkpoint. Report changed files, commands and actual results, failures and any deployed addresses/transaction hashes. Local Git review/commit happens between checkpoints. Do not claim an unexecuted check passed.

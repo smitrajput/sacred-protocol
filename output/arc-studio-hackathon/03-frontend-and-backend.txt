@@ -1,11 +1,42 @@
-Work in this same Sacred Arc Studio app. Read attached spec.md v0.3; it is the contract for this task. Generate/test/deploy through Studio using its supported tools. Touch only this checkpoint's implementation/config/test paths; plans/review docs are maintained locally.
+Build Sacred: a testnet cirBTC spot-financing app with Earn, Trade and Activity. Work in this same Arc Studio app. This message contains the requirements for the selected checkpoint; no attachment is needed. Generate and test through Studio, preserve working files, and use real testnet evidence. Deadline November 7, 2026, 9:30 AM IST; target submission 7:30 AM.
 
-CURRENT CHECKPOINT: 03a. Implement only this checkpoint, then stop. When I say “Continue <checkpoint>”, implement only that named checkpoint from the list below. Preserve all working behavior outside scope.
+CURRENT CHECKPOINT 03a: implement real contract-backed read endpoints. Stop. Continue03b: keeper;03c: Earn;03d: Trade;03e: Activity, rendered desktop/mobile QA and deployment reconciliation. Execute only the named checkpoint, then stop. Use verified manifest/ABIs and the hosting choice proved during preflight.
 
-03a — Implement api/ read endpoints: health/config/vault/positions/activity. Financial state comes from chain at a reported block; integer strings. Logs are bounded/paginated with deploymentBlock and in-memory overlap/dedupe. No auth/database/indexer. Use the hosting choice proven in00c.
-03b — Add one gas-funded keeper to the same Node service (or external operator process for Netlify fallback). Mutex async loop10–15s, one tx pending, simulate, dynamic fees≥20gwei, await receipt, reconcile nonce on restart/timeout. No treasury or pricing privileges. Expose liveness/error state; manual processing is a wallet contract call.
-03c — Build Earn: wallet connection/switch-chain/approval/deposit, accepted mandate and NAV terms, shares/value/reserves, request/queue/claim. Display actual demo parameters and each blocked action's reason. No marketing redesign.
-03d — Build Trade: actual v4 quote, E/C/P/M/D, maturity, coverage/price timestamp/expiry, open/repay/release/close. One action-specific pending state, receipt-confirmed success, clear revert/retry path and explorer link. Bigint/string amounts with6/8/18 decimals; prevent duplicate submissions.
-03e — Build Activity from real events and finish deploy/reconciliation. Preserve Sacred's established visual identity. Use an operational interface with clear numeric hierarchy, accessible focus/contrast, responsive widths and one primary next action. Test actual rendered desktop/mobile app, API failure, wallet rejection, expired price and pending receipt. Cite actual screenshots/checks; TSX source alone is not verification.
+## 5. Frontend and backend
 
-At completion report changed files, test commands and observed outputs, remaining failures, and any real deployed addresses/transaction hashes. A missing check is not a pass. Stop for local download/review before the next checkpoint.
+```mermaid
+flowchart LR
+  U[Wallet and React app] --> V[MarginVault]
+  U --> E[TradeEngine]
+  E --> V
+  E --> S[V4SpotVenue]
+  S --> P[Existing v4 PoolManager - cirBTC USDC pool]
+  E --> O[DemoPriceGuard]
+  A[Read API] --> V
+  A --> E
+  U --> A
+  K[Keeper with gas only] --> E
+  K --> V
+  U -. after repayment and release .-> B[BridgeKit to Ethereum Sepolia]
+```
+
+**Frontend:** reuse Sacred's visual identity, with three tabs and a persistent Arc Testnet badge. No redesign of the marketing site.
+
+- **Earn:** deposit availability and reason when blocked, connected balance, accepted mandate, shares and current value, realized earnings, protection balances; deposit, request withdrawal, queue position and claim.
+- **Trade:** one asset; contribution, fixed 2×, real acquisition quote, P/M/D, maturity, coverage levels, execution bound and approval/open buttons. Position actions: repay amount, repay and receive cirBTC, sell and close. Display actual remaining full debt and reference-price timestamp.
+- **Activity:** real acquisition/sale/pledge/payment/split/queue/reserve/loss events, hashes, explorer links, deployment addresses and compact architecture. Show pending, confirmed, reverted and retry states; never show success before a successful receipt.
+- Use bigint/decimal strings for transactions, explicit 6/8/18 decimals, wallet-chain checks, actionable errors and double-submit guards. Refresh after receipts. Keep gas available. Failed backend requests must be visible.
+
+**Backend:** a Node/TypeScript service using viem. `GET /health`, `/config`, `/vault`, `/positions?owner=`, `/activity?cursor=`; integer-string amounts, observed block/timestamp, manifest/policy hash. `/activity` uses bounded block ranges from deploymentBlock and an in-memory cache keyed by chain/txHash/logIndex. Paginate and cap reads, rescan a small overlap, and never rescan the entire lifetime on every request. Contract reads remain financial truth; no database/indexer/auth subsystem.
+
+**Hosting decision:** frontend → Netlify; API + keeper → one Node process in a Hugging Face Docker Space, port7860 bound to0.0.0.0, with a mutex-guarded async polling loop. Verify account entitlement and deployment in preflight: current HF docs require a paid plan for new Docker Spaces, and free hardware can sleep. Do not assume paid access or unattended uptime. If unavailable, deploy the same read handlers as Netlify Functions and run the gas-funded keeper from the operator's machine for the demo; keep the permissionless wallet button as the durable fallback and display scheduler state honestly. This fallback adds no new hosting provider. [Studio capabilities](https://docs.arc.io/ai/arc-studio), [HF lifecycle and access](https://huggingface.co/docs/hub/spaces-overview).
+
+**Keeper:** poll bounded live IDs every 10–15s while awake. Simulate eligible actions, send one transaction at a time, wait for a successful receipt, then process up to16 FIFO entries. `maxFeePerGas=max(20gwei, dynamically estimated safe fee)`; use a sensible priority fee and refresh estimates on retry. Never run overlapping async intervals. Pin one wallet to one worker; reconcile latest/pending nonce at startup and on timeout. If pending state cannot be reconciled after restart, report paused and use manual wallet execution rather than blindly resending. Persist pending metadata where durable storage is available; chain receipts and position state remain authoritative.
+
+The keeper has gas only, no treasury/guardian/price powers. `/health` exposes last poll, last confirmed action, pending hash and error without secrets. There is no public endpoint accepting arbitrary transactions. Manual “Process eligible action” invokes the same permissionless contract method from the user's wallet. Netlify fallback API exposes scheduling as external/unavailable, not a simulated keeper.
+
+**Skill-guided frontend:** build an operational financial interface: preserve Sacred's type/color identity, one primary action at each stage, readable amounts and coverage, keyboard focus, responsive layout, transaction-specific loaders and errors. Apply Impeccable's Operate guidance and ETHSkills frontend transaction sequence; Taste and Awesome DESIGN.md are reference material, not a mandate to replace the app with a marketing page. Render and inspect the actual app at desktop/mobile sizes; a TSX file is not a demo.
+
+Cross-contract requirements: immutable 2x exposure, 14-day term, 10% annualized markup fixed at open, 77/23 split of collected markup only, no late growth or trader-profit share. NAV=recorded depositor idle+outstanding principal; exclude reserves, claims and uncollected markup. Opening requires gross2P cash, empty withdrawal queue, >=5% net idle/NAV and <=95% principal+commitments/NAV plus ceiling/account caps. Reserves must meet 0.4%/0.6% of immutable ceiling. All tests use public entry points and independent expectations. Guardian may pause new deposits/originations; repayment, release and reserved claims remain available.
+
+Stop after the selected checkpoint. Report changed files, commands and actual results, failures and any deployed addresses/transaction hashes. Local Git review/commit happens between checkpoints. Do not claim an unexecuted check passed.

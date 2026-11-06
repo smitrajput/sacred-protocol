@@ -5,8 +5,7 @@
 import { BORROW, EARN, LADDER, LAUNCH_TIER, SIFT } from "../../lib/params";
 import { borrowQuote, pct, siftCeiling, usd } from "../../lib/quote";
 
-// One switch for the launch. Before it, every primary action is Get early access. After it,
-// Get started, with Sign in beside it in the bar.
+// Production access actions. The separate Launch app button opens the Arc Testnet demo.
 export const launched = false;
 
 export const links = {
@@ -153,7 +152,7 @@ export const faq = [
   {
     group: "Getting started",
     items: [
-      { q: "Can I use Sacred today?", a: "Not yet. Sacred is being built. Get early access and we will let you know when your product opens.", link: { text: "Get early access", href: `/${links.signup}` } },
+      { q: "Can I use Sacred today?", a: "The Arc Testnet demo is live: try USDC Earn and 2× cirBTC trading with test assets using Launch app. The broader products described here are planned for production. Get early access for launch updates.", link: { text: "Get early access", href: `/${links.signup}` } },
       { q: "Where is Sacred available?", a: "Web first, with iOS and Android to follow. Availability will depend on your country and the product. Some products may not be offered everywhere." },
       { q: "Is there a minimum?", a: "No product minimum is planned for Earn or Trade. Very small positions pay a larger share of execution costs. Borrow is planned to start at $1,000." },
     ],
@@ -199,7 +198,7 @@ export const faq = [
     items: [
       { q: "Is Sacred halal?", a: "Sacred is designed around Islamic sale and profit-sharing contracts, and no Shariah board has reviewed it yet. Until one does, Sacred makes no certified claim.", link: { text: "Islamic sale and profit-sharing contracts", href: shariahDocs } },
       { q: "Do I have to be Muslim?", a: "No. Sacred is open to anyone in a supported country." },
-      { q: "Has Sacred been audited?", a: "Not yet. The contracts for this design are not built. They will be independently reviewed before launch.", link: { text: "independently reviewed", href: protection } },
+      { q: "Has Sacred been audited?", a: "Not yet. The Arc Testnet prototype is deployed, but has not had an independent audit. Production contracts will be independently reviewed before launch.", link: { text: "independently reviewed", href: protection } },
     ],
   },
 ];

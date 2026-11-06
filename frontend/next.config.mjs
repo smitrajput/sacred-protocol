@@ -26,7 +26,9 @@ const nextConfig = {
       destination: "https://sacred.markets/:path*",
       permanent: true,
     }));
-    return [...hosts, ...MOVED_DOCS.map(([from, to]) => ({ source: `/docs/${from}`, destination: `/docs/${to}`, permanent: true }))];
+    // Branded entry to the testnet app. Exact /app only, temporary (307).
+    const app = { source: "/app", destination: "https://sacred-arc-mvp.vercel.app/", permanent: false };
+    return [...hosts, app, ...MOVED_DOCS.map(([from, to]) => ({ source: `/docs/${from}`, destination: `/docs/${to}`, permanent: true }))];
   },
 };
 

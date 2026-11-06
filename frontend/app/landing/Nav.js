@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import Brand from "../shared/Brand";
 import shared from "../shared/shared.module.css";
-import { action, nav, resources } from "./content";
+import { action, links, nav, resources } from "./content";
 import styles from "./landing.module.css";
 
 // The bar: the three jobs and FAQ, with the rest under Resources. Under 900px it folds
@@ -39,8 +39,14 @@ export default function Nav({ signupHref = action.primary.href }) {
     setMore(false);
   };
 
+  // Launch app is a plain anchor: /app redirects off-site, so it needs a full navigation.
   const primary = (
-    <Link href={signupHref} className={`${shared.btn} ${shared.btnPrimary}`} data-track="interest" onClick={close}>
+    <a href={links.app} className={`${shared.btn} ${shared.btnPrimary}`} onClick={close}>
+      Launch app
+    </a>
+  );
+  const interest = (extra = "") => (
+    <Link href={signupHref} className={`${shared.btn} ${shared.btnGhost}${extra}`} data-track="interest" onClick={close}>
       {action.primary.label}
     </Link>
   );
@@ -79,6 +85,7 @@ export default function Nav({ signupHref = action.primary.href }) {
               {action.secondary.label}
             </Link>
           )}
+          {interest(` ${styles.navSecondary}`)}
           {primary}
           <button
             ref={menuButton}
@@ -119,6 +126,7 @@ export default function Nav({ signupHref = action.primary.href }) {
             {action.secondary.label}
           </Link>
         )}
+        {interest()}
       </div>
     </header>
   );

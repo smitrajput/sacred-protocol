@@ -169,7 +169,7 @@
   font-size: 0.875rem;
 }
 
-.navSecondary {
+.navActions > .navSecondary {
   display: none;
 }
 
@@ -265,7 +265,7 @@
   .navLinks {
     display: flex;
   }
-  .navSecondary {
+  .navActions > .navSecondary {
     display: inline-flex;
   }
   .menuButton,

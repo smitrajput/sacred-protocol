@@ -5,7 +5,7 @@ import styles from "./landing.module.css";
 
 // The opening: three verbs across one line, centred. Read the top row alone and it is the
 // headline; read down and each column is the pitch for one product. The closing line, which
-// leads to the Shariah reasoning, and two actions sit beneath.
+// leads to the Shariah reasoning, and actions sit beneath.
 export default function Hero() {
   const [before, word, after] = hero.closing;
   return (
@@ -24,7 +24,10 @@ export default function Hero() {
         {after}
       </p>
       <div className={styles.ctas}>
-        <Link href={action.primary.href} className={`${shared.btn} ${shared.btnPrimary}`} data-track="interest">
+        <a href={links.app} className={`${shared.btn} ${shared.btnPrimary}`}>
+          Launch app
+        </a>
+        <Link href={action.primary.href} className={`${shared.btn} ${shared.btnGhost}`} data-track="interest">
           {action.primary.label}
         </Link>
         <a href={links.explore} className={`${shared.btn} ${shared.btnGhost}`}>

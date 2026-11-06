@@ -41,7 +41,7 @@ export default function Nav({ signupHref = action.primary.href }) {
 
   // Launch app is a plain anchor: /app redirects off-site, so it needs a full navigation.
   const primary = (
-    <a href={links.app} className={`${shared.btn} ${shared.btnPrimary}`} onClick={close}>
+    <a href={links.app} target="_blank" rel="noopener noreferrer" aria-label="Launch app (opens in a new tab)" className={`${shared.btn} ${shared.btnPrimary}`} onClick={close}>
       Launch app
     </a>
   );

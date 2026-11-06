@@ -1,13 +1,14 @@
 {
   "status": "READY_FOR_IMPLEMENTATION",
   "spec_version": "0.3-reviewed",
-  "current_spec_sha256": "b8da2d199282d48b90ac9267da422a0dc3362a6b9b2e3a6a161901007831a4a9",
-  "approved_spec_sha256": "b8da2d199282d48b90ac9267da422a0dc3362a6b9b2e3a6a161901007831a4a9",
+  "current_spec_sha256": "d1aa5f145a020462e7127c150bcf38ffa2e277d28ed71ad9cf9d06fcf9ea5889",
+  "approved_spec_sha256": "d1aa5f145a020462e7127c150bcf38ffa2e277d28ed71ad9cf9d06fcf9ea5889",
   "claude_fable_review_received": true,
   "review_dispositions_complete": true,
   "implementation_started": false,
   "next_step": "00a preflight in one Studio app",
   "deadline_ist": "2026-11-07T09:30:00+05:30",
   "target_submission_ist": "2026-11-07T07:30:00+05:30",
-  "review_scope": "Codex incorporated Fable findings; operational preflight remains; no second Fable approval claimed"
+  "review_scope": "Codex incorporated Fable findings; operational preflight remains; no second Fable approval claimed",
+  "handoff_revision": "browser-safe-1"
 }

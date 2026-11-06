@@ -54,3 +54,5 @@ git -C "$SACRED_REPO" push -u origin codex/arc-mvp
 - Never pull `.env*`/secret context with `--all` into the repository. Keep the CLI's local sync metadata uncommitted; inspect its actual filename after the first pull before adding an ignore rule.
 
 Verified syntax: [Arc CLI reference](https://docs.arc.io/ai/arc-studio-cli). A repository push is performed only after the full staged diff has been reviewed for project scope and private information.
+
+Browser handoff correction: paste the self-contained checkpoint messages without attaching the full spec. Start with00-preflight.txt; the browser-safe message order is in the prompt instructions. CLI --file behavior is not inferred from browser attachments.

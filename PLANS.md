@@ -18,3 +18,5 @@ Status: **READY_FOR_IMPLEMENTATION — Fable review incorporated in v0.3; next 0
 6. Finish contracts by 21:00, app/rehearsal 00:30, freeze 02:00, video 04:00 and submit 07:30. Drop optional bridge first if gates slip.
 
 Existing Sacred website/design/code predate this implementation. Preserve prior-work disclosure and real chronology. For each checkpoint record actor, decisions, actual tests, SHA and Studio trace in AI_WORKLOG.md. Plan files explain the process; they do not estimate a human/AI authorship percentage.
+
+Browser handoff correction: paste the self-contained checkpoint messages without attaching the full spec. Start with00-preflight.txt; the browser-safe message order is in the prompt instructions. CLI --file behavior is not inferred from browser attachments.

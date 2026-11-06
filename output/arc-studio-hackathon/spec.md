@@ -28,9 +28,9 @@ Layout: `contracts/` (Foundry), `src/` (Vite React TypeScript), `api/` (read ser
 
 ## 2. Arc Studio workflow and visibility
 
-Use **Vite + React + TypeScript and Foundry**, matching Studio's scaffold. Build in the browser's existing app/thread; select the **Uniswap skill** and remove Eco Sauce. Attach `docs/spec.md` and the current numbered prompt. Send only the checkpoint identified in the prompt, then stop for local review. Keep the Studio share URL and trace for each checkpoint. [Studio overview](https://docs.arc.io/ai/arc-studio).
+Use **Vite + React + TypeScript and Foundry**, matching Studio's scaffold. Build in the browser's existing app/thread; select the **Uniswap skill** and remove Eco Sauce. Paste the relevant self-contained prompt as text with no attachment. Send only its selected checkpoint, then stop for local review. Keep the full spec in the repository for local review; the browser rejected a prompt bundled with that large attachment. Keep the Studio share URL and trace for each checkpoint. [Studio overview](https://docs.arc.io/ai/arc-studio).
 
-- Prompt cap: **10,000 characters**. Attach the full spec as a reference file. Extra attachment-count/size limits are not relied on here.
+- Prompt cap: **10,000 characters**. Each browser message is self-contained and checked in UTF-16 units below8,500 characters. Do not attach the37k-character spec. CLI --file is a separate documented input mechanism and remains unverified for this account.
 - `arc-studio usage --json` exposes usage percentages, windows and scope. Absolute quotas and served model identities remain undisclosed. Reserve roughly one-third of the observed allowance for fixes; this is our planning allowance, not a vendor quota.
 - **Git ownership:** Studio generates one change → `arc-studio pull --app "$SACRED_APP_ID" --out "$SACRED_REPO"` → Codex inspects/tests → commits named files/hunks → pushes to GitHub. See STUDIO_GIT_WORKFLOW.md for executable commands. First pull is full; later pulls may use `--changed` if every turn has been captured. A full dry-run catches generated files and missed turns.
 - Pull skips local edits with exit code 2. Reconcile the specific file; preserve the local copy. Never automate `--force`. Keep plans/docs locally owned and ask Studio to leave them alone.

@@ -41,3 +41,7 @@ Signed planning commits in `sacred-markets`, branch `codex/arc-mvp`, based on `b
 | 4ac4e30 | docs: document installed MVP engineering and design skills | 54 |
 
 Validation: reviewed spec hash matches both copies; all seven prompts fit the10,000-character cap and select one checkpoint; root document links resolve; public handoff excludes internal strategy; arithmetic and read-only RPC checks are documented. Application tests and deployments have not run.
+
+## Browser handoff correction — November6
+
+The user supplied a Studio screenshot showing a10,000-character rejection for the1,984-character first prompt with the37,650-character spec attached. Earlier validation checked prompt files alone and did not establish browser attachment behavior. Codex replaced attachment-dependent prompts with self-contained messages below8,500 UTF-16 units, corrected the instructions and kept protocol requirements. The screenshot confirms rejection; the exact browser counting mechanism and corrected send acceptance are not yet independently observed.

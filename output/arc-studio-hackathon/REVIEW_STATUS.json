@@ -1,14 +1,22 @@
 {
-  "status": "READY_FOR_IMPLEMENTATION",
+  "status": "IMPLEMENTING",
   "spec_version": "0.3-reviewed",
-  "current_spec_sha256": "d1aa5f145a020462e7127c150bcf38ffa2e277d28ed71ad9cf9d06fcf9ea5889",
-  "approved_spec_sha256": "d1aa5f145a020462e7127c150bcf38ffa2e277d28ed71ad9cf9d06fcf9ea5889",
+  "current_spec_sha256": "816a1fdc96b078d591eafc9cd1fbe5a7f3688bde8bf0b0a5efeec942b79fb2a3",
+  "approved_spec_sha256": "816a1fdc96b078d591eafc9cd1fbe5a7f3688bde8bf0b0a5efeec942b79fb2a3",
   "claude_fable_review_received": true,
   "review_dispositions_complete": true,
-  "implementation_started": false,
-  "next_step": "00a preflight in one Studio app",
+  "implementation_started": true,
+  "next_step": "00b v4 dependency/interface checkpoint",
   "deadline_ist": "2026-11-07T09:30:00+05:30",
-  "target_submission_ist": "2026-11-07T07:30:00+05:30",
+  "target_submission_ist": "2026-11-06T22:00:00+05:30",
   "review_scope": "Codex incorporated Fable findings; operational preflight remains; no second Fable approval claimed",
-  "handoff_revision": "browser-safe-1"
+  "handoff_revision": "browser-safe-1",
+  "completed_checkpoints": [
+    "00a"
+  ],
+  "studio_app_id": "37c6c8dc-b313-49c9-9cbb-fe5f61673ab3",
+  "prior_economics_review_spec_sha256": "d1aa5f145a020462e7127c150bcf38ffa2e277d28ed71ad9cf9d06fcf9ea5889",
+  "hard_finish_ist": "2026-11-06T22:30:00+05:30",
+  "execution_mode": "codex-orchestrated-studio-cli",
+  "schedule_revision": "User requested same-day finish; schedule only, economics unchanged"
 }

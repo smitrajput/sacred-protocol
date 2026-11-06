@@ -8,8 +8,8 @@ This log distinguishes observed contributions. It was assembled by Codex on Nove
 - **Existing Sacred material:** public design/site and older repository code existed beforehand. Their complete authorship history has not been reconstructed in this log.
 - **Codex:** researched current public protocol and integration documentation; drafted the specification and staged prompts; checked arithmetic examples; incorporated an internal consistency review; prepared plan, commit and Fable-review handoffs. These artifacts are AI-assisted, not presented as solely human-authored.
 - **Claude Fable:** review supplied by the user on November 6,2026; identified integration, sizing, hosting, queue and Git issues. See review dispositions for accepted changes and corrections.
-- **Arc Studio:** intended implementation tool; no code generation, deployment or transaction has been performed through Studio in this workflow yet.
-- **Verification so far:** specification arithmetic and prompt-length/package checks. This is not a claim that future Solidity, API or end-to-end tests have passed.
+- **Arc Studio:** generated checkpoint 00a and its cleanup in the app linked below. No Sacred deployment or transaction has occurred.
+- **Verification so far:** specification arithmetic, prompt checks and 00a scaffold validation. Financial contract and end-to-end tests remain upcoming.
 
 ## Update format
 
@@ -45,3 +45,27 @@ Validation: reviewed spec hash matches both copies; all seven prompts fit the10,
 ## Browser handoff correction — November6
 
 The user supplied a Studio screenshot showing a10,000-character rejection for the1,984-character first prompt with the37,650-character spec attached. Earlier validation checked prompt files alone and did not establish browser attachment behavior. Codex replaced attachment-dependent prompts with self-contained messages below8,500 UTF-16 units, corrected the instructions and kept protocol requirements. The screenshot confirms rejection; the exact browser counting mechanism and corrected send acceptance are not yet independently observed.
+
+## Checkpoint 00a — 2026-11-06T16:20+05:30
+
+Arc Studio generated the scaffold and corrected unused starter tooling after Codex reproduced a local typecheck failure. Codex pulled and reviewed the files, pinned the byte-identical forge-std release as a submodule, normalized trailing blank lines in five exported config/entry files, preserved prior-work documentation and performed the checks in [CHECKPOINT_00A.md](docs/review/CHECKPOINT_00A.md).
+
+Studio app: [Sacred](https://studio.arc.io/app/37c6c8dc-b313-49c9-9cbb-fe5f61673ab3). Cleanup thread: `868bf545-07ba-4ecd-a97c-b45762be5d3c`. All generation remains in that same app. No financial contracts, API or deployments are claimed for this checkpoint.
+
+| SHA | Change | Changed lines |
+| --- | --- | --- |
+| e2caf62 | chore(deps): pin Studio scaffold packages and runtimes | 2361 |
+| faadde8 | build(contracts): pin forge-std and align Foundry layouts | 114 |
+| 917d040 | build(web): configure Vite TypeScript and lint checks | 238 |
+| b92f89a | chore(studio): preserve generated chain metadata | 621 |
+| 1a1a086 | chore(studio): preserve amount and receipt helpers | 590 |
+| 5022713 | chore(studio): retain development transaction tracing | 501 |
+| 4f87a59 | chore(studio): retain console capture and share integration | 378 |
+| ef7f4d3 | feat(config): verify Arc token manifest with live reads | 140 |
+| d378f7b | feat(scaffold): display live network and token status | 293 |
+
+The 2,305-line generated Bun lockfile is kept in the dependency-only commit. Every remaining implementation/import commit is below 1,000 changed lines; the two Sacred-specific commits are 140 and 293 lines. Starter modules are labelled as imported Studio tooling, not newly designed protocol features.
+
+## Automated execution and same-day finish — November 6
+
+The user authorized Codex to prompt Studio directly for all remaining checkpoints and escalate blockers, and moved the hard finish to November 6 at 22:30 IST. Codex revised delivery gates and prompt timing without changing protocol economics. The first automated v4 dependency/interface checkpoint is running in the existing Studio app. Optional bridging is off the critical path.

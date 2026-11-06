@@ -27,4 +27,6 @@ Paste one file per message, with **no attachment**. Continue messages are plain 
 
 Codex handles CLI pull, diff review, relevant checks and normal local Git commit/push. STUDIO_GIT_WORKFLOW.md has the exact commands. Wallet signatures, login and required account access remain yours. Locally installed skills are not automatically installed inside Studio.
 
-Deadline November7,2026,9:30AM IST; target submission7:30AM. Review evidence is under docs/review in the implementation repository; prompt files are under docs/prompts. Exact served Studio models and absolute usage quotas remain undisclosed.
+External deadline November 7, 2026, 9:30 AM IST; hard finish November 6, 10:30 PM IST. Review evidence is under docs/review in the implementation repository; prompt files are under docs/prompts. Exact served Studio models and absolute usage quotas remain undisclosed.
+
+Primary execution is now automated through Studio CLI by Codex: send one checkpoint, inspect result/files, run checks, commit and push, then continue. The user is contacted for credentials/account authorization, funding or product decisions that cannot be resolved from the approved spec. Browser copy/paste instructions above are fallback only.

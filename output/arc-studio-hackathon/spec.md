@@ -1,6 +1,6 @@
 # Sacred Arc hackathon build specification
 
-Deadline: **November 7, 2026 at 9:30 AM IST (09:30; 04:00 UTC)**. Target submission: **7:30 AM IST**. **Revised v0.3 — Fable review incorporated; ready for implementation preflight.**
+Deadline: **November 7, 2026 at 9:30 AM IST (04:00 UTC)**. Build/demo hard finish: **November 6, 10:30 PM IST**; package ready by **10:00 PM**. **v0.3 economics retained; schedule revised by user November 6.**
 
 ## 0. Review and execution
 
@@ -250,7 +250,7 @@ Require one real BridgeKit transfer, source receipt, attestation, destination re
 
 **Real integration tests:** official token approvals/transfers, real Uniswap purchase and sale, two-wallet funding/trading, actual settlement receipts, API values reconciling to contracts, pending/revert/retry UI, queue funded from repayment. Test maturity with time warp. Bridge tests are separate and optional.
 
-**Delivery gates, IST:** preflight within 60 minutes of starting Studio; contract core by **Nov 6 9:00 PM**; deployed frontend/API and core rehearsal by **Nov 7 12:30 AM**. Bridge only after a green core, and only if it finishes by **1:30 AM**. Freeze by **2:00 AM**; video by **4:00 AM**; submit by **7:30 AM**, ahead of the **9:30 AM** deadline. If core slips, drop bridge immediately and fix the core. These are cutoffs, not build-time guarantees.
+**Delivery gates, IST, November 6:** contract deployment and real swap flow by **6:30 PM**; deployed frontend/API and complete core flow by **8:00 PM**; feature freeze and rehearsal by **9:00 PM**; demo recording and submission package ready by **10:00 PM**; **hard finish 10:30 PM**. The external submission deadline remains November 7 at 9:30 AM. Optional bridge work is off the critical path and is cut if it threatens core delivery. Preserve accounting, custody and receipt verification; reduce presentation scope first. These are delivery targets, not a guarantee that dependencies will cooperate.
 
 **Demo:** rehearse a core version of about three minutes inside the organisers’ **4-minute finalist demo slot**, followed by **3 minutes of Q&A**. Use a live deployment and a video **≤4 minutes, without speed-up**, as reported by Fable from the current submission form. Check upload acceptance before the submission buffer.
 

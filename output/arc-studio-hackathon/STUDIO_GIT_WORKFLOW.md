@@ -13,7 +13,7 @@ export SACRED_REPO='/Users/smitrajput/Projects/halal-defi/sacred-markets'
 git -C "$SACRED_REPO" switch -c codex/arc-mvp
 ```
 
-If that branch already exists, switch to it without `-c`. Keep the browser in the same Studio app and chat. `run --app` starts a new chat thread, so it is not the preferred continuation path. `--session` is the CLI alternative when building through a named session from the beginning.
+If that branch already exists, switch to it without `-c`. Keep one Studio app. CLI 1.2.2 reports that the first `run --app` creates a new chat with the same workspace files, and subsequent `--app` runs reuse that CLI-created chat. Restate checkpoint context on the first CLI turn. Browser and CLI chats share files; avoid simultaneous edits. `--session` can explicitly continue a known thread.
 
 ## After each Studio checkpoint
 
@@ -56,3 +56,13 @@ git -C "$SACRED_REPO" push -u origin codex/arc-mvp
 Verified syntax: [Arc CLI reference](https://docs.arc.io/ai/arc-studio-cli). A repository push is performed only after the full staged diff has been reviewed for project scope and private information.
 
 Browser handoff correction: paste the self-contained checkpoint messages without attaching the full spec. Start with00-preflight.txt; the browser-safe message order is in the prompt instructions. CLI --file behavior is not inferred from browser attachments.
+
+## Connected project
+
+App ID: `37c6c8dc-b313-49c9-9cbb-fe5f61673ab3`. CLI continuation thread: `868bf545-07ba-4ecd-a97c-b45762be5d3c`. Code branch: `codex/arc-mvp`.
+
+Codex now sends the checkpoints directly through the CLI, reads compact results, pulls actual files, verifies and commits each completed behavior. No user relay is needed. User input is reserved for unresolved access/funding or consequential product decisions. Ask Studio for a final response of at most 150 words: checkpoint, changed paths, actual checks, blockers.
+
+After the first pull, `.arc-studio/` is confirmed as local sync metadata and ignored. Exported caches, console logs and the unused example skill are excluded. `forge-std` is a pinned submodule matching all 68 files of Studio's export. Subsequent pulls must not replace its `.git` metadata. Studio deletions require explicit local reconciliation; the 00a deleted starter tools were archived outside the repository.
+
+Redirect CLI run stdout and stderr to local files, then print only selected result fields. Raw event streams can include temporary authenticated preview URLs and must not enter public logs or commits.

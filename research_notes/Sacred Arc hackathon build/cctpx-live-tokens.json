@@ -1,0 +1,129 @@
+{
+  "source": "https://iris-api-sandbox.circle.com/v2/cctpx/tokens?pageSize=150",
+  "pages": 7,
+  "exhausted": true,
+  "total": 1017,
+  "tokens": [
+    {
+      "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+      "name": "EURC",
+      "symbol": "EURC",
+      "decimals": 6,
+      "displayName": null,
+      "displaySymbol": null,
+      "fxSymbol": "EUR",
+      "deployments": [
+        {
+          "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+          "domainId": 0,
+          "tokenAddress": "0x08210f9170f89ab7658f0b5e3ff39b0e03c594d4",
+          "tokenManagerAddress": "0xe5d6eacf2ed5a7f81cc89d2a216f004092c0c2e0",
+          "enabled": true
+        },
+        {
+          "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+          "domainId": 1,
+          "tokenAddress": "0x5e44db7996c682e92a960b65ac713a54ad815c6b",
+          "tokenManagerAddress": "0xe5d6eacf2ed5a7f81cc89d2a216f004092c0c2e0",
+          "enabled": true
+        },
+        {
+          "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+          "domainId": 6,
+          "tokenAddress": "0x808456652fdb597867f38412077a9182bf77359f",
+          "tokenManagerAddress": "0xe5d6eacf2ed5a7f81cc89d2a216f004092c0c2e0",
+          "enabled": true
+        },
+        {
+          "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+          "domainId": 14,
+          "tokenAddress": "0xe479eca5740ac65d6e1823bea2f1c08bc14e954f",
+          "tokenManagerAddress": "0xe5d6eacf2ed5a7f81cc89d2a216f004092c0c2e0",
+          "enabled": true
+        },
+        {
+          "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+          "domainId": 21,
+          "tokenAddress": "0x14e4ae1e59676865c8c76362e2d13156880315d6",
+          "tokenManagerAddress": "0xe5d6eacf2ed5a7f81cc89d2a216f004092c0c2e0",
+          "enabled": true
+        },
+        {
+          "tokenId": "0x2587821a0ee7daa174b95436b5dab1731cfa1844775b010217d3c0dd02a4eecd",
+          "domainId": 26,
+          "tokenAddress": "0x89b50855aa3be2f677cd6303cec089b5f319d72a",
+          "tokenManagerAddress": "0xe5d6eacf2ed5a7f81cc89d2a216f004092c0c2e0",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "tokenId": "0x7c27b7b6485f3ea49b7d1a439e288d3c3116f533302afabb7e372dfc0770cc7d",
+      "name": "Circle Wrapped Bitcoin",
+      "symbol": "cirBTC",
+      "decimals": 8,
+      "displayName": null,
+      "displaySymbol": null,
+      "fxSymbol": "BTC",
+      "deployments": [
+        {
+          "tokenId": "0x7c27b7b6485f3ea49b7d1a439e288d3c3116f533302afabb7e372dfc0770cc7d",
+          "domainId": 0,
+          "tokenAddress": "0x3a3fe695f684bf9b9e43cf43c2b895ea5e392bb3",
+          "tokenManagerAddress": "0xb995f4060c38b7608626d0ccabe547cdc2c7390a",
+          "enabled": true
+        },
+        {
+          "tokenId": "0x7c27b7b6485f3ea49b7d1a439e288d3c3116f533302afabb7e372dfc0770cc7d",
+          "domainId": 26,
+          "tokenAddress": "0xf0c4a4ce82a5746abaad9425360ab04fbba432bf",
+          "tokenManagerAddress": "0xb995f4060c38b7608626d0ccabe547cdc2c7390a",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "tokenId": "0xaa3cf4df2d82ec4b91da19afe54d414f637d068fe9cd52ba5e0e7e0d94f9eac8",
+      "name": "Wrapped Ether",
+      "symbol": "WETH",
+      "decimals": 18,
+      "displayName": null,
+      "displaySymbol": null,
+      "fxSymbol": "ETH",
+      "deployments": [
+        {
+          "tokenId": "0xaa3cf4df2d82ec4b91da19afe54d414f637d068fe9cd52ba5e0e7e0d94f9eac8",
+          "domainId": 0,
+          "tokenAddress": "0xfff9976782d46cc05630d1f6ebab18b2324d6b14",
+          "tokenManagerAddress": "0xb1cc779e865d84421e218a010f3193bcf0a3332d",
+          "enabled": true
+        },
+        {
+          "tokenId": "0xaa3cf4df2d82ec4b91da19afe54d414f637d068fe9cd52ba5e0e7e0d94f9eac8",
+          "domainId": 26,
+          "tokenAddress": "0x2c4047028a72803939b6fb674d01bc059b5c4961",
+          "tokenManagerAddress": "0xb1cc779e865d84421e218a010f3193bcf0a3332d",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "tokenId": "0xfc5523f11226e63d73a0c1ee9efa8f1762399c50cfa98b315d61d637f9ca07c4",
+      "name": "EURC",
+      "symbol": "EURC",
+      "decimals": 6,
+      "displayName": null,
+      "displaySymbol": null,
+      "fxSymbol": null,
+      "deployments": [
+        {
+          "tokenId": "0xfc5523f11226e63d73a0c1ee9efa8f1762399c50cfa98b315d61d637f9ca07c4",
+          "domainId": 26,
+          "tokenAddress": "0x89b50855aa3be2f677cd6303cec089b5f319d72a",
+          "tokenManagerAddress": "0x0bc0559fddb1c17c066acd3da95a0c23d5a46e48",
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}

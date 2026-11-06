@@ -1,3 +1,5 @@
+> Historical research snapshot. The revised implementation decisions and current checks are in [spec v0.3](../../output/arc-studio-hackathon/spec.md) and [review dispositions](../../output/arc-studio-hackathon/REVIEW_DECISIONS.md).
+
 # Arc Studio limits and build workflow
 
 ## What is actually known about usage limits and models

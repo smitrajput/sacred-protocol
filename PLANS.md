@@ -1,37 +1,20 @@
-# Sacred hackathon plan
+# Sacred implementation plan
 
-Status: **REVIEW_CANDIDATE — awaiting Claude Fable review. Implementation has not started in this workflow.**
-Deadline: **November 7, 2026, 9:30 AM IST**. Submit by **7:30 AM IST**.
+Status: **READY_FOR_IMPLEMENTATION — Fable review incorporated in v0.3; next 00a preflight.** No application build has started in this workflow. Deadline **November 7,2026,9:30 AM IST**, target submission 7:30 AM.
 
-## Files and responsibilities
+- [Specification](output/arc-studio-hackathon/spec.md)
+- [Prompt instructions](output/arc-studio-hackathon/README.md)
+- [Studio/local Git workflow](output/arc-studio-hackathon/STUDIO_GIT_WORKFLOW.md) and [commit plan](output/arc-studio-hackathon/COMMIT_PLAN.md)
+- [Review dispositions](output/arc-studio-hackathon/REVIEW_DECISIONS.md), [math checks](output/arc-studio-hackathon/SPEC_VERIFICATION.md), [status/hash](output/arc-studio-hackathon/REVIEW_STATUS.json)
+- [Skills](output/arc-studio-hackathon/SKILLS.md), [organiser guidance](output/arc-studio-hackathon/ORGANISER_GUIDANCE.md), [AI work log](AI_WORKLOG.md)
 
-- [Specification](output/arc-studio-hackathon/spec.md): complete proposed contract, frontend, backend and demo requirements; drafted by Codex from public Sacred docs and integration documentation.
-- [Fable review prompt](output/arc-studio-hackathon/CLAUDE_REVIEW_PROMPT.md): send with the specification, this plan and the commit plan.
-- [Commit plan](output/arc-studio-hackathon/COMMIT_PLAN.md): small sequential implementation checkpoints.
-- [Review status](output/arc-studio-hackathon/REVIEW_STATUS.json) and [review decisions](output/arc-studio-hackathon/REVIEW_DECISIONS.md): gate and actual findings/dispositions.
-- [Prompt instructions](output/arc-studio-hackathon/README.md): exactly how to use the numbered Arc Studio prompts after review.
-- [AI work log](AI_WORKLOG.md): contributions and evidence, updated as work occurs.
-- [Organiser guidance](output/arc-studio-hackathon/ORGANISER_GUIDANCE.md): summary of the four supplied slides.
+## Decisions and sequence
 
-## Sequence
+1. User direction: current Sacred economics, small end-to-end demo, Fable review before implementation and clear sequential commits.
+2. Codex specification and Fable review: complete. Codex incorporated justified findings, corrected review arithmetic and preserved the separate protection waterfall.
+3. Scope: one cirBTC market, existing v4 pool infrastructure, Earn/Trade/Activity, NAV deposits, continuous FIFO, separate admin demo-price fixture, real read API, gas-funded keeper plus manual path. Optional bridge follows a passing core.
+4. Implementation lives in `smitrajput/sacred-markets`, local sibling checkout `sacred-markets`. Studio generates one checkpoint; Codex pulls, checks, commits and pushes before the next checkpoint.
+5. First preflight proves affordable pool/position sizing, token funding, actual v4 execution and hosting access. Freeze actual amounts/roles in the deployment manifest.
+6. Finish contracts by 21:00, app/rehearsal 00:30, freeze 02:00, video 04:00 and submit 07:30. Drop optional bridge first if gates slip.
 
-1. Codex completes the review-candidate specification and prompt pack. **Complete.**
-2. Claude Fable reviews that exact candidate. **Pending.**
-3. Codex records each material finding, makes justified fixes, synchronizes affected prompts and records the final spec hash. **Pending.**
-4. Set READY_FOR_IMPLEMENTATION only after review is incorporated and critical issues resolved; preserve the user's chosen review order. **Pending.**
-5. Build in Arc Studio one checkpoint at a time, test it, inspect its diff and commit before the next checkpoint. **Pending.**
-6. Rehearse the real core demo; add bridge only if time permits; record video and submit. **Pending.**
-
-## Locked scope and decisions
-
-- Human direction evidenced in this chat: follow current Sacred design, ship a simple end-to-end demo, use Fable review before implementation, and preserve small clear commits.
-- Codex proposal pending that review: one cirBTC market, Earn/Trade/Activity, one initial funding cohort, real read API, bounded keeper, Uniswap v2, optional bridge to Ethereum Sepolia.
-- Existing Sacred website/design/code predate this new implementation. Disclose reused work; this plan does not assert who authored all historical work.
-- Financial acceptance covers ownership before sale, fixed markup, collected 77/23 split, principal-first settlement, 160/190 coverage, FIFO withdrawals and explicit losses.
-- Do not grow scope during review. Record brief rationale for accepted, deferred or rejected changes.
-
-## Evidence to add while building
-
-For each checkpoint append: feature, responsible tool/person, key decision, tests actually run, commit SHA and Studio trace/project reference. Add real user feedback and resulting changes when received. Do not fabricate historical plan files, backdate entries, invent test passes or estimate a human/AI percentage from commit counts.
-
-The organisers recommend plan files in the repo; PLANS.md is our chosen index, not an organiser-mandated filename. This file is a current plan assembled by Codex from the conversation, not a verbatim historical transcript.
+Existing Sacred website/design/code predate this implementation. Preserve prior-work disclosure and real chronology. For each checkpoint record actor, decisions, actual tests, SHA and Studio trace in AI_WORKLOG.md. Plan files explain the process; they do not estimate a human/AI authorship percentage.

@@ -1,3 +1,5 @@
+> Historical research snapshot. The revised implementation decisions and current checks are in [spec v0.3](../../output/arc-studio-hackathon/spec.md) and [review dispositions](../../output/arc-studio-hackathon/REVIEW_DECISIONS.md).
+
 # Sacred protocol and implementable pilot specification
 
 ## What the current protocol actually requires

@@ -1,0 +1,11 @@
+{
+  "status": "AWAITING_CLAUDE_FABLE_REVIEW",
+  "spec_version": "0.2-review-candidate",
+  "current_spec_sha256": "6d39926bc8929ef861266f75a4a99ce7a7ea8f9c02e271200ef4bbf18896aa13",
+  "approved_spec_sha256": null,
+  "claude_fable_review_received": false,
+  "review_dispositions_complete": false,
+  "implementation_started": false,
+  "deadline_ist": "2026-11-07T09:30:00+05:30",
+  "target_submission_ist": "2026-11-07T07:30:00+05:30"
+}

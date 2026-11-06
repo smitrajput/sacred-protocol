@@ -25,3 +25,19 @@ Fable review: received. Codex dispositions: complete. Final specification: v0.3 
 - Codex independently checked Arc Testnet block 71009777: contract bytecode, three PoolManager identity getters, existing EURC pool liquidity and uninitialized cirBTC pool. No transaction was sent.
 - Codex corrected reserve/trade requirements, the integer partial-sale scaling factor and dust-limited coverage bands. Kept an independent admin-controlled testnet fixture and preserved primary/tail/backstop ordering.
 - Codex revised specification, prompts, local Git workflow and public plan; application generation remains a later Studio step. Skills installed locally do not imply they ran inside Studio.
+
+## Reviewed handoff commits
+
+Signed planning commits in `sacred-markets`, branch `codex/arc-mvp`, based on `b5b8906`:
+
+| SHA | Change | Changed lines |
+| --- | --- | --- |
+| af8fecb | docs: establish MVP plan and contribution record | 86 |
+| 2dd0a22 | docs: specify reviewed sale financing MVP | 297 |
+| 20624d2 | docs: record review fixes and verification evidence | 119 |
+| be337f2 | docs: define Studio checkpoint and local Git workflow | 110 |
+| 3873e13 | docs: add contract and integration build checkpoints | 29 |
+| e5b0119 | docs: add app verification and delivery checkpoints | 32 |
+| 4ac4e30 | docs: document installed MVP engineering and design skills | 54 |
+
+Validation: reviewed spec hash matches both copies; all seven prompts fit the10,000-character cap and select one checkpoint; root document links resolve; public handoff excludes internal strategy; arithmetic and read-only RPC checks are documented. Application tests and deployments have not run.

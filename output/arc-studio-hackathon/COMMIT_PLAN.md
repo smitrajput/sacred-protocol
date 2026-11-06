@@ -1,63 +1,29 @@
-# Sequential commit plan
+# Sequential implementation checkpoints
 
-A milestone prompt can produce several commits. Before starting implementation, preserve the current repository baseline SHA and the approved spec hash in the work log. Use a dedicated branch; retain pre-existing history and Studio provenance.
+Canonical code repository: `smitrajput/sacred-markets`. Baseline before planning: `b5b8906`. Studio creates one checkpoint per turn; Codex downloads, checks, commits and pushes it locally before the next turn. See STUDIO_GIT_WORKFLOW.md. Ordinary checkpoints aim for 50–300 changed lines, including meaningful tests; split larger behaviors cleanly. Dependencies and generated output are separate. No 1,000-line catch-all commit.
 
-## Checkpoint loop
+| Prompt / checkpoint | Behavior / intended commit boundary |
+| --- | --- |
+| 00a | scaffold, pinned chain/token configuration and draft deployment manifest |
+| 00b | pin v4 dependencies separately; adapter and tests separately; record seeded pool and two-way smoke results |
+| 00c | minimal health endpoint and deploy configuration; verify chosen hosting access |
+| 01a | NAV-priced deposits, mandate acceptance and funding/cap accounting |
+| 01b | continuous FIFO reservations, dust/zeroNAV handling and claims |
+| 01c | treasury seed, segregated protection buckets and loss order |
+| 02a | independent demo feed, explicit refresh/scenario scripts and price checks |
+| 02b | actual purchase → sale → pledge opening, atomic rollback and capacity checks |
+| 02c | principal-first repayment, cumulative markup split and debt-free release |
+| 02d | bounded partial sales, full close and maturity settlement |
+| 02e | accounting/custody invariants and real testnet deployments |
+| 03a | contract-backed read endpoints and bounded log pagination |
+| 03b | keeper simulation, nonce/receipt handling, restart and manual fallback |
+| 03c | Earn connect/deposit/request/claim user flow |
+| 03d | Trade quote/open/repay/close and per-action transaction states |
+| 03e | Activity, mobile/accessibility pass and deployed frontend/API reconciliation |
+| 04a | complete real flow rehearsal and acceptance evidence; fixes remain separate commits |
+| 05a | optional released cirBTC transfer and recovery, only after core green |
+| 06a | architecture, provenance, runbook, integration evidence and submission materials |
 
-1. State one small behavior and its acceptance check.
-2. Generate that behavior in Studio, with its relevant tests; keep unrelated files untouched.
-3. Run the check. Inspect `git diff --check`, `git diff --stat` and the actual diff.
-4. Stage only named files/hunks for this checkpoint. Commit before starting the next behavior.
-5. Record the SHA, actual validation and Studio trace in the work log; continue without seeking routine extra approval.
+Some checkpoints contain more than one inseparable tooling step; dependency changes still get their own commit. Ask Studio to stop at the first completed behavior within an oversized checkpoint. Commit messages describe outcomes. Tests use public interfaces and independent spec examples; fix reproductions precede fixes. Record actual validation and actor/trace in AI_WORKLOG.md, not invented success or ownership percentages.
 
-Aim for 50–300 handwritten changed lines. Split larger features at coherent boundaries. Do not make a 1,000-plus-line catch-all commit. Dependency/lock/generated changes belong separately; if an indivisible generated file makes that limit impossible, report it before committing rather than silently ignoring the constraint or breaking the file. Pin upstream dependencies instead of dumping vendored trees into a feature commit.
-
-If Studio lacks fine-grained Git controls, stop after each checkpoint, export/pull that checkpoint, inspect and commit locally, then resume in the same Studio project. Do not wait until the whole app exists to export one giant diff. Commit messages describe the behavior; their bodies give why, validation and agent role. Never rewrite history to create a fictitious development chronology.
-
-## Planned order
-
-### Prompt 00 — preflight
-
-- `chore: establish Arc testnet scaffold and manifest`
-- `build: pin canonical Uniswap dependencies`
-- `test: prove seeded pair buy and sell`
-
-### Prompt 01 — vault
-
-- `feat(vault): add funding phase and share accounting`
-- `feat(vault): add FIFO withdrawal reservations and claims`
-- `feat(vault): segregate protection and loss accounting`
-
-### Prompt 02 — trading
-
-- `feat(trade): add guarded venue and demo price adapter`
-- `feat(trade): implement purchase sale and pledge opening`
-- `feat(trade): add principal first repayment and markup split`
-- `feat(trade): add partial sale and maturity settlement`
-- `test(trade): enforce accounting and custody invariants`
-- `chore: record verified testnet deployments`
-
-### Prompt 03 — application
-
-- `feat(api): expose contract backed read endpoints`
-- `feat(keeper): add simulation receipt tracking and retries`
-- `feat(ui): add Earn funding and withdrawal flow`
-- `feat(ui): add Trade opening and repayment flow`
-- `feat(ui): show activity and transaction failure states`
-
-### Prompt 04 — verification
-
-- `test(e2e): verify complete financing and withdrawal demo`
-- Separate fixes by the behavior they repair; do not combine unrelated failures.
-
-### Prompt 05 — optional bridge
-
-- `feat(bridge): add released cirBTC transfer and recovery`
-- `test(bridge): record successful transfer rehearsal`
-
-### Prompt 06 — delivery
-
-- `docs: document architecture provenance and integration evidence`
-- `docs: finalize demo and submission materials`
-
-These are planned boundaries, not commits claimed to exist. Adjust boundaries when a smaller coherent change is needed; do not add dummy commits to inflate the count.
+Test seams from the accepted specification: vault public entry points (share/NAV/queue accounting); engine public entry points (custody, debt, loss and lifecycle); venue boundary on an Arc fork (real v4 settlement); API contract-read boundary; browser wallet flow against real testnet receipts. These are the agreed MVP verification boundaries, not a mandate to test every internal getter.

@@ -1,38 +1,25 @@
-# How to use this handoff
+# Use the revised handoff
 
-**Current step: Claude Fable review. Do not run 00–06 yet.**
-Deadline: **November 7, 2026 at 9:30 AM IST**; target submission **7:30 AM IST**.
+Fable review is incorporated in **v0.3**. REVIEW_DECISIONS.md explains accepted fixes and corrected math. Ready for implementation preflight; no app build/deployment has been performed by this handoff. Deadline **November 7,2026,9:30 AM IST**; target submission 7:30 AM.
 
-## Now — review the specification
+## Your next steps
 
-1. Open Claude with Fable selected.
-2. Attach `spec.md`, `PLANS.md` and `COMMIT_PLAN.md` from the review pack. `ORGANISER_GUIDANCE.md` supplies the slide summary if needed.
-3. Paste the text of `CLAUDE_REVIEW_PROMPT.md`. Ask for review findings, not implementation.
-4. Bring Claude's full response back to this Codex chat. Codex will assess the findings, make justified fixes, update the prompts and log, and freeze the final spec hash. Fable review has not been performed by this pack.
+1. Open one Sacred app in Arc Studio. Select the **Uniswap skill** and remove Eco Sauce. Attach the revised `spec.md`.
+2. Paste all of `00-preflight.txt`. Its default CURRENT CHECKPOINT is00a: Studio does only that small part and stops.
+3. Give Codex the Studio app ID/share URL and complete one CLI login. Codex pulls that checkpoint into `sacred-markets`, inspects/tests it, commits the coherent diff and pushes the branch using normal Git. See STUDIO_GIT_WORKFLOW.md for the exact commands.
+4. After that checkpoint is captured, send `Continue 00b`, then00c in the same Studio chat. When00 is complete, attach/paste01 (starts01a), then continue01b/01c. Follow02a–e,03a–e,04a. Run05 only if core works and time remains; finish06.
+5. Send any failures back to Codex with the actual output; fixes go into the same Studio project. Attach an updated spec only if a material decision changes. Never paste all numbered prompts at once.
 
-## After review and revisions — build in Arc Studio
+**You do not manually shuttle each code file or create the commits.** Studio handles code generation; Codex handles CLI pull, verification and local Git. Wallet signatures, Studio login and host-account access remain yours when the platform requires them.
 
-1. Use the revised pack, with `REVIEW_STATUS.json` set to `READY_FOR_IMPLEMENTATION` and its approved hash matching `spec.md`.
-2. Create one Sacred project. Remove Eco Sauce unless intentionally needed. Attach the actual final `spec.md`, `PLANS.md`, `COMMIT_PLAN.md` and `REVIEW_STATUS.json`. A link to a private Page is not a substitute for files Studio can read.
-3. Paste the complete contents of `00-preflight.txt` into Studio and send it. This is an implementation prompt, not a shell command.
-4. Let Studio complete its small checkpoint loop: implement one behavior → test → inspect diff → commit → next checkpoint. Multiple checkpoints inside a prompt must remain separate commits. Save Studio traces and commit SHAs.
-5. Advance through **01 → 02 → 03 → 04** only when the current milestone is complete. Fix failures in that same project. Run optional **05** only if core verification is green and time remains; finish with **06**.
-6. Do not paste all prompts together or start a fresh project for each. If a changed spec conflicts with an old prompt, stop and resynchronize them; the approved spec is canonical.
+## Pack layout
 
-If the web interface cannot attach files or preserve checkpoint commits, use the documented CLI/file handoff, or export each checkpoint for local Git review and commit. Keep code generation in Studio. Codex can orchestrate that later once the Studio session is authorized; no such build has begun yet.
+- spec.md — complete behavior, parameters and acceptance criteria.
+- 00–06.txt — staged prompts, one selected checkpoint per turn.
+- STUDIO_GIT_WORKFLOW.md / COMMIT_PLAN.md — download, review, commit and push mechanics.
+- REVIEW_DECISIONS.md / SPEC_VERIFICATION.md / ARC_V4_READ_CHECK.json — technical review and verification evidence.
+- REVIEW_STATUS.json — spec hash and current stage.
+- SKILLS.md / INSTALLED_SKILLS.json — installed local skills, revisions and intended uses.
+- Root PLANS.md / AI_WORKLOG.md — public plan and honest contribution record.
 
-## CLI alternative after the review gate clears
-
-From the extracted final pack:
-
-```sh
-npm install -g @circle-fin/arc-studio-cli@1.2.2
-arc-studio login
-arc-studio usage --json
-arc-studio agent-guide
-arc-studio run --prompt-file ./00-preflight.txt --file ./spec.md --file ./PLANS.md --file ./COMMIT_PLAN.md --file ./REVIEW_STATUS.json --output json
-```
-
-Follow the current `agent-guide` for continuing the same project. Inspect with `arc-studio pull --changed --dry-run --diff`; use `arc-studio deployments --json` for deployment evidence. Each numbered prompt stays below the documented 10,000-character limit.
-
-This pack contains a specification and workflow, not a deployed application. Registry and quote checks do not replace a real bridge rehearsal. Model identities and absolute Studio quotas remain undisclosed; `usage --json` exposes available percentages/windows/scope.
+In the implementation repository these live under `docs/`, with prompts under `docs/prompts/` and review evidence under `docs/review/`. The private original review text is not part of the distributed pack. Exact served Studio models and absolute usage limits remain undisclosed; use `usage --json` for available percentages/windows/scope.

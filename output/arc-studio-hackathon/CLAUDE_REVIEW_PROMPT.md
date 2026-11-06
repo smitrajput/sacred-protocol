@@ -1,4 +1,6 @@
-# Claude Fable review prompt
+# Original Claude Fable review prompt
+
+Historical review request retained for provenance. The v0.2 review is complete; current status and dispositions are in REVIEW_STATUS.json and REVIEW_DECISIONS.md. This is not an instruction to repeat the review before preflight.
 
 Review the attached Sacred hackathon specification, PLANS.md and COMMIT_PLAN.md. This is the required review BEFORE implementation. Deadline: November 7, 2026 at 9:30 AM IST. Current build status: specification only; no new Studio implementation exists.
 

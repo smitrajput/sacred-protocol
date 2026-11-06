@@ -1,0 +1,39 @@
+[
+  {
+    "repo": "austintgriffith/ethskills",
+    "ref": "47779e720e99c0d5014c0612a08500bdd565108f",
+    "paths": [
+      "."
+    ],
+    "exit_code": 0
+  },
+  {
+    "repo": "leonxlnx/taste-skill",
+    "ref": "9b4bf937a1f69348126959c15d2f99a73e65699b",
+    "paths": [
+      "skills/taste-skill"
+    ],
+    "exit_code": 0
+  },
+  {
+    "repo": "pbakaus/impeccable",
+    "ref": "c3bb418ee38ee49a6b999b7752c1368f3123a2bd",
+    "paths": [
+      ".agents/skills/impeccable"
+    ],
+    "exit_code": 0
+  },
+  {
+    "repo": "mattpocock/skills",
+    "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+    "paths": [
+      "skills/productivity/grill-me",
+      "skills/productivity/grilling",
+      "skills/productivity/writing-for-agents",
+      "skills/engineering/tdd",
+      "skills/engineering/diagnosing-bugs",
+      "skills/engineering/codebase-design"
+    ],
+    "exit_code": 0
+  }
+]

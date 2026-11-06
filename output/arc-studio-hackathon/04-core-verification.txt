@@ -1,0 +1,27 @@
+REVIEW GATE: Execute only after Claude Fable review has been incorporated and REVIEW_STATUS.json says READY_FOR_IMPLEMENTATION with an approved hash matching spec.md. If the gate is absent or pending, stop before code generation/deployment and report the pending review. Read PLANS.md and COMMIT_PLAN.md.
+
+COMMIT DISCIPLINE: This milestone contains multiple small checkpoints. For each, implement one coherent behavior with relevant tests, inspect the actual diff and git diff --check/stat, stage only that checkpoint, commit it, record its SHA/tests/Studio trace, then continue. No catch-all commit with 1,000+ changed lines. Separate dependencies/generated artifacts. If Studio cannot commit granularly, stop after each checkpoint for export/local commit; do not accumulate the full app. Do not claim a Git commit without a SHA.
+
+Work in the SAME Sacred Arc Studio project. This is a testnet-only pilot due November 7, 2026 at 9:30 AM IST. Preserve existing working files and tests. Generate, test and deploy changes through Studio. Do not import the old Sacred contracts as protocol truth. Read attached spec.md when available. Implement only this milestone; report changed files, executed tests, failures, and real transaction evidence. Never claim an unexecuted check passed.
+
+Freeze feature scope. Run the complete core acceptance suite and rehearse the real demo, fixing only blockers. Bridge is optional and should not block any core test. Generate the test report with commands and actual results. Preserve a working checkpoint and Studio share URL.
+
+Acceptance, demo and deadline
+
+**Contract tests:** actual acquisition before sale; failed swap or contribution rolls back; fixed markup/no late growth; principal-first recovery and cumulative split; partial repay retains pledge; full repay releases despite stale feed; coverage includes markup; friction/rounding/dust handling and keeper cannot oversell; slippage failure preserves state; commitments/caps/idle floor; FIFO partial persistence across epochs; queue blocks new finance; claim accounting once; impairment before redemption; reserve order and gross-loss preservation; duplicate/unauthorized calls; reentrancy; token ordering and decimals; pause keeps exit payments available. Use fuzz/invariant tests for asset accounting, collateral conservation and no payout exceeding segregated balances.
+
+**Real integration tests:** official token approvals/transfers, real Uniswap purchase and sale, two-wallet funding/trading, actual settlement receipts, API values reconciling to contracts, pending/revert/retry UI, queue funded from repayment. Test maturity with time warp. Bridge tests are separate and optional.
+
+**Delivery gates, IST:** complete the Fable review and Codex revisions first, aiming for one 60–90-minute combined review cycle. After that gate: preflight within 90 minutes; contract core by **Nov 6, 8:00 PM**; working frontend/API and core rehearsal by **11:30 PM**; optional bridge only if that core gate is already green, with a **Nov 7, 12:30 AM** cutoff; freeze implementation then; video and submission package by **3:00 AM**; submit by **7:30 AM**, ahead of the **9:30 AM** deadline. Late gates cut optional scope; they do not move the submission deadline. These are planning targets, not measured build-time guarantees.
+
+**Demo:** rehearse within the organisers’ four-minute demo slot and prepare three minutes of Q&A; provide video and live deployment.
+
+1. Show Studio project, generated contracts and passing tests; explain sale-based spot financing in one sentence.
+2. Show funded Earn vault; open 2× cirBTC position. Follow the real purchase → fixed sale → pledge trace and explorer link.
+3. Repay and release. Show exact fixed debt and collected 77/23 allocation.
+4. Show a second prepared position's real price scenario and partial sale; coverage restores toward 190%. Show a queued withdrawal filling from returned liquidity. Prepared accounts are fine; transaction evidence must be real.
+5. If rehearsed, show released cirBTC bridging to Sepolia. Close with architecture and repository.
+
+**Submission files:** PLANS.md, AI_WORKLOG.md, actual review findings/dispositions and sequential Git history; README with setup, demo script, prior-work disclosure and integration documentation; Studio share URL accessible to judges; live app/API URLs; deployment manifest and explorer links; architecture diagram; test results; short video and presentation; source repository with licenses. For Uniswap add `FEEDBACK.md`, submit the [developer feedback form](https://developers.uniswap.org/hackathon-feedback), and link exact integration files/lines in README. Use the selected event track's requirements.
+
+Success means the complete core flow runs with real testnet transactions, tests pass, backend is reachable, and a fresh reviewer can reproduce the demo. Keep proposed sale-based financing and testnet status visible; current Sacred design still has open review questions. [Sacred status](https://sacred.markets/docs), [review questions](https://sacred.markets/docs/shariah).

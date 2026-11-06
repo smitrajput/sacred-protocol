@@ -1,0 +1,38 @@
+REVIEW GATE: Execute only after Claude Fable review has been incorporated and REVIEW_STATUS.json says READY_FOR_IMPLEMENTATION with an approved hash matching spec.md. If the gate is absent or pending, stop before code generation/deployment and report the pending review. Read PLANS.md and COMMIT_PLAN.md.
+
+COMMIT DISCIPLINE: This milestone contains multiple small checkpoints. For each, implement one coherent behavior with relevant tests, inspect the actual diff and git diff --check/stat, stage only that checkpoint, commit it, record its SHA/tests/Studio trace, then continue. No catch-all commit with 1,000+ changed lines. Separate dependencies/generated artifacts. If Studio cannot commit granularly, stop after each checkpoint for export/local commit; do not accumulate the full app. Do not claim a Git commit without a SHA.
+
+Work in the SAME Sacred Arc Studio project. This is a testnet-only pilot due November 7, 2026 at 9:30 AM IST. Preserve existing working files and tests. Generate, test and deploy changes through Studio. Do not import the old Sacred contracts as protocol truth. Read attached spec.md when available. Implement only this milestone; report changed files, executed tests, failures, and real transaction evidence. Never claim an unexecuted check passed.
+
+Implement and deploy the real read API, keeper and three-tab UI against the verified manifest and ABIs. Retain the configured venue. Prove the deployed UI can reach its backend and execute real transactions. Preserve Sacred identity; do not regenerate the marketing site.
+
+Frontend and backend
+
+```mermaid
+flowchart LR
+  U[Wallet and React app] --> V[MarginVault]
+  U --> E[TradeEngine]
+  E --> V
+  E --> S[Fixed pair adapter]
+  S --> P[Uniswap v2 cirBTC USDC pair]
+  E --> O[DemoPriceGuard]
+  A[Read API] --> V
+  A --> E
+  U --> A
+  K[Keeper with gas only] --> E
+  K --> V
+  U -. after repayment and release .-> B[BridgeKit to Ethereum Sepolia]
+```
+
+**Frontend:** reuse Sacred's visual identity, with three tabs and a persistent Arc Testnet badge. No redesign of the marketing site.
+
+- **Earn:** funding-open/closed state, connected balance, accepted mandate, shares and current value, realized earnings, protection balances; deposit, request withdrawal, queue position and claim.
+- **Trade:** one asset; contribution, fixed 2×, real acquisition quote, P/M/D, maturity, coverage levels, execution bound and approval/open buttons. Position actions: repay amount, repay and receive cirBTC, sell and close. Display actual remaining full debt and reference-price timestamp.
+- **Activity:** real acquisition/sale/pledge/payment/split/queue/reserve/loss events, hashes, explorer links, deployment addresses and compact architecture. Show pending, confirmed, reverted and retry states; never show success before a successful receipt.
+- Use bigint/decimal strings for transactions, explicit 6/8/18 decimals, wallet-chain checks, actionable errors and double-submit guards. Refresh after receipts. Keep gas available. Failed backend requests must be visible.
+
+**Backend:** one small Node/TypeScript service using viem, generated in Studio. Endpoints: `GET /health`, `/config`, `/vault`, `/positions?owner=`, `/activity?cursor=`. Amounts are integer strings; include observed block and timestamp. `/config` returns manifest, policy hash, deployment block and feature flags. Contract reads are financial truth. A small persistent event cache is optional; key logs by chain, tx hash and log index, persist cursor, and rescan a confirmation overlap without duplicating events. Do not build a subgraph, user database, custody service or authentication system.
+
+Preflight must prove the chosen host can serve this API to the deployed UI. Generate its hosting configuration in Studio. If Studio cannot host a persistent worker, keep the real API hosted through the supported deployment path and provide a user-triggered permissionless keeper button; show scheduling as unavailable. A static frontend with invented backend responses fails acceptance.
+
+**Keeper:** one process polling bounded live IDs every 10–15 seconds. Simulate eligible rebalances/maturity settlement, submit, persist pending hash/nonce, await receipt and retry safely. Process eligible FIFO batches afterward. The key has gas only and no guardian, price or treasury powers. UI shows last successful poll and last error. Manual fallback invokes the same onchain functions. Feed scenario updates are a separate explicit test harness.

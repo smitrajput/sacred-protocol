@@ -16,9 +16,22 @@ const MOVED_DOCS = [
 ];
 
 /** @type {import('next').NextConfig} */
+// The testnet app is its own deployment, built to live under /app. It is served here at
+// sacred.markets/app (pages, assets and its read API under /app/api) rather than redirected to.
+const APP_ORIGIN = "https://sacred-arc-mvp.vercel.app";
+
 const nextConfig = {
   // The docs under app/docs are written in MDX; mdx-components.js maps their elements.
   pageExtensions: ["js", "jsx", "mdx"],
+  async rewrites() {
+    return {
+      // Before the filesystem, so the app takes /app ahead of any page in this project.
+      beforeFiles: [
+        { source: "/app", destination: `${APP_ORIGIN}/app` },
+        { source: "/app/:path*", destination: `${APP_ORIGIN}/app/:path*` },
+      ],
+    };
+  },
   async redirects() {
     const hosts = OLD_HOSTS.map((host) => ({
       source: "/:path*",
@@ -26,9 +39,7 @@ const nextConfig = {
       destination: "https://sacred.markets/:path*",
       permanent: true,
     }));
-    // Branded entry to the testnet app. Exact /app only, temporary (307).
-    const app = { source: "/app", destination: "https://sacred-arc-mvp.vercel.app/", permanent: false };
-    return [...hosts, app, ...MOVED_DOCS.map(([from, to]) => ({ source: `/docs/${from}`, destination: `/docs/${to}`, permanent: true }))];
+    return [...hosts, ...MOVED_DOCS.map(([from, to]) => ({ source: `/docs/${from}`, destination: `/docs/${to}`, permanent: true }))];
   },
 };
 

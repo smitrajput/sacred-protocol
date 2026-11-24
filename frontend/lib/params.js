@@ -49,6 +49,17 @@ export const SIFT = {
   drawdownHalve: 0.2,
   drawdownFreeze: 0.3,
   newcomerSleeve: 0.05,
+  // A verified record from another venue starts an account further along the same curve.
+  // Proposed thresholds; no model run covers them yet.
+  imported: {
+    tiers: [
+      { startDay: 14, minDays: 90, minEquity: 10_000 },
+      { startDay: 42, minDays: 180, minEquity: 50_000 },
+    ],
+    maxDrawdown: 0.2,
+    recentDays: 30,
+    sleeve: 0.1,
+  },
 };
 
 // ---- Earn: the MarginVault's modeled returns at $10m active NAV ----
@@ -74,9 +85,15 @@ export const EARN = {
 export const BORROW = {
   termDays: 30,
   referenceApr: 0.08, // audited reference only; the launch quote is unset until approved
-  entryLtv: 0.45,
-  liquidationLtv: 0.625,
-  restoreLtv: 0.5,
+  // Limits are set per collateral. The top-level three are the cirBTC route, the highest entry
+  // limit and the one the worked examples use.
+  entryLtv: 0.55,
+  liquidationLtv: 0.7,
+  restoreLtv: 0.6,
+  collateral: {
+    BTC: { entryLtv: 0.55, liquidationLtv: 0.7, restoreLtv: 0.6 },
+    ETH: { entryLtv: 0.5, liquidationLtv: 0.65, restoreLtv: 0.55 },
+  },
   minFinancing: 1_000,
   maxPerBorrower: 5_000,
   pilotCeiling: 250_000,

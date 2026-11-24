@@ -2,7 +2,7 @@ export const metadata = { title: "Shariah" };
 
 # Shariah
 
-Sacred is built from classical contracts, and no board has reviewed it. This page is the founder's structural analysis with sources, written so that a scholar can check each claim, and it states exactly what still needs approval. Until then nothing here should be read as a ruling, and Sacred makes no certified claim.
+Sacred is built from classical Islamic contracts. No Shariah board has reviewed it yet. This page is the founder's analysis of the structure, with sources a scholar can check, and a list of what still needs approval. Nothing here is a ruling, and Sacred is not certified halal.
 
 ## Review status
 
@@ -28,12 +28,12 @@ Sacred is built from classical contracts, and no board has reviewed it. This pag
 | **Murabaha** | Trade: the sale of BTC or ETH | Seller owns first; cost disclosed; price fixed at the sale; never rises on default; no rollover | Usmani pp. 70–71, 91, 98–100; OIC Fiqh Academy Res. 51, 64; [AAOIFI SS8](https://aaoifi.com/download/24233/) |
 | **Musawamah** | Borrow: the sale of USDC from inventory | Negotiated price; asset exists, is owned and deliverable; price known | [SBP model agreement](https://archive.sbp.org.pk/press/Essentials/Musawamah%20Facility%20Agreement.htm) |
 | **Rahn** | Trade and Borrow: the pledge | The pledge stays the buyer's property; surplus on sale returns to the buyer | Usmani pp. 88–89; Res. 51 |
-| **Mudarabah** | Earn and Funding Borrow | Profit split by ratio; loss falls on capital; no guarantee | Usmani pp. 36, 47–49; AAOIFI SS45 |
+| **Mudarabah** | Earn, in both its Trade vault and its Borrow vault | Profit split by ratio; loss falls on capital; no guarantee | Usmani pp. 36, 47–49; AAOIFI SS45 |
 | **Ibra'** | Early settlement | A waiver of unearned markup; binding in Borrow if approved | [BNM SAC](https://www.bnm.gov.my/-/resolutions-of-shariah-advisory-council-bank-negara-malaysia) |
 
 ## Why Trade takes no share of profit
 
-Mandatory trader profit share is 0% at every tier. AAOIFI's Murabaha standard, clauses 4/6 to 4/7, requires the sale price and profit to be known at signing and rejects profit set by future variations. [SBP](https://archive.sbp.org.pk/press/Essentials/Essentials%20of%20Islamic.htm) also requires a certain price. A charge that depends on later trading profit is not established as part of a fixed sale. A separate partnership would change how losses fall and needs its own structure, and no income from one is assumed.
+Mandatory trader profit share is 0% at every tier. AAOIFI's Murabaha standard, clauses 4/6 to 4/7, requires the sale price and profit to be known at signing and rejects profit set by future variations. [SBP](https://archive.sbp.org.pk/press/Essentials/Essentials%20of%20Islamic.htm) also requires a certain price. A charge tied to later trading profit has no established basis in a fixed sale. A separate partnership would change who bears losses and needs its own structure, so Sacred assumes no income from one.
 
 ## The 2006 ruling, answered
 
@@ -46,24 +46,24 @@ The Muslim World League's Fiqh Council ruled against margin trading for four rea
 | Non-compliant instruments and selling what is not owned | Real assets, bought and owned by the vault before it sells them |
 | Excessive borrowing and risk-taking | Leverage capped at 5×, with higher tiers opened gradually as rulings are approved |
 
-The fourth reason is not fully answered by structure, which is why the leverage ceiling belongs to a board. Precedent exists at 2×: Mawarid Securities in the UAE runs murabaha margin at 2× with forced sale at a 30% maintenance level (Musa, 2021), and Kenanga's Islamic margin charges 10.75 to 11% a year.
+Structure alone doesn't fully answer the fourth reason, so the leverage ceiling is for a board to set. Precedent exists at 2×: Mawarid Securities in the UAE runs murabaha margin at 2× with forced sale at a 30% maintenance level (Musa, 2021), and Kenanga's Islamic margin charges 10.75 to 11% a year.
 
 ## Arc and USDC
 
-Borrow rests on a premise. Sacred **accepts as a working assumption that USDC on Arc qualifies as a commodity**. On Arc, USDC is the native gas token: the thing you spend to use the network. That gives it a use beyond being money, which is the core of the argument, and it is why Arc gives Sacred stronger ground for Shariah approvals than a chain where USDC is only a payment token.
+Borrow depends on one assumption. Sacred **accepts as a working assumption that USDC on Arc qualifies as a commodity**. On Arc, USDC is the native gas token: the thing you spend to use the network. That gives it a use beyond being money. This is the core of the argument, and it is why Arc gives Sacred stronger ground for Shariah approval than a chain where USDC is only a payment token.
 
-If that holds, selling USDC for a fixed deferred USDC price can be a sale of a commodity rather than a loan of money. That premise and the sale are different questions:
+If that holds, selling USDC now for a fixed USDC price paid later can be a commodity sale instead of a loan of money. The assumption and the sale are separate questions:
 
 | Question | Status |
 | --- | --- |
-| Is USDC on Arc a commodity? | Assumed, not ruled on. Scholars may reject it |
+| Is USDC on Arc a commodity? | Assumed. Shariah ruling pending. |
 | Is this owned-inventory sale, payable in USDC, a non-ribawi sale? | Not approved. Separate from the commodity question |
 | Is the binding rebate permissible, including partial and forced settlement? | Not approved |
 | Are the mudarabah pool and reserve deed acceptable? | Not approved |
 
-Commodity status does not settle the rest. AAOIFI's qard standard covers fungible wealth generally and prohibits stipulated excess, and its Murabaha standard excludes deferred currency, gold and silver transactions. None of the reviewed authorities approves this particular USDC exchange. Arc gas utility alone does not select an approved cash mechanism.
+Even if USDC is a commodity, the other questions stay open. AAOIFI's qard standard covers fungible wealth in general and prohibits any stipulated excess, and its Murabaha standard excludes deferred currency, gold and silver deals. None of the authorities reviewed approves this specific USDC exchange. USDC's use as gas on Arc does not, by itself, give an approved way to deliver cash.
 
-A no-profit qard is a possible fallback. It delivers USDC and recovers the same amount plus independently permissible service costs. It would not fund any of Borrow's modeled investor returns, so it would be a different product.
+A no-profit qard is a possible fallback. It delivers USDC and gets back the same amount, plus service costs that are permissible on their own. It would pay none of Borrow's modeled investor returns, so it would be a different product.
 
 ## What needs review
 
@@ -80,7 +80,7 @@ Nothing below has been ruled on.
 7. Limited recourse: collection stops at the pledged asset, so a trader never owes more than the pledge.
 8. The leverage ceiling.
 9. The depositor mandate, vintages and conservation offers.
-10. Manager-funded protection and the pilot backstop. The Borrow research found that AAOIFI SS45 places capital-protection reserves in investors' profit, not in the manager's share, and a manager may not guarantee investors' capital in a mudarabah. Whether Trade's manager-funded stock and a backstop from Sacred's raised capital are acceptable needs review, and may change their structure.
+10. Manager-funded protection and the pilot backstop. The Borrow research found that AAOIFI SS45 funds capital-protection reserves from investors' profit and not from the manager's share, and that a manager in a mudarabah may not guarantee investors' capital. A board needs to rule on whether Trade's manager-funded stock and a backstop from Sacred's raised capital are acceptable. The answer may change how they are structured.
 
 ### Borrow
 
@@ -91,7 +91,7 @@ Nothing below has been ruled on.
 5. Collateral enforcement, and any keeper or service compensation.
 6. Eligibility of each collateral asset.
 
-Rulings are not independent, so a no on one may change others. Each board candidate is asked about these before engagement.
+The rulings depend on each other, so a no on one may change others. Every board candidate is asked about these before Sacred engages them.
 
 ## What the design does on purpose
 
@@ -102,7 +102,7 @@ Rulings are not independent, so a no on one may change others. Each board candid
 
 ## Precedent and limits
 
-- No fatwa covers leverage on crypto, approving or rejecting.
+- No fatwa covers leverage on crypto, either for or against.
 - Some scholars reject crypto itself. A June 2026 fatwa from Darul Uloom Karachi holds that crypto tokens are not property. A board following it would reject the whole design.
 - If a board says no, the design changes.
 

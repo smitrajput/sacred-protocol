@@ -2,7 +2,7 @@ export const metadata = { title: "Returns and allocation" };
 
 # Returns and allocation
 
-How Trade's markup becomes depositor income, company cash and protection. Figures are proposed research parameters as of 2 November 2026. They assume demand that has not been measured, and they exclude any income from Borrow.
+How Trade's markup becomes depositor income, company cash and protection in Earn's Trade vault. Figures are proposed research parameters as of 2 November 2026. They assume demand that has not been measured, and they exclude any income from Earn's Borrow vault, which has [its own page](/docs/borrow/economics).
 
 ## The money
 
@@ -23,11 +23,11 @@ At leverage `L`, the normal depositor share is `(0.077 + 0.5 × (APR − 0.10)) 
 5. 12 months of company operating cash ($125,000)
 6. Distributions
 
-Protection and profit are different uses of cash. Operating surplus does not mean distributable profit: all three initial scenarios distribute nothing in year one. Depositor principal and refundable amounts can never become protocol protection. Operating cash supplies no credit backstop, and protection is never spent on salaries. The [pilot backstop](/docs/risk#how-your-funds-are-protected) is separate: capital set aside from Sacred's raise to protect the pilot phase.
+Protection and profit are different uses of cash. Operating surplus does not mean distributable profit: all three initial scenarios distribute nothing in year one. Depositor principal and refundable amounts are never used as protection. Operating cash is not a credit backstop, and protection is never spent on salaries. The [pilot backstop](/docs/risk#how-your-funds-are-protected) is separate: capital set aside from Sacred's raise to protect the pilot phase.
 
 ## Market effects and demand are separate
 
-At constant 90% use, 2× earns about 7.14% in every market regime, because fixed markup does not disappear when prices fall. The difference between the cases below comes from utilization, and utilization is a chosen stress case. It is not observed demand and it is not inferred from funding.
+At constant 90% use, 2× earns about 7.14% in every market regime, because the fixed markup is still paid when prices fall. The cases below differ by utilization, and each utilization level is a chosen stress case. None of them is measured demand.
 
 A past-only classifier labels each entry by the asset's 90-day return: above +20% bull, below −20% bear, otherwise sideways.
 
@@ -37,24 +37,24 @@ A past-only classifier labels each entry by the asset's 90-day return: above +20
 | Sideways | 75% | 5.76% / **5.92%** | **$43,251** | $45,198 | 752 days |
 | Bear, conservation terms | 50% | 3.49% / **3.55%** | **$22,068** | $21,606 | 1,456 days |
 
-\*Cash references assume zero realized credit losses, collection lag and an explicit company bridge. Annual surplus separately subtracts a planning loss allowance. These are two different views and should not be combined into one realized-loss claim.
+\*Cash references assume zero realized credit losses, collection lag and an explicit company bridge. Annual surplus separately subtracts a planning loss allowance. These are two separate views, so don't add them up into one loss figure.
 
-**The base case in full, 2× at 90% use:** collected markup $897,375; depositor income $690,979; manager income $206,396; operations $125,000; loss budget $4,500; net $76,896. Operating break-even NAV is $6,191,298 at 90% use. At $1m NAV it is still startup R&D, not a self-funding company.
+**The base case in full, 2× at 90% use:** collected markup $897,375; depositor income $690,979; manager income $206,396; operations $125,000; loss budget $4,500; net $76,896. Operating break-even NAV is $6,191,298 at 90% use. At $1m NAV it is still startup R&D and does not pay for itself.
 
 ## Conservation vintages
 
-Conservation enters when trailing 30-day productive use falls below 60% and exits when it recovers to at least 70%. The 70% allocation applies only to accepted new vintages. Existing contracts run off at 77%, because a fungible vault cannot unilaterally rewrite holders' rights.
+Conservation enters when trailing 30-day productive use falls below 60% and exits when it recovers to at least 70%. The 70% allocation applies only to accepted new vintages. Existing contracts run off at 77%, because a shared vault can't change holders' terms on its own.
 
 | Bear, 50% use | Depositor APY | Annual result after budget |
 | --- | ---: | ---: |
 | Keep 77% | 3.91% | −$12,831 |
 | 70% for accepted new vintages | 3.55% | +$22,068 |
 
-The conservation case needs about 42.5% use to break even at $10m NAV and $125k costs. Below that the options are verified cost cuts, previously earned company cash or responsible runoff. Stopping lending alone does not fix fixed expenses. No automatic acceptance is assumed outside the scenario, and lower terms may themselves reduce deposits.
+The conservation case needs about 42.5% use to break even at $10m NAV and $125k costs. Below that the options are verified cost cuts, company cash saved earlier or responsible runoff. Stopping lending alone does not fix fixed expenses. No automatic acceptance is assumed outside the scenario, and lower terms may themselves reduce deposits.
 
-## Earned protection
+## Protection cash
 
-The 2× target is **1% of approved financing**: at $9.5m of approved capacity, $95,000, of which $38,000 is primary and $57,000 tail. Before any higher tier opens:
+The 2× target is **1% of approved financing**: at $9.5m of approved capacity, $95,000, of which $38,000 is primary and $57,000 tail. Approved financing is the total the vault has committed to finance, used or not, since unused capacity can be drawn at any time. Before any higher tier opens:
 
 ```text
 eligible_cash ≥ Σ (approved_financing_i × stock_ratio_i)
@@ -68,9 +68,9 @@ Primary and tail requirements are checked separately. There is no diversificatio
 | Tail | 0.6% | 1.0% | 7.5% | 7.5% | 9.5% | 10.5% | 10.5% |
 | Combined | 1.0% | 1.5% | 9.0% | 10.0% | 14.0% | 17.0% | 17.0% |
 
-Cumulative caps on total approved financing: above 2× at most 25%; 3× and up 15%; 3.5× and up 7.5%; 4× and up 5%; 4.5× and up 2.5%; 5× at most 1%. These overlap. A saturated illustrative mix of 75/10/7.5/2.5/2.5/1.5/1% in ascending tiers needs 2.6% weighted protection, or $247,000 at $9.5m capacity. Its bull case improves APY to 7.50%, but needs about 29 budget months to build that stock from zero. Fees earned later cannot fund a loss that arrives first.
+Cumulative caps on total approved financing: above 2× at most 25%; 3× and up 15%; 3.5× and up 7.5%; 4× and up 5%; 4.5× and up 2.5%; 5× at most 1%. These overlap. A saturated illustrative mix of 75/10/7.5/2.5/2.5/1.5/1% in ascending tiers needs 2.6% weighted protection, or $247,000 at $9.5m capacity. Its bull case improves APY to 7.50%, but needs about 29 budget months to build that stock from zero. Fees collected later cannot pay for a loss that comes first.
 
-Steady budget formation takes 14.82, 26.36 and 51.66 months in the three chosen cases. The zero-start model needs company operating bridges of $4,795, $4,795 and $5,644. That funding supplies no credit backstop. Until protection is earned, the pilot backstop stands in front of depositor NAV.
+Steady budget formation takes 14.82, 26.36 and 51.66 months in the three chosen cases. The zero-start model needs company operating bridges of $4,795, $4,795 and $5,644. That funding is not a credit backstop. Until protection fills up, the pilot backstop protects depositor NAV.
 
 ## What SIFT changes
 
@@ -78,7 +78,7 @@ SIFT's objective is collected contribution: markup collected minus principal los
 
 The commercial measure is net contribution per vault NAV, which punishes idle capital, alongside contribution per financed dollar-day, which punishes bad financing.
 
-The closed pilot and the public release are different things. The pilot instruments the system at $500 per account. The growth curve needs a funded public release, with at least $1m, $5m and $10m of vault NAV behind $10,000, $50,000 and $100,000 accounts, plus earned protection for the full approved envelope.
+The closed pilot and the public release are different things. The pilot instruments the system at $500 per account. The growth curve needs a funded public release, with at least $1m, $5m and $10m of vault NAV behind $10,000, $50,000 and $100,000 accounts, plus filled protection for the full approved envelope.
 
 **Pilot arithmetic.** At $25,000 fully financed, gross markup is $2,500 a year: $1,925 to depositors and $575 to the manager, about $88 over 56 days before costs and timing. Building the $250 target would take about 159 days of full continuous receipts, and only if company runway already pays pilot operations and every available manager dollar is retained. Delay, losses or unfunded costs lengthen that. If receipts pay costs above $575 a year, protection does not build at all.
 
@@ -91,5 +91,5 @@ Assumed yearly operations of $125,000 are a budget judgment: $60k engineering an
 - **Demand is unproven.** Every figure here scales with traders who may not come.
 - **Costs are unquoted.** Arc execution costs and company costs are assumptions.
 - **Depositor acceptance of conservation terms is unmeasured.**
-- **The numbers are not a commercial optimum.** Rates are policy choices informed by replay.
+- **Rates are policy choices.** Replay informed them, and they may not be the commercial optimum.
 - **Not modeled:** contract or oracle failure, USDC events, wrapper failure, Arc-specific depth and MEV.

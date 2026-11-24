@@ -4,7 +4,7 @@ export const metadata = { title: "How Trade works" };
 
 # How Trade works
 
-Buy BTC or ETH with your own capital plus Sacred financing. You agree one fixed dollar cost before you buy, there are no funding payments, and Sacred takes no share of your profit. Leverage goes up to 5×. Higher tiers are gradually opened as their protection is earned and Shariah rulings approved.
+Buy BTC or ETH with your own capital plus Sacred financing. You agree one fixed dollar cost before you buy, there are no funding payments, and Sacred takes no share of your profit. Leverage goes up to 5×. Higher tiers open gradually as their protection is funded and Shariah rulings are approved.
 
 This is a proposed design. It is not live, audited or Shariah-approved.
 
@@ -20,13 +20,13 @@ Sacred finances permitted spot-asset purchases through genuine sales. At 2×, $5
 | Your capital | $5,000.00 | Paid at purchase |
 | Financing | $5,000.00 | `asset cost × (1 − 1/leverage)` |
 | Fixed markup | $19.18 | `financing × 10% × 14 ÷ 365`, fixed in dollars at the sale |
-| Assumed execution | $11.00 | 5 bps in, 5 bps out, $1 fixed. Route assumptions, not measured Arc fills |
+| Assumed execution | $11.00 | 5 bps in, 5 bps out, $1 fixed. Assumed route costs, not yet measured on Arc |
 | **Total cost at constant price** | **$30.18** | |
 | You owe by day 14 | $5,019.18 | Financing plus markup |
 
-The APR is a quoting convention. What you agree to is a dollar price. It does not move with utilization, funding or your result.
+The APR is only how the quote is expressed. You agree to a dollar price, and it does not move with utilization, funding or your result.
 
-**Your first position is smaller.** A new account starts with up to $500 of financing, so its first full position is $500 of your capital, $500 of financing and $1,000 of asset: $1.92 of markup and about $2 of assumed execution, $3.92 in total. The $10,000 example is what a larger earned ceiling buys. [SIFT](/docs/trade/sift) sets that ceiling: at a funded public release, a qualifying trader can reach $10,000 of financing in 2 weeks, $50,000 in 6 and $100,000 in 12. Each step needs your own capital beneath the financing, available vault capacity and clean risk, and growth pauses or cuts when those fail.
+**Your first position is smaller.** A new account starts with up to $500 of financing, so its first full position is $500 of your capital, $500 of financing and $1,000 of asset: $1.92 of markup and about $2 of assumed execution, $3.92 in total. The $10,000 example is what a larger ceiling, unlocked later, buys. [SIFT](/docs/trade/sift) sets that ceiling: at a funded public release, a qualifying trader can reach $10,000 of financing in 2 weeks, $50,000 in 6 and $100,000 in 12. A trader with a verified record on another venue can bring it and start at $10,000 or $50,000 instead. Each step needs your own capital beneath the financing, available vault capacity and clean risk, and growth pauses or cuts when those fail.
 
 ## What you pay, and what you do not
 
@@ -40,13 +40,13 @@ The APR is a quoting convention. What you agree to is a dollar price. It does no
 
 Mandatory profit share is 0% because a Murabaha sale needs a known price and profit at signing. A charge that depends on later trading results is not established as part of that price ([AAOIFI SS8](https://aaoifi.com/download/24233/), clauses 4/6 to 4/7).
 
-There is no product minimum for deposits or positions. Small positions carry a larger share of the fixed execution cost.
+There is no product minimum for deposits or positions. Small positions pay a larger share of the fixed execution cost.
 
 ## How a position stays safe
 
-Every position is measured by **coverage**: asset value divided by the full remaining debt. At 2× a partial sale begins at **160%** coverage and sells enough asset to restore **190%**. Because of the markup and entry cost, that first trigger sits about **19.7%** below the entry price.
+Every position is measured by **coverage**: asset value divided by the full remaining debt. At 2× a partial sale begins at **160%** coverage and sells enough asset to restore **190%**. Because of the markup and entry cost, that first trigger is about **19.7%** below the entry price.
 
-A partial sale is a reduction in size. It leaves you with less asset, less debt and your remaining equity. On the $10,000 position, before sale costs and any approved rebate:
+A partial sale shrinks the position. It leaves you with less asset, less debt and your remaining equity. On the $10,000 position, before sale costs and any approved rebate:
 
 | | Asset value | Debt | Coverage | Your equity |
 | --- | --- | --- | --- | --- |
@@ -54,7 +54,7 @@ A partial sale is a reduction in size. It leaves you with less asset, less debt 
 | Asset falls 19.7% | $8,031 | $5,019 | 160% | $3,011 |
 | After the partial sale of $1,673 | $6,358 | $3,346 | 190% | $3,011 |
 
-If price keeps falling, later partial sales repeat at the same levels until the debt is repaid. If the asset sells for less than the debt, the gap is a principal shortfall. **You can never owe more than you pledged.** Collection stops at the pledged asset, so the shortfall freezes your account for new financing and is absorbed under the order on the [risk page](/docs/risk), rather than collected from you.
+If price keeps falling, later partial sales repeat at the same levels until the debt is repaid. If the asset sells for less than the debt, the gap is a principal shortfall. **You can never owe more than you pledged.** Collection stops at the pledged asset, so the shortfall freezes your account for new financing and is covered in the order set out on the [risk page](/docs/risk). It is not collected from you.
 
 Execution is a design target of 60 seconds from detection to sale. It has not been measured on Arc.
 
@@ -70,7 +70,7 @@ Any rebate for settling early needs separate approval, so quotes assume the full
 
 ## How the cost compares
 
-Each quote shows the Hyperliquid cost for the same exposure as information. A cheaper quote elsewhere does not stop a valid trade, and Sacred makes no promise of being cheapest.
+Each quote shows what the same exposure would cost on Hyperliquid, for reference. A cheaper quote elsewhere does not stop a valid trade, and Sacred does not promise to be cheapest.
 
 History on BTC and ETH, $10,000 held 14 days, 2,446 daily windows with Hyperliquid's current base fee applied to past funding:
 
@@ -85,7 +85,7 @@ The recent picture is weaker: across the 518 windows of 2026, Sacred is 3.0% mor
 
 ## Leverage up to 5×
 
-Higher tiers are gradually opened as their protection is earned, execution supports them and Shariah rulings are approved. A better SIFT score never unlocks one.
+Higher tiers open gradually as their protection is funded, execution can handle them and Shariah rulings are approved. A better SIFT score never unlocks one.
 
 | Leverage | Financed APR | Partial sale / restore | Price room | Cost on $10,000 |
 | --- | --- | --- | --- | --- |
@@ -101,4 +101,4 @@ Higher tiers cost more and leave less room. At 5×, a 7.2% fall is about a 36% l
 
 ## What can go wrong for you
 
-You can lose your capital, though never more than you pledged. A fall takes equity first, and a fast one can sell part of your position at a poor price. Partial sales are common at higher leverage and can happen during a move that later reverses. A route, oracle or chain outage can delay exits. BTC and ETH on Arc are wrapped or bridged tokens (cirBTC, WETH), which add custody and bridge risk beyond the spot price. The [risk page](/docs/risk) has the evidence.
+You can lose your capital, though never more than you pledged. A fall takes equity first, and a fast one can sell part of your position at a poor price. Partial sales are common at higher leverage and can happen during a move that later reverses. A route, oracle or chain outage can delay exits. BTC and ETH on Arc are wrapped or bridged tokens (cirBTC, WETH), which add custody and bridge risk on top of price risk. The [risk page](/docs/risk) has the evidence.

@@ -909,7 +909,7 @@ label.slider {
   .siftHead {
     grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     gap: 4rem;
-    align-items: end;
+    align-items: center;
   }
 }
 

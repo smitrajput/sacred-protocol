@@ -25,6 +25,7 @@ export default function Sift() {
         ))}
       </ol>
       <p className={styles.stageNote}>{sift.milestoneNote}</p>
+      <p className={styles.stageNote}>{sift.imported}</p>
 
       <p className={styles.cuts}>
         {sift.rules} {sift.cuts}

@@ -24,7 +24,7 @@ export function Quote() {
       h={176}
       min={520}
       label={`Your capital of ${usd(q.contribution)} and financing of ${usd(q.financing)} buy ${usd(q.exposure)} of asset. Fixed markup ${usd(q.markup)} plus assumed execution ${usd(q.execution)} is ${usd(q.totalCost)} in total.`}
-      caption="One position, priced before you buy. The cost is a dollar figure from the moment of the sale; it does not move with the market."
+      caption="One position, priced before you buy. The cost is fixed in dollars at the sale and does not move with the market."
     >
       <rect x={20} y={20} width={299} height={34} className={styles.barMute} />
       <Text x={170} y={42} lines={`Your capital ${usd(q.contribution, 0)}`} className={styles.body} />
@@ -144,7 +144,7 @@ export function Anatomy() {
       w={640}
       h={182}
       label="The asset cost 10,000: 5,000 of your capital and 5,000 financed by the vault. The debt owed by day 14 is the same 5,000 plus a fixed markup of 19.18."
-      caption="The two sums, to scale. The financing comes back as itself; the markup is the thin red slice at the end, fixed at the sale."
+      caption="The two sums, to scale. The financing is repaid as is, and the markup is the thin red slice at the end, fixed at the sale."
     >
       <text x={x0} y="20" className={styles.big}>
         What the asset cost: $10,000
@@ -217,7 +217,7 @@ export function SiftLoop() {
       h={150}
       min={640}
       label="Four steps in a loop: own capital plus small financing, verifiable performance across the whole account, capacity that grows by the qualifying day and cuts at once, and collected markup. New outcomes update the next decision."
-      caption="Each qualifying day uses new real outcomes. Nothing here depends on a simulated stage."
+      caption="Each qualifying day adds new real outcomes. There is no simulated stage."
     >
       {steps.map(([title, sub], i) => {
         const x = 16 + i * 186;

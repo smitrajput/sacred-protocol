@@ -7,7 +7,7 @@ export const sections = [
     title: "Start here",
     pages: [
       { slug: "", title: "Overview", blurb: "One screen: the three products, where they stand, and where to read next." },
-      { slug: "thesis", title: "Thesis", blurb: "The market, the one new primitive, and what fixed-price financing does and does not offer." },
+      { slug: "thesis", title: "Thesis", blurb: "The market, the one new primitive, and the tradeoffs of fixed-price financing." },
       { slug: "funding", title: "Add funds", blurb: "Every supported route onto Arc: exchanges, wallets, tokens and networks." },
       { slug: "support", title: "Support", blurb: "How to reach us, and what we will never ask you for." },
     ],
@@ -16,14 +16,14 @@ export const sections = [
     title: "Earn",
     pages: [
       { slug: "earn", title: "How Earn works", blurb: "Where the return comes from, the modeled range, fees, withdrawals and what protects a deposit." },
-      { slug: "earn/economics", title: "Returns and allocation", blurb: "The markup split, demand cases, conservation terms, earned protection and scale." },
+      { slug: "earn/economics", title: "Returns and allocation", blurb: "The markup split, demand cases, conservation terms, how protection is funded, and scale." },
     ],
   },
   {
     title: "Trade",
     pages: [
       { slug: "trade", title: "How Trade works", blurb: "A position up to 5×, its fixed cost, partial sales, financing limits and the market benchmark." },
-      { slug: "trade/sift", title: "SIFT", blurb: "How financing follows evidence: the growth curve, qualifying days, repayment checkpoints and the limits nothing bypasses." },
+      { slug: "trade/sift", title: "SIFT", blurb: "How financing grows with your results: building a record here or bringing one, the growth curve, qualifying days, repayment checkpoints and the hard limits." },
       { slug: "trade/mechanism", title: "Trade mechanics", blurb: "Purchase, ownership, sale, pledge, partial sale and settlement, and the leverage ladder." },
     ],
   },
@@ -48,7 +48,7 @@ export const sections = [
     pages: [
       { slug: "architecture", title: "Architecture", blurb: "Separate vaults, shared infrastructure, the SIFT ledger and who may do what." },
       { slug: "contracts", title: "Contracts and code", blurb: "What exists today, what is proposed, verified addresses and how to run it." },
-      { slug: "glossary", title: "Glossary", blurb: "The words, used the same way everywhere." },
+      { slug: "glossary", title: "Glossary", blurb: "The terms used across these docs, and what each one means." },
     ],
   },
 ];

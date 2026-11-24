@@ -2,7 +2,7 @@ import { borrowQuote, earlySettlement, usd } from "../../../lib/quote";
 import { Arrow, Box, Figure, Text } from "./Figure";
 import styles from "./figures.module.css";
 
-// The Borrow pages' pictures, on the audited reference: collateral worth 10,000, 45% entry, 30
+// The Borrow pages' pictures, on the reference: cirBTC collateral worth 10,000, 55% entry, 30
 // days, 8% annualized. The 8% is a reference, not a launch quote.
 
 const q = borrowQuote({ collateral: 10_000 });
@@ -15,9 +15,9 @@ export function BorrowFlow() {
       h={190}
       min={680}
       label={`Pledge collateral worth 10,000. Receive ${usd(q.usdc, 0)} USDC to spend. Repay a fixed ${usd(q.debt)} USDC by day 30, or less if you settle early. Your collateral is released.`}
-      caption="The collateral stays yours throughout. It is pledged, never lent, staked or reused. Figures use the 8% reference, not a launch quote."
+      caption="Your collateral stays yours the whole time. It is pledged and never lent, staked or reused. Figures use the 8% reference rate, which is not a launch quote."
     >
-      <Box x={10} y={36} w={170} h={92} title="Pledge" sub={["collateral worth $10,000", "WETH or cirBTC", "still yours"]} />
+      <Box x={10} y={36} w={170} h={92} title="Pledge" sub={["collateral worth $10,000", "cirBTC in this example", "still yours"]} />
       <Arrow points={[[180, 82], [290, 82]]} label="sale accepted" at={[235, 74]} />
       <Box x={290} y={36} w={170} h={92} title="Receive" sub={[`${usd(q.usdc, 0)} USDC`, "spendable at once", `fixed price ${usd(q.debt)}`]} kind="accent" />
       <Arrow points={[[460, 82], [570, 82]]} label="by day 30" at={[515, 74]} />
@@ -41,7 +41,7 @@ export function BorrowStates() {
       h={214}
       min={560}
       label="A sale moves through five states: quoted, funded, active, due and paid. A new sale is a separate transaction with its own funding."
-      caption="A sale's states. Price-triggered liquidation stays available in every funded state, including the 24-hour cure. A new sale needs new underwriting and real delivery, and never funds the old debt."
+      caption="A sale's states. A price-triggered liquidation can happen in every funded state, including the 24-hour cure. A new sale needs new underwriting and real delivery, and is never used to pay off the old debt."
     >
       {states.map(([name, line], i) => {
         const y = 8 + i * 41;

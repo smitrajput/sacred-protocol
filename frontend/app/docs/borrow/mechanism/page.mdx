@@ -4,14 +4,14 @@ export const metadata = { title: "Borrow mechanics" };
 
 # Borrow mechanics
 
-Borrow is a fixed-price sale of USDC from inventory owned by the pool's investors, payable later in USDC and secured by pledged collateral. It rests on a premise and on contracts that are not yet approved. This page states the sequence those approvals would cover.
+Borrow is a fixed-price sale of USDC from inventory owned by the depositors in Earn's Borrow vault, payable later in USDC and secured by pledged collateral. It depends on a premise and on contracts that are not approved yet. This page lays out the steps those approvals would cover.
 
 ## The sequence
 
-1. **Inventory.** Investors hold USDC under a restricted mandate. Sacred records which capital is committed, and acts as their manager and agent. The USDC is not company money.
-2. **Pledge.** The borrower deposits approved collateral and grants a pledge and an enforcement mandate. The pool does not acquire economic ownership of it.
+1. **Inventory.** Earn depositors who chose the Borrow vault, called investors here, hold USDC under a restricted mandate. This vault is a separate contract from the one that funds Trade. Sacred records which capital is committed, and acts as their manager and agent. The USDC is not company money.
+2. **Pledge.** The borrower deposits approved collateral and grants a pledge and an enforcement mandate. The borrower keeps economic ownership of the collateral.
 3. **Sale.** The borrower accepts a quote: a principal amount now, a fixed sale price, a maturity and a rebate rule.
-4. **Delivery.** The pool transfers USDC to the borrower's wallet and records the debt in one step. The borrower can spend it freely. No simulated commodity movement is inserted.
+4. **Delivery.** The pool transfers USDC to the borrower's wallet and records the debt in one step. The borrower can spend it freely. No simulated commodity trade is added in between.
 5. **Rebate and settlement.** Payment within the term cancels unused markup under a binding *ibra*. Debt reaches zero and the collateral returns.
 
 ```text
@@ -19,16 +19,16 @@ fixed debt at sale         = F × (1 + r × T / 365)
 cash settlement            = q × (1 + r × min(d, T) / 365)
 binding rebate             = q × r × max(T − d, 0) / 365
 remaining contractual debt = (remaining principal − q) × (1 + r × T / 365)
-health factor              = 0.625 × collateral value in USDC / full remaining debt
+health factor              = liquidation LTV × collateral value in USDC / full remaining debt
 ```
 
-`F` is principal, `r` the annualized quote, `T` the term in days and `q` principal retired on day `d`.
+`F` is principal, `r` the annualized quote, `T` the term in days and `q` principal retired on day `d`. Liquidation LTV is 70% for cirBTC and 65% for WETH.
 
-Cash plus waiver extinguishes that slice's full fixed debt. This is Sacred's proposed linear formula, using a contractual approach supported by [Bank Negara Malaysia's Shariah Advisory Council](https://www.bnm.gov.my/-/resolutions-of-shariah-advisory-council-bank-negara-malaysia). BNM has not certified the formula.
+The cash plus the waiver clears that slice's full fixed debt. This is Sacred's proposed linear formula, using a contractual approach supported by [Bank Negara Malaysia's Shariah Advisory Council](https://www.bnm.gov.my/-/resolutions-of-shariah-advisory-council-bank-negara-malaysia). BNM has not certified the formula.
 
 ## Why musawamah
 
-Sacred uses **musawamah**, a negotiated-price sale, for pool inventory without documented acquisition cost. **Murabaha** needs genuine cost disclosure, and a $1 peg is not a lot's cost. Murabaha applies only to lots with documented acquisition cost. This is the shape of the [SBP model agreement](https://archive.sbp.org.pk/press/Essentials/Musawamah%20Facility%20Agreement.htm), which covers sales from an institution's existing inventory, separates acquisition from sale and allows collateral.
+Sacred uses **musawamah**, a negotiated-price sale, for pool inventory without documented acquisition cost. **Murabaha** needs real cost disclosure, and a $1 peg doesn't count as the cost of a lot. Murabaha applies only to lots with documented acquisition cost. This follows the [SBP model agreement](https://archive.sbp.org.pk/press/Essentials/Musawamah%20Facility%20Agreement.htm), which covers sales from an institution's existing inventory, separates acquisition from sale and allows collateral.
 
 ## A sale's states
 
@@ -40,18 +40,18 @@ If debt stays unpaid, collateral is enforced, or approved hardship forbearance a
 
 ## Liquidation
 
-When debt LTV reaches 62.5%, a keeper sells a bounded amount of collateral, applies proceeds to the rebated settlement amount, and restores 50% or closes the debt. The order of recovery is:
+When debt LTV reaches the liquidation level (70% on cirBTC, 65% on WETH), a keeper sells a limited amount of collateral, applies proceeds to the rebated settlement amount, and restores 60% or 55% respectively, or closes the debt. The order of recovery is:
 
 1. Approved execution costs
 2. The secured sale obligation, with the approved rebate
 3. Surplus back to the borrower
 
-Unrecovered principal is recorded promptly. It falls on investor-owned reserves, primary then tail, and then on the pool. Keeper rewards need an approved service arrangement. Model costs are 0.10% plus $2 in normal conditions, 3% plus $10 in four-hour stress and 5% plus $10 in day-long emergency, on $5,000 of financing. They are assumptions, not observed Arc fills or penalty revenue.
+Unrecovered principal is recorded promptly. It is covered by the investor-owned reserves, primary first and then tail, and after that by the pool. Keeper rewards need an approved service arrangement. Model costs are 0.10% plus $2 in normal conditions, 3% plus $10 in four-hour stress and 5% plus $10 in day-long emergency, on $5,000 of financing. These costs are assumptions. They have not been measured on Arc, and none of them is penalty revenue.
 
 ## Collateral rules
 
 - Never rehypothecated, staked or lent.
-- Withdrawals need fresh prices, no unpaid maturity, principal LTV of 45% or less afterwards and a healthy full debt. Debt-free withdrawals need no price check.
+- Withdrawals need fresh prices, no unpaid maturity, principal LTV at or under the entry limit afterwards (55% on cirBTC, 50% on WETH) and a healthy full debt. Debt-free withdrawals need no price check.
 - Adding collateral and repaying stay open during an origination freeze.
 - Repayment in BTC or ETH needs an approved spot conversion at an actual settlement quote, and does not reset the debt.
 
@@ -59,8 +59,8 @@ Unrecovered principal is recorded promptly. It falls on investor-owned reserves,
 
 | Setting | State |
 | --- | --- |
-| 90 and 180-day terms | Disabled. 8.5% and 9% are old illustrations, not selected quotes |
-| 50 / 65 / 55 LTV policy | Disabled candidate. Needs new approval |
+| 90 and 180-day terms | Disabled. 8.5% and 9% are old illustrations and were never chosen as quotes |
+| Entry limits above 55% on cirBTC or 50% on WETH | Excluded. In the four-hour stress replay a 60% limit either lost principal or left under 14% of price room |
 | Automatic renewal | Excluded |
 
-Longer terms carry more liquidation risk and need matching investor maturities. In replay, 90 and 180-day cohorts saw price liquidation about 29% and 46% of the time on BTC, against 9% at 30 days.
+Longer terms have more liquidation risk and need matching investor maturities. In replay at the earlier 45% limit, 90 and 180-day cohorts saw price liquidation about 29% and 46% of the time on BTC, compared with 9% at 30 days. The longer terms were not rerun at the current limits.

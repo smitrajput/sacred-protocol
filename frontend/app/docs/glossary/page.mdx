@@ -8,18 +8,18 @@ These words are used the same way everywhere in Sacred.
 
 | Word | Meaning |
 | --- | --- |
-| **Earn** | Depositing USDC in the MarginVault to receive a share of Trade's markup |
+| **Earn** | Depositing USDC to receive a share of markup. Earn has two separate vault contracts: the MarginVault funds Trade and the CashFinanceVault funds Borrow |
 | **Trade** | Buying BTC or ETH with your capital plus financing, at a fixed price. The contracts call this margin |
 | **Borrow** | Receiving USDC against collateral through a fixed-price sale. The contracts call this Cash Finance |
-| **MarginVault** | The pool that funds Trade |
-| **CashFinanceVault** | The separate pool that funds Borrow |
+| **MarginVault** | Earn's Trade vault, the contract that funds Trade |
+| **CashFinanceVault** | Earn's Borrow vault, the contract that funds Borrow. Its books, reserves and losses are kept apart from the MarginVault's |
 | **Available** | Funds in your account that are not in a product |
 
 ## Sale terms
 
 | Word | Meaning |
 | --- | --- |
-| **Financed APR** | The annualized quoting convention for markup: 10% at 2×. What you agree to is a dollar price |
+| **Financed APR** | How markup is quoted, as a yearly rate: 10% at 2×. What you actually agree to is a dollar price |
 | **Fixed markup** | The seller's profit, fixed at the sale: `financing × APR × days ÷ 365` |
 | **Financing** | The part of the purchase not paid by the trader: `asset cost × (1 − 1/leverage)` |
 | **Leverage** | Asset purchase cost divided by the trader's capital |
@@ -27,9 +27,9 @@ These words are used the same way everywhere in Sacred.
 | **Partial sale** | A sale of only enough pledged asset to restore coverage |
 | **Coverage** | Trade: asset value divided by full remaining debt |
 | **Debt LTV** | Borrow: full remaining debt divided by collateral value |
-| **Principal LTV** | Borrow: USDC principal divided by collateral value. 45% at entry |
+| **Principal LTV** | Borrow: USDC principal divided by collateral value. At entry, up to 55% on cirBTC and 50% on WETH |
 | **Rebate** | A waiver of unearned markup on early settlement. Binding in Borrow if approved |
-| **Principal shortfall** | The part of financing not recovered. Recorded even if a reserve absorbs it |
+| **Principal shortfall** | The part of financing not recovered. Recorded even if a reserve covers it |
 | **Pledge** | The asset held as security. It belongs to the buyer |
 
 ## Vaults and protection
@@ -42,9 +42,9 @@ These words are used the same way everywhere in Sacred.
 | **Utilization** | Productive financing divided by active NAV |
 | **Approved capacity** | Financing authorized, including commitments. Protection is measured against this |
 | **Vintage** | A group of deposits or commitments with the same fixed terms |
-| **Conservation terms** | A 70% base share offered to consenting new Earn vintages when use is weak |
-| **Primary and tail stock** | Earned manager cash set aside for losses in Trade. Targets 0.4% and 0.6% of approved financing at 2× |
-| **Pilot backstop** | The fourth layer of protection: a small portion of the capital Sacred raises from investors, set aside to protect the pilot phase of Earn and Borrow |
+| **Conservation terms** | A 70% base share offered to new Earn vintages that agree to it, when vault use is low |
+| **Primary and tail stock** | Collected manager cash set aside for losses in Trade. Targets 0.4% and 0.6% of approved financing at 2× |
+| **Pilot backstop** | The fourth layer of protection: a small part of the money Sacred raises from investors, set aside to protect Earn and Borrow during the pilot |
 | **Company cash** | Operating runway. It is neither credit protection nor depositor money |
 | **Investment risk reserve (IRR)** | Borrow's reserve, owned by investors and funded from their profit |
 | **Loss carry** | Losses that future earnings must restore before profit is shared |
@@ -55,14 +55,16 @@ These words are used the same way everywhere in Sacred.
 
 | Word | Meaning |
 | --- | --- |
-| **SIFT** | Skill-Informed Financing Tiers: how financing capacity follows real results |
+| **SIFT** | Skill-Informed Financing Tiers: how your financing limit grows with your real results, built at Sacred or started from a record you bring |
 | **Curve ceiling** | C(q): the published financing ceiling after `q` qualifying funded days, from $500 to $100,000 |
 | **Qualifying funded day** | One complete 24-hour funded period that meets the use, rolling-result, drawdown, data and contribution tests |
 | **Repayment checkpoint** | Evidence required every 14 qualifying days: full-term repaid principal and positive contribution |
 | **Headroom** | What is left of the effective ceiling after outstanding and pending financing |
 | **Starter, Serviced** | Before and after the first successful repayment checkpoint |
+| **Brought record** | A verified trading history from another venue, used to start an account at $10,000 or $50,000 instead of $500 |
+| **Imported** | An account started from a brought record, until its first successful repayment checkpoint at Sacred |
 | **Proven** | A separate long-window skill label. It can improve ranking and is not required for any milestone |
-| **Earned ceiling** | The financing an account has earned through reviews |
+| **Unlocked ceiling** | The financing an account has unlocked through reviews |
 | **Sticky risk ceiling** | A lower limit left by a drawdown. No automatic recovery in v1 |
 | **Headroom** | Ceiling minus outstanding and pending financing |
 | **Fresh capital** | Settled, unpledged capital available for a new position |
@@ -71,13 +73,13 @@ These words are used the same way everywhere in Sacred.
 | **Effective observations** | Weekly observations after correlation is discounted |
 | **SIFT score** | Shrunk excess return less an uncertainty haircut. Not a probability |
 | **Contribution (J)** | Collected markup less losses and variable costs, per contractual financed dollar-day |
-| **Discovery** | The bounded first pilot, where newcomers may fill the whole envelope |
+| **Discovery** | The first pilot, with fixed caps, where newcomers may fill the whole envelope |
 
 ## Islamic finance
 
 | Word | Meaning |
 | --- | --- |
-| **Mudarabah** | One side gives capital, the other manages it. Profit is split by ratio; capital bears loss |
+| **Mudarabah** | One side gives capital, the other manages it. Profit is split by ratio, and the capital provider takes any loss |
 | **Murabaha** | A sale at disclosed cost plus an agreed profit, payable later |
 | **Musawamah** | A sale at a negotiated price, without disclosing cost |
 | **Rahn** | A pledge securing a debt. Surplus on sale returns to the owner |

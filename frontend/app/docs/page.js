@@ -9,17 +9,17 @@ const paths = [
   { who: "Saver", go: "earn", title: "Put stablecoins to work", line: "Earnings come from fixed financing markup. The return is variable, and it depends on how much of the vault is in use." },
   { who: "Trader", go: "trade", title: "More buying power, costs upfront", line: "Buy BTC or ETH with up to 5× leverage and one fixed dollar cost, no funding payments and no share of your profit." },
   { who: "Holder", go: "borrow", title: "USDC against your crypto", line: "Pledge collateral, receive spendable USDC, repay a fixed amount and take your collateral back." },
-  { who: "Prop trader", go: "trade/sift", title: "SIFT: capital follows evidence", line: "Real trades from day one. Qualifying traders can reach $10,000 of financing in 2 weeks and $100,000 in 12." },
-  { who: "Investor", go: "thesis", title: "Thesis", line: "The market, the one new primitive, and the measured tradeoffs behind fixed-price financing." },
+  { who: "Prop trader", go: "trade/sift", title: "SIFT: financing grows with your results", line: "Real trades from day one. Build to $100,000 of financing in 12 weeks, or bring a verified record and start at up to $50,000." },
+  { who: "Investor", go: "thesis", title: "Thesis", line: "The market, the one new primitive, and the tradeoffs of fixed-price financing, with numbers." },
   { who: "Scholar", go: "shariah", title: "The contracts and what needs approval", line: "Each sale, pledge and partnership, the Arc and USDC premise, and the open questions." },
   { who: "Engineer", go: "architecture", title: "How it is built", line: "Separate vaults, a canonical account ledger, the existing deployment and the proposed engine." },
   { who: "Getting started", go: "funding", title: "Add funds", line: "Exchange and wallet routes onto Arc, with the exact tokens and networks." },
 ];
 
 const products = [
-  { name: "Earn", status: "Proposed. First release.", line: "Deposits finance Trade positions. 77% of base markup goes to depositors." },
+  { name: "Earn", status: "Proposed. First release.", line: "Deposits fund Trade and Borrow through two separate vaults. 77% of Trade's base markup goes to depositors." },
   { name: "Trade", status: "Proposed. First release.", line: "A 14-day fixed sale of BTC or ETH, up to 5×. From 10% annualized on financing, 0% of your profit." },
-  { name: "Borrow", status: "Proposed. After Trade.", line: "A 30-day fixed sale of USDC against collateral, funded by a separate 12-month pool." },
+  { name: "Borrow", status: "Proposed. After Trade.", line: "A 30-day fixed sale of USDC against collateral, funded by Earn's 12-month Borrow vault." },
 ];
 
 export default function DocsOverview() {
@@ -29,7 +29,7 @@ export default function DocsOverview() {
       <p className={styles.lead}>
         Sacred is onchain financing for holding and trading halal assets. It gives people three things to do with their
         crypto: earn on stablecoins, trade BTC and ETH with more buying power, and access USDC against what they already
-        hold. All three run on sales with a price fixed upfront, rather than loans with a rate that moves.
+        hold. All three use sales with a price fixed upfront, instead of loans with a rate that moves.
       </p>
 
       <table>

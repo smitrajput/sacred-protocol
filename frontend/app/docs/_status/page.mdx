@@ -2,7 +2,7 @@ export const metadata = { title: "Status and roadmap" };
 
 # Status and roadmap
 
-Sacred is at the angel stage. This page says what exists, what does not, what each phase waits on, and which decisions are still open.
+Sacred is at the angel stage. This page lists what exists, what doesn't yet, what each phase is waiting on, and the decisions still open.
 
 ## Built
 
@@ -14,7 +14,7 @@ Sacred is at the angel stage. This page says what exists, what does not, what ea
 
 ## Deployed
 
-Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses on the [contracts page](/docs/contracts). A BTC desk (3x max) and an ETH desk (2x max) exist behind an allow-list, each paired with its own vault in the deployed shape; the single vault for both is the rewrite before launch. The token is on chain under a placeholder name, `SacredTokenDummy` with ticker `SRD`, with no airdrop, no listing and no protocol-owned stake. It is not live in any sense that matters.
+Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses on the [contracts page](/docs/contracts). A BTC desk (3x max) and an ETH desk (2x max) are deployed behind an allow-list, each with its own vault. Before launch they are rewritten to share one vault. The token is on chain under a placeholder name, `SacredTokenDummy` with ticker `SRD`, with no airdrop, no listing and no protocol-owned stake. For practical purposes it is not live.
 
 ## Tested
 
@@ -26,7 +26,7 @@ Both sides are on Arbitrum One, every contract verified on Arbiscan; addresses o
 - **No Shariah board ruling.** Ten points plus SCR's go to a board before launch; the [Shariah page](/docs/shariah) lists them with odds and fallbacks.
 - **No open access.** Depositors and traders are allow-listed. Deposits capped at 1 million USDC, raised in steps.
 - **No token.** SCR launches only after the vault has run on points for 6 to 12 months and has real fees.
-- **The launch economics and the single vault are not yet in the deployed code.** The contracts on Arbitrum One pair a vault with each desk and run the first design's dials: a 10% markup plus 1% above 2x, a 30% profit share per position, all markup to depositors, a weekly withdrawal queue. The utilisation curve, the netted 10% profit share, the 85/10/5 split, the 9% target with its payout reserve, the admission and capital-return rules, the instant withdrawals and the fund buffer on the [economics page](/docs/economics) ship with the re-cut before launch, and the profit share is then tuned with launch data.
+- **The launch economics and the single vault are not yet in the deployed code.** The contracts on Arbitrum One pair a vault with each desk and run the first design's dials: a 10% markup plus 1% above 2x, a 30% profit share per position, all markup to depositors, a weekly withdrawal queue. The utilisation curve, the netted 10% profit share, the 85/10/5 split, the 9% target with its payout reserve, the admission and capital-return rules, the instant withdrawals and the fund buffer on the [economics page](/docs/economics) ship with the rewrite before launch, and the profit share is then tuned with launch data.
 
 ## Launch plan
 

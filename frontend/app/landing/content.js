@@ -57,7 +57,7 @@ export const hero = {
 
 const topTier = LADDER.at(-1);
 
-export const higherTiers = "Higher tiers are gradually opened as their protection is earned and Shariah rulings approved.";
+export const higherTiers = "Higher tiers open gradually, once their protection is funded and a Shariah board approves them.";
 const refBorrow = borrowQuote({ collateral: 10_000 });
 const strong = EARN.cases[0];
 const weak = EARN.cases[2];
@@ -67,12 +67,12 @@ const weak = EARN.cases[2];
 export const earn = {
   id: "earn",
   eyebrow: "Earn",
-  heading: "Put your stablecoins to work.",
+  heading: "Market-bending returns on stablecoins.",
   lead: "Deposit USDC. It finances real BTC and ETH purchases at a fixed markup, and you receive a share of that markup.",
   facts: [
-    ["The return", `Modeled ${pct(weak.apy, 2)} to ${pct(strong.apy, 2)} APY at $10m of deposits, depending on how much of the vault is in use. Variable, and not guaranteed.`],
-    ["Where earnings come from", "Fixed markup that traders pay for financing. Idle cash earns nothing, and no one pays interest."],
-    ["Fees", "Sacred keeps 23% of base markup. Depositors receive 77%. No other Earn fee is proposed."],
+    ["The return", `Modeled ${pct(weak.apy, 2)} to ${pct(strong.apy, 2)} APY at $10m of deposits, depending on how much of the vault is in use.`],
+    ["Where earnings come from", "The fixed markup traders pay for financing. No one pays interest, and idle cash earns nothing."],
+    ["Fees", "Sacred keeps 23% of base markup. Depositors receive 77%. There are no other Earn fees."],
     ["Withdrawal timing", "From idle cash first, then a daily queue filled as positions settle. About 7 days for half the vault and 14 for all of it."],
     ["Protection", "Your funds are protected by 4 layers of backstops before a loss touches your principal.", { text: "4 layers of backstops", href: protection }],
   ],
@@ -82,12 +82,12 @@ export const earn = {
 export const trade = {
   id: "trade",
   eyebrow: "Trade",
-  heading: "More buying power. Costs shown upfront.",
+  heading: "Levered buying power. Fixed costs upfront.",
   lead: "Buy real BTC or ETH with your capital plus Sacred financing. One fixed dollar cost, no funding payments, and your profit stays yours.",
   facts: [
-    ["Your contribution", `You put in part of the position. Financing covers the rest, up to your ceiling. New accounts start with up to $${usd(SIFT.starterCeiling, 0)} of financing.`],
+    ["Your contribution", `You put in part of the position. Financing covers the rest, up to your ceiling. New accounts start with up to $${usd(SIFT.starterCeiling, 0)} of financing, or more with a verified trading record from another venue.`],
     ["Exposure", `Up to ${topTier.leverage}× leverage, on real spot assets you own, pledged until the debt is paid.`],
-    ["Costs", `${pct(LAUNCH_TIER.apr, 0)} annualized on financing at ${LAUNCH_TIER.leverage}×, up to ${pct(topTier.apr, 0)} at ${topTier.leverage}×, fixed in dollars for 14 days, plus execution. Sacred takes no share of your profit.`],
+    ["Costs", `${pct(LAUNCH_TIER.apr, 0)} annualized on financing at ${LAUNCH_TIER.leverage}×, up to ${pct(topTier.apr, 0)} at ${topTier.leverage}×, fixed in dollars for 14 days, plus trading costs (buy + sell). Sacred takes no share of your profit.`],
     ["Liquidation", "If your position's value falls to the coverage level in your quote, part of it is sold to restore cover. You keep the rest, and you can never owe more than you pledged."],
   ],
   cta: { label: "Explore Trade", href: "/trade" },
@@ -99,10 +99,10 @@ export const borrow = {
   heading: "Access USDC against your crypto.",
   lead: "Keep your BTC or ETH exposure and get spendable USDC. Repay a fixed amount, and your collateral comes back.",
   facts: [
-    ["Supported assets", "WETH and cirBTC on Arc are the candidates. Each opens only once its backing and market depth are verified."],
-    ["Borrowing capacity", `Up to ${pct(BORROW.entryLtv, 0)} of your collateral's value, from $${usd(BORROW.minFinancing, 0)} to $${usd(BORROW.maxPerBorrower, 0)} per person in the pilot.`],
-    ["Costs", "A fixed price for 30 days, set before launch. Repay early and you pay only for the days used, if the rebate is approved."],
-    ["Liquidation", `At ${pct(BORROW.liquidationLtv)} debt LTV, only the collateral needed to return to ${pct(BORROW.restoreLtv, 0)} is sold. Any surplus is yours.`],
+    ["Supported assets", "WETH and cirBTC on Arc are early candidates."],
+    ["Borrowing capacity", `Up to ${pct(BORROW.collateral.BTC.entryLtv, 0)} of your collateral's value on BTC and ${pct(BORROW.collateral.ETH.entryLtv, 0)} on ETH, from $${usd(BORROW.minFinancing, 0)} to $${usd(BORROW.maxPerBorrower, 0)} per person in the pilot.`],
+    ["Costs", "A fixed price for 30 days, set before launch. Repay early and you pay only for the days used."],
+    ["Liquidation", `At ${pct(BORROW.collateral.BTC.liquidationLtv, 0)} debt LTV on BTC, or ${pct(BORROW.collateral.ETH.liquidationLtv, 0)} on ETH, only the collateral needed to return to ${pct(BORROW.collateral.BTC.restoreLtv, 0)} or ${pct(BORROW.collateral.ETH.restoreLtv, 0)} is sold. Any surplus is yours.`],
   ],
   flow: [
     { label: "Pledge collateral", value: `$${usd(refBorrow.collateral, 0)}`, note: "Stays yours" },
@@ -110,7 +110,7 @@ export const borrow = {
     { label: "Repay by day 30", value: usd(refBorrow.debt), note: "Fixed at the sale" },
     { label: "Collateral released", value: `$${usd(refBorrow.collateral, 0)}`, note: "Back in your wallet" },
   ],
-  flowNote: "Uses the 8% reference price, which is not a launch quote. Borrow follows Trade and is not yet enabled.",
+  flowNote: "Example at an 8% reference price. The launch price isn't set yet. Borrow launches after Trade.",
   cta: { label: "Explore Borrow", href: "/borrow" },
 };
 
@@ -118,14 +118,15 @@ export const borrow = {
 
 export const sift = {
   eyebrow: "SIFT · Skill-Informed Financing Tiers",
-  heading: "Capital follows evidence.",
-  lead: "Prop firms scale traders with discipline, but on paid challenges and simulated accounts. SIFT keeps the discipline and drops the simulation: you trade real capital from day one, and your financing grows as your results earn it.",
+  heading: "Permissionless, onchain evidence-based capital allocation.",
+  lead: "Prop firms make you pay for a challenge and trade a simulated account before they fund you. With SIFT you trade real capital from day one, and your financing grows with your results. Already have a record on Hyperliquid, Binance or Bybit? Bring it and start higher.",
+  imported: `Bring a verified record and start at $${usd(siftCeiling(SIFT.imported.tiers[0].startDay), 0)} or $${usd(siftCeiling(SIFT.imported.tiers[1].startDay), 0)}. No record? Start at $${usd(SIFT.starterCeiling, 0)} and build one here, with no permission needed.`,
   milestones: [
     { when: "Day one", ceiling: siftCeiling(0) },
     ...SIFT.milestones.map(({ weeks, day }) => ({ when: `Week ${weeks}`, ceiling: siftCeiling(day) })),
   ],
-  milestoneNote: "Fast at first, then slower as your limit rises. The maximum path for a qualifying trader at a funded public release, with your own capital beneath the financing and vault capacity to match.",
-  rules: "A day counts only with real use of your limit, positive net results and drawdown under 10%. Every 14 qualifying days you also show repaid financing.",
+  milestoneNote: "Fast at first, then slower as your limit rises. This is the fastest path for a qualifying trader after public launch, if you add your own capital alongside the financing and the vault has room.",
+  rules: "A day counts when you actually use your limit, finish net positive and stay under 10% drawdown. Every 14 qualifying days you also need to show repaid financing.",
   cuts: "A 20% drawdown halves your limit, and 30% or a principal shortfall freezes new financing.",
   cta: { label: "How SIFT works", href: "/docs/trade/sift" },
 };
@@ -154,13 +155,13 @@ export const faq = [
     items: [
       { q: "Can I use Sacred today?", a: "The Arc Testnet demo is live: try USDC Earn and 2× cirBTC trading with test assets using Launch app. The broader products described here are planned for production. Get early access for launch updates.", link: { text: "Get early access", href: `/${links.signup}` } },
       { q: "Where is Sacred available?", a: "Web first, with iOS and Android to follow. Availability will depend on your country and the product. Some products may not be offered everywhere." },
-      { q: "Is there a minimum?", a: "No product minimum is planned for Earn or Trade. Very small positions pay a larger share of execution costs. Borrow is planned to start at $1,000." },
+      { q: "Is there a minimum?", a: "No product minimum is planned for Earn or Trade. Very small positions pay a larger share of trading costs. Borrow is planned to start at $1,000." },
     ],
   },
   {
     group: "Custody and funding",
     items: [
-      { q: "Who controls my funds?", a: "You do. Your account uses a wallet you control, either embedded with export and recovery, or your own. Money you put into a product follows that product's rules until it is available again." },
+      { q: "Who controls my funds?", a: "You do. Your account uses a wallet you control, either embedded with export and recovery, or your own. Once you put money into a product, that product's rules apply until it is back in your Available balance." },
       { q: "How do I add funds?", a: "From an exchange or a wallet. Supported incoming assets arrive as USDC on Arc, and appear as Available in your account.", link: { text: "exchange or a wallet", href: "/docs/funding" } },
       { q: "Why Arc?", a: "Sacred's first release is planned for Arc as USDC being a gas token there simplifies protocol and user fee calculation and estimation, plus provides a stronger ground for USDC to be approved as a commodity by Shariah.", link: { text: "approved as a commodity by Shariah", href: `${shariahDocs}#arc-and-usdc` } },
     ],
@@ -172,33 +173,33 @@ export const faq = [
       { q: "Where does the return come from?", a: "Traders pay a fixed markup to finance purchases of BTC and ETH. Depositors receive 77% of base markup. Idle cash earns nothing." },
       { q: "What fees does Earn charge?", a: "Sacred's 23% share of base markup. No other Earn fee is proposed." },
       { q: "How do withdrawals work?", a: "They rank ahead of new financing. Money comes from idle cash first, then a daily queue filled as 14-day positions settle. Half the vault could leave in about 7 days and all of it in about 14, if positions settle as expected." },
-      { q: "Can I lose money?", a: "Your funds are protected by 4 layers of backstops before a loss touches your principal: the trader's capital, primary protection, tail protection and a pilot backstop. A loss larger than all four reaches depositors. Contract, oracle, USDC and chain failures sit outside these layers.", link: { text: "4 layers of backstops", href: protection } },
+      { q: "Can I lose money?", a: "Your funds are protected by 4 layers of backstops before a loss touches your principal: the trader's capital, primary protection, tail protection and a pilot backstop. If a loss is bigger than all four, depositors take the rest. These layers don't cover smart contract, oracle, USDC-peg or chain failures.", link: { text: "4 layers of backstops", href: protection } },
     ],
   },
   {
     group: "Trade",
     items: [
-      { q: "What does a trade cost?", a: "A markup fixed in dollars when you open, plus execution costs. At 2× that is $19.18 of markup and about $11 of execution on a $10,000 position over 14 days. No funding payments, and no share of your profit." },
+      { q: "What does a trade cost?", a: "A markup fixed in dollars when you open, plus trading costs to buy and sell. At 2× that is $19.18 of markup and about $11 of estimated trading costs on a $10,000 position over 14 days. No funding payments, and no share of your profit." },
       { q: "Do I own the asset?", a: "Yes. Sacred buys the asset and sells it to you. It stays pledged until you pay the debt, then you can take it to your wallet." },
-      { q: "When is my position sold?", a: "Each leverage level has its own coverage level, from 160% at 2×, about a 19.7% fall from entry, to 115% at 5×, about 7.2%. A partial sale restores cover, and you can repay to avoid it. You can lose your full contribution, but you can never owe more than you pledged." },
-      { q: "Why is my financing limited?", a: "New accounts start with up to $500. Under SIFT, qualifying traders can reach $10,000 in 2 weeks, $50,000 in 6 and $100,000 in 12, always with their own capital beneath the financing.", link: { text: "SIFT", href: "/docs/trade/sift" } },
+      { q: "When is my position sold?", a: "Coverage is your asset's value divided by what you owe. It starts near 199% at 2× and 124% at 5×. If BTC falls about 19.7% at 2× (coverage hits 160%), or about 7.2% at 5× (115%), part of your asset is sold to lift coverage back to 190% or 123%. You keep the rest, and you can repay early to avoid the sale. You can lose your full contribution, but you can never owe more than you pledged." },
+      { q: "Why is my financing limited?", a: "New accounts start with up to $500. Under SIFT, qualifying traders can reach $10,000 in 2 weeks, $50,000 in 6 and $100,000 in 12, always with their own capital beneath the financing. If you already have a verified record on another venue, such as Hyperliquid, Binance or Bybit, you can bring it and start at $10,000 or $50,000.", link: { text: "SIFT", href: "/docs/trade/sift" } },
       { q: "What about higher leverage?", a: higherTiers },
     ],
   },
   {
     group: "Borrow",
     items: [
-      { q: "How does Borrow work?", a: "You pledge collateral and accept a fixed-price sale of USDC. You spend the USDC, repay within 30 days and take your collateral back. Borrow follows Trade and is not yet enabled." },
-      { q: "What does it cost?", a: "The price is not set. Examples use an 8% annualized reference: 29.59 USDC on 4,500 USDC for 30 days. Sacred does not claim to be the cheapest." },
-      { q: "When is collateral liquidated?", a: "At 62.5% debt LTV, about a 27.5% fall from the example's start. Only what is needed to return to 50% is sold, and any surplus is yours. You can add collateral or repay to avoid it." },
+      { q: "How does Borrow work?", a: "You pledge collateral and accept a fixed-price sale of USDC. You spend the USDC, repay within 30 days and take your collateral back. Borrow launches after Trade." },
+      { q: "What does it cost?", a: "The price isn't set yet. Examples use 8% annualized: 36.16 USDC on 5,500 USDC for 30 days. Aave and Morpho's floating rates were lower than the 8% reference when last checked. Sacred's price is fixed for 30 days and avoids interest, so it may not be the cheapest. It can come down with proven demand, more scale and lower verified costs." },
+      { q: "When is collateral liquidated?", a: "At 70% debt LTV on cirBTC, or 65% on WETH. In the cirBTC example that is about a 20.9% fall from the start, when the $10,000 of collateral is worth $7,908.81. Only what is needed to return to 60% is sold: a quarter of the collateral, $1,977.20, leaving $5,931.61 of collateral against $3,558.96 of debt, before sale costs. Any surplus is yours. You can add collateral or repay to avoid it." },
     ],
   },
   {
     group: "Trust",
     items: [
-      { q: "Is Sacred halal?", a: "Sacred is designed around Islamic sale and profit-sharing contracts, and no Shariah board has reviewed it yet. Until one does, Sacred makes no certified claim.", link: { text: "Islamic sale and profit-sharing contracts", href: shariahDocs } },
+      { q: "Is Sacred halal?", a: "Sacred is designed around Islamic sale and profit-sharing contracts, but no Shariah board has reviewed it yet. Until one does, we don't claim it is certified halal.", link: { text: "Islamic sale and profit-sharing contracts", href: shariahDocs } },
       { q: "Do I have to be Muslim?", a: "No. Sacred is open to anyone in a supported country." },
-      { q: "Has Sacred been audited?", a: "Not yet. The Arc Testnet prototype is deployed, but has not had an independent audit. Production contracts will be independently reviewed before launch.", link: { text: "independently reviewed", href: protection } },
+      { q: "Has Sacred been audited?", a: "Not yet. The Arc Testnet prototype is deployed, but has not had an independent audit. Production contracts will be independently reviewed before launch.", link: { text: "independently reviewed", href: "/docs/risk#reviews-and-audits" } },
     ],
   },
 ];
@@ -224,7 +225,7 @@ export const signup = {
 };
 
 export const footer = {
-  note: "Sacred is pre-launch. No Shariah board has reviewed the design, so nothing here is certified halal. Every number is a proposal, a model or a backtest, not a promise. This page is not an offer to sell anything, and products may not be available in your country.",
+  note: "Sacred is pre-launch. No Shariah board has reviewed the design, so nothing here is certified halal. Every number is a proposal, a model or a backtest. None of them is a promise. This page is not an offer to sell anything, and products may not be available in your country.",
   links: [
     { label: "Earn", href: "/earn" },
     { label: "Trade", href: "/trade" },

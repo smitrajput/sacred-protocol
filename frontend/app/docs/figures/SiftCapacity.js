@@ -34,7 +34,7 @@ export default function SiftCapacity() {
   const binding = r.binding === "capital" ? "Your capital binds" : ceiling < curve ? "The vault binds" : "The curve binds";
 
   const rows = [
-    ["Earned ceiling", curve],
+    ["Unlocked ceiling", curve],
     ["Allowed by the vault", vault],
     ["Supported by your capital", r.capitalBound],
     ["Maximum new financing", r.financing],

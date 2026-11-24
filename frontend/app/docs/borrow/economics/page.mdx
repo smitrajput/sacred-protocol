@@ -2,7 +2,7 @@ export const metadata = { title: "Borrow: pricing and reserves" };
 
 # Pricing and reserves
 
-New Borrow offers are priced against the market, aiming at the lowest sustainable borrower price and the highest investor profit share the product can support. **8% with a 75% investor share is the audited reference.** It is not a launch quote. Both launch values are unset until an offer is approved. Sacred has a measurable selection process, not evidence of an optimal or cheapest price.
+New Borrow offers are priced against the market, aiming at the lowest sustainable borrower price and the highest investor profit share the product can support. **8% with a 75% investor share is the audited reference.** It is not a launch quote. Both launch values are unset until an offer is approved. Sacred has a measurable way to pick a price, but no evidence yet that it is the best or cheapest.
 
 These are research scenarios as of 2 November 2026. All of them exclude Trade income, token income and any yield on idle cash.
 
@@ -19,7 +19,7 @@ IRR retention        = min(20% × LP entitlement, max(0, 1% × A − eligible IR
 company operating profit = manager revenue − company operating costs
 ```
 
-IRR is the **investment risk reserve**. It belongs to investors, and it is funded from their profit entitlement. It is not company money and it is not a guarantee.
+IRR is the **investment risk reserve**. It belongs to investors, is funded from their share of profit, and is not company money. It is not a guarantee.
 
 | Of each 100 of distributable profit | 75% reference | 80% candidate |
 | --- | --- | --- |
@@ -27,17 +27,17 @@ IRR is the **investment risk reserve**. It belongs to investors, and it is funde
 | Investor-owned IRR | 15 | 16 |
 | Manager, held in escrow | 25 | 20 |
 
-Once the reserve reaches target, investors receive their full agreed share in cash, and retention resumes only if it is needed. Manager allocations stay in escrow until final vintage true-up, and any overallocation returns to investors. The 5 bps allowance is a budget assumption, not a second cash reserve.
+Once the reserve reaches target, investors receive their full agreed share in cash, and retention resumes only if it is needed. Manager allocations stay in escrow until final vintage true-up, and any overallocation returns to investors. The 5 bps allowance is only a budget assumption. No separate cash is set aside for it.
 
 ## Protection
 
-The target is **1% of approved financing**, including commitments: 0.4% primary and 0.6% tail. Those are two sleeves of one investor-owned stock, and each contribution splits 40/60. Unused approved capacity still needs protection.
+The target is **1% of approved financing**, including commitments: 0.4% primary and 0.6% tail. Both are parts of one investor-owned reserve, and each contribution splits 40/60. Unused approved capacity still needs protection.
 
-The reserve starts empty in the pilot, when the pilot backstop, a small portion of the capital Sacred raises from investors, stands behind it. Growth beyond the pilot needs the full target, and depletion pauses new risk until the stock and any loss are restored. The 1% is a judgment, about 6.2 times the largest modeled operating-stress ES99. It does not cover a day-long outage, as the [risk page](/docs/risk#borrow) shows.
+The reserve starts empty. During the pilot, the pilot backstop (a small part of the money Sacred raises from investors) covers it. Growing past the pilot needs the full target. If the reserve is drawn down, new financing pauses until the reserve and any loss are restored. The 1% is a judgment call, about 3.2 times the largest modeled operating-stress ES99 at the current entry limits of 55% on cirBTC and 50% on WETH. It does not cover a day-long outage, as the [risk page](/docs/risk#borrow) shows.
 
 ## Reference results
 
-**A steady $10m book at the 8%/75% reference**, with $9m approved capacity, $90,000 reserve target, $125,000 yearly costs and a 5 bps allowance. Utilization is a chosen demand sensitivity.
+**A steady $10m book at the 8%/75% reference**, with $9m approved capacity, $90,000 reserve target, $125,000 yearly costs and a 5 bps allowance. The utilization levels are assumed demand scenarios.
 
 | | Strong | Moderate | Weak |
 | --- | ---: | ---: | ---: |
@@ -60,13 +60,13 @@ The reserve starts empty in the pilot, when the pilot backstop, a small portion 
 | Annualized cashflow return | 4.76% | 3.91% | 2.78% |
 | Company cash after costs | $31,027 | $3,493 | −$33,219 |
 
-The $90,000 target is reached on day 352 at 85% use. Lower use needs year two. A full exit returns the stock, leaving zero protection for that departing vintage, and the $10m scenarios cannot use other vintages' reserves.
+The $90,000 target is reached on day 352 at 85% use. Lower use needs year two. A full exit returns the reserve, so the departing vintage is left with no protection. The $10m scenarios can't use other vintages' reserves.
 
-Costs exclude initial development, legal and audits. The company needs $125,000 of first-year funding, because manager allocations sit in escrow, and $187,500 keeps the six-month floor intact.
+Costs exclude initial development, legal and audits. The company needs $125,000 of first-year funding, because manager allocations are held in escrow, and $187,500 keeps the six-month floor intact.
 
 ## The price tradeoff
 
-Raising the investor share moves company revenue. It creates no new income.
+Raising the investor share moves revenue from the company to investors. It adds no new income.
 
 | $10m, 85% use, steady budget | Investor cash APR | Company net | First-vintage company net |
 | --- | ---: | ---: | ---: |
@@ -74,9 +74,9 @@ Raising the investor share moves company revenue. It creates no new income.
 | 7.5% / 80%, conditional candidate | 4.05% | $1,650 | −$7,979 |
 | 6% / 80%, lower-price sensitivity | 3.24% | −$23,850 | −$31,384 |
 
-At 70% use, 7.5%/80% loses $20,700 a year. Lower prices need shown demand, more scale or verified lower costs. The alternative vintage figures are projections, not new liquidation or reserve replays.
+At 70% use, 7.5%/80% loses $20,700 a year. Lower prices need shown demand, more scale or verified lower costs. The alternative vintage figures are projections. The liquidation and reserve replays were not rerun for them.
 
-**New-offer rule.** Compare all-in costs over the same tenor, validate demand, and require conservative company cost coverage for mature offers. A capped pilot deficit must be fully budgeted from company cash with the runway floor intact, never from investor principal or the reserve. Investor share is fixed at vintage subscription and each sale price at acceptance. New quotes never amend old debts or investor rights.
+**New-offer rule.** Compare all-in costs over the same tenor, validate demand, and require conservative company cost coverage for mature offers. A capped pilot deficit must be fully budgeted from company cash, with the runway floor intact. It never comes from investor principal or the reserve. Investor share is fixed at vintage subscription and each sale price at acceptance. New quotes never amend old debts or investor rights.
 
 ## How competitors compare
 
@@ -89,7 +89,7 @@ To compare fairly, normalize an APR as `F × r × 30 / 365` and an APY as `F × 
 | Morpho USDC/WBTC, 30-day mean, 2 Nov 2026 | 5.104% APY | $41.00 |
 | Sacred at 8% / 7.5% / 6% | Fixed once accepted | $65.75 / $61.64 / $49.32 |
 
-Sources: [Aave rate review](https://governance.aave.com/t/risk-stewards-slope2-increases-on-aave-v3-and-aave-v4-2026-10-31/25970), [Morpho market data](https://api.morpho.org/v0/blue/markets/1:0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49/apy-averages). These dated observations are not firm offers. No cheapest-price claim follows from them.
+Sources: [Aave rate review](https://governance.aave.com/t/risk-stewards-slope2-increases-on-aave-v3-and-aave-v4-2026-10-31/25970), [Morpho market data](https://api.morpho.org/v0/blue/markets/1:0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49/apy-averages). These are dated observations and not firm offers, so they don't support any cheapest-price claim.
 
 ## What transfers from other protocols
 

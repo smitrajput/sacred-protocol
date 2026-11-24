@@ -77,6 +77,11 @@ describe("SIFT", () => {
     expect(siftCeiling(400)).toBe(100_000);
   });
 
+  it("starts a brought record on the published curve, below the maximum", () => {
+    expect(SIFT.imported.tiers.map((t) => siftCeiling(t.startDay))).toEqual([10_000, 50_000]);
+    SIFT.imported.tiers.forEach((t) => expect(t.minEquity).toBe(siftCeiling(t.startDay)));
+  });
+
   it("slows percentage growth at each phase", () => {
     const weekly = (from, to) => (siftCeiling(to) / siftCeiling(from)) ** (7 / (to - from)) - 1;
     expect(weekly(0, 14)).toBeCloseTo(3.4721, 3);
@@ -116,15 +121,23 @@ describe("Earn", () => {
 describe("Borrow", () => {
   it("prices the reference sale", () => {
     const q = borrowQuote({ collateral: 10_000 });
-    expect(q.usdc).toBeCloseTo(4_500, 8);
-    expect(q.debt).toBeCloseTo(4_529.59, 2);
-    expect(q.triggerValue).toBeCloseTo(7_247.34, 2);
-    expect(q.priceRoom).toBeCloseTo(0.2753, 4);
+    expect(q.usdc).toBeCloseTo(5_500, 8);
+    expect(q.debt).toBeCloseTo(5_536.16, 2);
+    expect(q.triggerValue).toBeCloseTo(7_908.81, 2);
+    expect(q.priceRoom).toBeCloseTo(0.2091, 4);
+  });
+
+  it("prices the ETH route at its lower limits", () => {
+    const q = borrowQuote({ collateral: 10_000, asset: "ETH" });
+    expect(q.usdc).toBeCloseTo(5_000, 8);
+    expect(q.debt).toBeCloseTo(5_032.88, 2);
+    expect(q.triggerValue).toBeCloseTo(7_742.89, 2);
+    expect(q.priceRoom).toBeCloseTo(0.2257, 4);
   });
 
   it("settles early for the days used", () => {
-    const { settle, rebate } = earlySettlement({ usdc: 4_500, day: 7 });
-    expect(settle).toBeCloseTo(4_506.9, 2);
-    expect(rebate).toBeCloseTo(22.68, 2);
+    const { settle, rebate } = earlySettlement({ usdc: 5_500, day: 7 });
+    expect(settle).toBeCloseTo(5_508.44, 2);
+    expect(rebate).toBeCloseTo(27.73, 2);
   });
 });

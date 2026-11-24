@@ -12,7 +12,7 @@ A position is one genuine sale of one asset to one trader, with the asset pledge
 
 | Party | Puts in | Gets |
 | --- | --- | --- |
-| **Depositors** | USDC, into the MarginVault | 77% of base markup, as variable income. Four layers of backstops stand in front of their principal |
+| **Depositors** | USDC, into the MarginVault | 77% of base markup, as variable income. Their principal is protected by 4 layers of backstops |
 | **Manager** | Its work | 23% of base markup, paying operations first, then protection, then company cash |
 | **Trader** | Their capital now, the balance by maturity | The asset, its full gains and losses, less the agreed price |
 | **Spot market** | Nothing | Where assets are bought and pledged assets are sold |
@@ -86,11 +86,11 @@ Renewal is settlement followed by a genuine new purchase and sale at a new quote
 - Depositor principal and refundable amounts never become protocol protection.
 - Repayment and exit survive origination pauses.
 
-These are design requirements for the proposed engine. The [contracts page](/docs/contracts) separates them from what is built today.
+These are design requirements for the proposed engine. The [contracts page](/docs/contracts) shows which of them are built today.
 
 ## The leverage ladder
 
-All terms are 14 days, mandatory profit share is 0% at every tier, and leverage goes up to 5×. Higher tiers are gradually opened as their protection is earned and Shariah rulings approved.
+All terms are 14 days, mandatory profit share is 0% at every tier, and leverage goes up to 5×. Higher tiers open gradually as their protection is funded and Shariah rulings are approved.
 
 | Leverage | Financed APR | Normal depositor share | Trigger / restore | Initial price room | Primary + tail stock | Cap on approved financing |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -102,7 +102,7 @@ All terms are 14 days, mandatory profit share is 0% at every tier, and leverage 
 | 4.5× | 18.0% | 65.00% | 116% / 125% | 9.1% | 6.5% + 10.5% = 17.0% | 4.5× and up: 2.5% |
 | 5× | 20.0% | 63.50% | 115% / 123% | 7.2% | 6.5% + 10.5% = 17.0% | 5×: 1% |
 
-`normal depositor share = (0.077 + 0.5 × (APR − 0.10)) / APR`. Stock ratios apply to approved financing, not asset notional or revenue. Caps overlap and count current exposure and committed financing. Rates and triggers are policy choices informed by replay, not a fitted commercial optimum. The 3× trigger at 130% gives traders more price room than 135%, and its 9% stock pays for the resulting stress exposure.
+`normal depositor share = (0.077 + 0.5 × (APR − 0.10)) / APR`. Stock ratios are measured against approved financing. Caps overlap and count current exposure and committed financing. Rates and triggers are policy choices guided by replay, and have not been optimized commercially. The 3× trigger at 130% gives traders more price room than 135%, and its 9% stock pays for the resulting stress exposure.
 
 ## Not in this design
 

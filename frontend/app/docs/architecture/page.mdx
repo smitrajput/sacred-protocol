@@ -22,7 +22,7 @@ This page is the proposed system: two isolated vaults on Arc, with shared librar
 
 ## Isolation
 
-**MarginVault** holds Earn deposits, BTC and ETH debt books, tier and vintage accounting, and earned protection. **CashFinanceVault** holds Borrow investors, receivables, investor-owned reserves, queues, loss carry and its emergency permissions.
+Earn deposits fund both products, through two vault contracts. **MarginVault** holds the Earn deposits that fund Trade, BTC and ETH debt books, tier and vintage accounting, and protection cash. **CashFinanceVault** holds the Earn deposits that fund Borrow (its depositors are called investors), receivables, investor-owned reserves, queues, loss carry and its emergency permissions. A depositor chooses the vault for each allocation.
 
 Shared: reviewed libraries, token adapters, validated feeds, keeper and routing infrastructure, notifications, monitoring and UI. Neither vault gets spending approval over the other. No token or cross-product subsidy enters either forecast. Trade forecasts assume **zero** Borrow income.
 
@@ -35,9 +35,9 @@ Shared: reviewed libraries, token adapters, validated feeds, keeper and routing 
 3. **Score engine** computes the weekly [SIFT](/docs/trade/sift) skill label from canonical state. A separate daily transition reads the published ceiling table and repayment checkpoints.
 4. **Capacity controller** enforces account and portfolio limits on every origination, counting pending commitments before external calls.
 5. **Permissionless keepers** supply deterministic checkpoints and trigger reviews and partial sales. They cannot choose a score or rewrite accounting.
-6. **Indexer and UI** display. They have no allocation authority.
+6. **Indexer and UI** only display results. They cannot allocate financing.
 
-Liquidation and settlement do not read the score. Coverage alone triggers a partial sale.
+Liquidation and settlement ignore the score. Coverage alone triggers a partial sale.
 
 **Vault accounting.** Approved financing, including commitments, is checked against the 95% NAV cap. Originations stop at the 5% idle floor. New financing needs temporary purchase cash of `L/(L−1)` times the financing. Queued withdrawals rank ahead. Risk capacity is weighted:
 
@@ -64,7 +64,7 @@ Debt is integer **six-decimal USDC**. Arc's native USDC uses 18 decimals for the
 | --- | --- | --- |
 | **Timelocked governance** | Change future policy within limits. Borrow risk increases wait 35 days | Change an existing sale or vintage entitlement |
 | **Emergency guardian** | Tighten limits or pause new risk | Award more credit, delete a loss, or stop repayment and safe exits |
-| **Keepers** | Checkpoints, reviews, partial sales, within bounded quotes | Set prices, choose scores, take surplus |
+| **Keepers** | Checkpoints, reviews, partial sales, within quote limits | Set prices, choose scores, take surplus |
 | **Manager** | Run the vaults, set new offers | Spend protection on operations, or use depositor principal as protection |
 
 Rule and version hashes are persisted, and every capacity change emits a versioned event.

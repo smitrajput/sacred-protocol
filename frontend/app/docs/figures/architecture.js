@@ -12,8 +12,8 @@ export function Vaults() {
       w={760}
       h={300}
       min={680}
-      label="MarginVault funds Trade and holds depositors, debts, vintages and earned protection. CashFinanceVault funds Borrow and holds investors, sales, investor reserves and loss carry. Both use shared libraries, adapters, keepers and UI, but neither can spend from the other."
-      caption="One financing vision, two isolated balance sheets. Shared libraries share code, not losses: neither vault has a spending approval over the other."
+      label="Earn deposits fund both vaults. MarginVault funds Trade and holds depositors, debts, vintages and protection cash. CashFinanceVault funds Borrow and holds its 12-month depositors, sales, investor reserves and loss carry. Both use shared libraries, adapters, keepers and UI, but neither can spend from the other."
+      caption="One Earn, two isolated balance sheets. The vaults share code, losses stay in the vault that made them, and neither can spend from the other."
     >
       <rect x={10} y={10} width={350} height={150} rx="2" className={styles.ghost} />
       <text x={24} y={30} className={styles.big}>
@@ -21,13 +21,13 @@ export function Vaults() {
       </text>
       <Text x={24} y={46} anchor="start" lines="Earn deposits fund Trade" className={styles.sub} />
       <Box x={24} y={60} w={158} h={86} title="BTC and ETH debt books" sub={["tier and vintage accounting", "weighted risk capacity"]} />
-      <Box x={190} y={60} w={158} h={86} title="Earned protection" sub={["manager-owned cash", "primary and tail"]} />
+      <Box x={190} y={60} w={158} h={86} title="Protection cash" sub={["manager-owned cash", "primary and tail"]} />
 
       <rect x={400} y={10} width={350} height={150} rx="2" className={styles.ghost} />
       <text x={414} y={30} className={styles.big}>
         CashFinanceVault
       </text>
-      <Text x={414} y={46} anchor="start" lines="12-month investors fund Borrow" className={styles.sub} />
+      <Text x={414} y={46} anchor="start" lines="12-month Earn deposits fund Borrow" className={styles.sub} />
       <Box x={414} y={60} w={158} h={86} title="USDC sales" sub={["vintage records", "route and maturity caps"]} />
       <Box x={580} y={60} w={158} h={86} title="Investment risk reserve" sub={["investor-owned", "primary and tail sleeves"]} />
 
@@ -79,11 +79,11 @@ export function Engine() {
 // ---- The order a Trade shortfall is absorbed in ----
 
 const layers = [
-  ["The trader's capital", "it sits under the financing"],
-  ["Primary protection", "earned manager cash, target 0.4% of approved financing"],
-  ["Tail protection", "earned manager cash, target 0.6% of approved financing"],
+  ["The trader's capital", "takes the first loss"],
+  ["Primary protection", "markup-share of manager cash, up to 0.4% of approved financing"],
+  ["Tail protection", "markup-share of manager cash, up to 0.6% of approved financing"],
   ["Pilot backstop", "capital set aside from Sacred's raise for the pilot phase"],
-  ["Every depositor of the vault", "in proportion, through active NAV"],
+  ["Every depositor of the vault", "shared by deposit size, through active NAV"],
 ];
 
 export function LossOrder() {
@@ -93,7 +93,7 @@ export function LossOrder() {
       h={250}
       min={540}
       label="A shortfall is absorbed in order by the trader's capital, primary protection, tail protection and the pilot backstop. Only what is left reaches depositors, through active NAV."
-      caption="When a pledged asset falls, the loss moves through these layers in order. Four layers stand in front of depositor principal."
+      caption="When a pledged asset falls, the loss moves through these layers in order. 4 layers come before depositor principal."
     >
       <Text x={10} y={26} anchor="start" lines="A loss" className={styles.big} />
       <Text x={10} y={44} anchor="start" lines={["what one layer", "cannot cover", "falls to the next"]} className={styles.sub} />

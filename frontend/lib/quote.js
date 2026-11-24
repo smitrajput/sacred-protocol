@@ -40,11 +40,12 @@ export const effectiveCeiling = ({ q, nav }) => Math.min(siftCeiling(q), SIFT.ac
 
 // A Borrow sale at the reference price. Debt is fixed at the sale; settling early pays only for
 // the days used under the proposed binding rebate.
-export function borrowQuote({ collateral, ltv = BORROW.entryLtv, apr = BORROW.referenceApr, days = BORROW.termDays }) {
-  const usdc = collateral * ltv;
+export function borrowQuote({ collateral, asset = "BTC", apr = BORROW.referenceApr, days = BORROW.termDays }) {
+  const { entryLtv, liquidationLtv } = BORROW.collateral[asset];
+  const usdc = collateral * entryLtv;
   const markup = (usdc * apr * days) / YEAR_DAYS;
   const debt = usdc + markup;
-  const triggerValue = debt / BORROW.liquidationLtv;
+  const triggerValue = debt / liquidationLtv;
   return { collateral, usdc, markup, debt, triggerValue, priceRoom: 1 - triggerValue / collateral, debtLtv: debt / collateral };
 }
 

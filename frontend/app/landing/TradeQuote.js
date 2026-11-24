@@ -67,10 +67,10 @@ export default function TradeQuote() {
       </label>
 
       <dl className={shared.rows}>
-        <Row label={`${asset} exposure`} value={usd(q.exposure)} />
         <Row label="Financing" value={usd(q.financing)} />
+        <Row label={`${asset} exposure`} value={usd(q.exposure)} />
         <Row label="Fixed markup, 14 days" value={usd(q.markup)} />
-        <Row label="Estimated execution" value={usd(q.execution)} />
+        <Row label="Est. trading costs (buy + sell)" value={usd(q.execution)} />
         <Row label="Share of your profit" value="None" />
         <Row label="Total cost at constant price" value={usd(q.totalCost)} total />
       </dl>
@@ -81,9 +81,9 @@ export default function TradeQuote() {
       </p>
       <p className={shared.note}>
         {earned
-          ? `This needs $${usd(q.financing, 0)} of earned financing. New accounts start at $${usd(SIFT.starterCeiling, 0)}.`
+          ? `This needs $${usd(q.financing, 0)} of unlocked financing. New accounts start at $${usd(SIFT.starterCeiling, 0)}, or higher with a verified record from another venue.`
           : "Within the Starter ceiling for a new account."}{" "}
-        {rung > 0 && `${higherTiers} `}Proposed terms. Execution costs are assumptions, not measured fills.
+        {rung > 0 && `${higherTiers} `}Proposed terms. Trading costs are assumptions.
       </p>
     </div>
   );

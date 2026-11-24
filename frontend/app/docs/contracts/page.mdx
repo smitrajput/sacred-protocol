@@ -5,7 +5,7 @@ export const revalidate = 60;
 
 # Contracts and code
 
-Two systems appear in these docs, and only one exists.
+These docs describe two systems. Only one of them exists today.
 
 | | Proposed | Existing |
 | --- | --- | --- |
@@ -14,7 +14,7 @@ Two systems appear in these docs, and only one exists.
 | **Economics** | Everything in these docs | The first design's dials, listed below |
 | **Status** | Specified, not built | Verified on block explorers. Not audited |
 
-**The proposed engine is pending implementation.** It has no addresses, no tests and no audit. The controls in [Architecture](/docs/architecture) are requirements, not code. The inspected `contracts/src/Desk.sol` is a term-mode implementation and not this system. No test count below applies to it.
+**The proposed engine is not built yet.** It has no addresses, no tests and no audit. The controls in [Architecture](/docs/architecture) are written requirements with no code behind them yet. `contracts/src/Desk.sol` is the existing term-mode implementation, a different system. None of the test counts below apply to the proposed engine.
 
 The rest of this page documents the existing deployment.
 
@@ -22,7 +22,7 @@ The rest of this page documents the existing deployment.
 
 ### Arbitrum One
 
-Token side, from the earlier design. It plays no part in the current product, and the token is a placeholder that is not on offer.
+Token side, from the earlier design. It has no role in the current product. The token is a placeholder and is not for sale.
 
 | Contract | Address |
 | --- | --- |
@@ -55,7 +55,7 @@ ETH desk and its vault (WETH, 2x max)
 
 ### Monad testnet
 
-Monad testnet (chain 10143): the same contracts, deployed by `script/DeployMonadTestnet.s.sol` on 2026-10-14 and verified on MonadScan. Every SCR-side contract but the pool hook sits at the same address as on Arbitrum One. The testnet has no native USDC, WBTC or WETH, no Chainlink feeds and no Uniswap v3, so the desks trade against test stand-ins: tokens anyone can mint, price feeds anyone can set (seeded at BTC $83,180 and ETH $2,499 from Chainlink on Arbitrum One), and a router that swaps at the set price. The oracles accept a year-old price, since the feeds only move when someone sets them. The SCR pool runs on the Monad-maintained Uniswap v4 `PoolManager`. Testnet prices are not a reference.
+Monad testnet (chain 10143): the same contracts, deployed by `script/DeployMonadTestnet.s.sol` on 2026-10-14 and verified on MonadScan. Every SCR-side contract except the pool hook has the same address as on Arbitrum One. The testnet has no native USDC, WBTC or WETH, no Chainlink feeds and no Uniswap v3, so the desks trade against test stand-ins: tokens anyone can mint, price feeds anyone can set (seeded at BTC $83,180 and ETH $2,499 from Chainlink on Arbitrum One), and a router that swaps at the set price. The oracles accept a year-old price, since the feeds only move when someone sets them. The SCR pool runs on the Monad-maintained Uniswap v4 `PoolManager`. Don't use testnet prices as a reference.
 
 Token side, from the earlier design
 
@@ -107,7 +107,7 @@ Test stand-ins
 
 The deployed version pairs a vault with each desk, so two vaults exist.
 
-Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new positions and new deposits, and cannot unpause. Exits are never pausable by anyone.
+Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a multisig can propose to and execute from. A guardian can pause new positions and new deposits but cannot unpause them. No one can pause exits.
 
 ## The rules the existing code keeps, and where each is tested
 
@@ -126,7 +126,7 @@ Ownership is an OpenZeppelin `TimelockController` with a 2-day delay that only a
 
 ## Deployed dials
 
-The values the existing code carries. Current design parameters are on the product pages and in `frontend/lib/params.js`.
+The values set in the existing code. Current design parameters are on the product pages and in `frontend/lib/params.js`.
 
 | Dial | Deployed |
 | --- | --- |

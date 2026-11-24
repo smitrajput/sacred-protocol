@@ -42,7 +42,7 @@ export function Penetration() {
       h={352}
       min={640}
       label="Four markets in a grid. Finance, 468 trillion, has 0.02% on chain in DeFi, 93 billion. Islamic finance, 5.98 trillion, is 1.3% of finance and has 0.0008% on chain in Islamic DeFi, under 50 million. Islamic DeFi is 25 times further behind its parent than DeFi is, and 25 times short of the 1.2 billion that Islamic finance's share of DeFi would be."
-      caption="How much of each market has moved on chain, and how far each sits from the one beside it. Red marks the two gaps Sacred is built to close: Islamic DeFi against its parent, and Islamic DeFi against DeFi. Sources: DefiLlama, October 2026; McKinsey, 2025; ICD-LSEG, 2024; Pew, 2020 data."
+      caption="How much of each market has moved on chain, and how far each is from the one beside it. Red marks the two gaps Sacred is built to close: Islamic DeFi against its parent, and Islamic DeFi against DeFi. Sources: DefiLlama, October 2026; McKinsey, 2025; ICD-LSEG, 2024; Pew, 2020 data."
     >
       {/* Column heads */}
       <Text x={midX(L)} y={T - 22} lines="OFF CHAIN" className={styles.sub} />

@@ -12,20 +12,22 @@ Your funds are protected by 4 layers of backstops before a loss touches your pri
 
 <LossOrder />
 
-Each pool stands alone. A loss in Earn's vault reaches neither Borrow's pool nor the company's operating cash. Borrow has its own four layers: the borrower's collateral, the primary and tail reserve sleeves, and the pilot backstop during its pilot.
+Primary and tail protection are cash pots Sacred fills from its 23% share of the markup, after essential operating costs. At the 2× tier they are sized at 0.4% and 0.6% of approved financing, which is the total the vault has committed to finance, used or not, since unused capacity can be drawn at any time. For example, $9.5m approved means $38,000 primary and $57,000 tail. In the model they take about 15 months to fill at $10m and 90% use.
 
-**Protection does not start at zero.** The pilot backstop, a small portion of the capital Sacred raises from investors, protects the pilot phase of both Earn and Borrow while primary and tail protection build.
+**The pilot backstop covers the start.** A small part of the money Sacred raises from investors protects Earn and Borrow during the pilot, while primary and tail protection fill up.
 
-Four controls sit around that order:
+Earn funds Trade and Borrow through two separate vault contracts. A loss in the Trade vault can't touch the Borrow vault or the company's operating cash, and the reverse holds too. The Borrow vault has its own 4 layers: the borrower's collateral, the primary and tail reserve sleeves, and the pilot backstop during its pilot.
+
+On top of that order, 4 controls apply:
 
 | | |
 | --- | --- |
 | **Wallet control** | You hold your own keys, through an embedded wallet you can export or a wallet you connect |
-| **Contract security** | New contracts go through independent review before launch, followed by a small bounded pilot |
-| **Collateral controls** | Pledged assets are never lent, staked or reused. Coverage limits, price checks and depth caps govern every sale |
+| **Contract security** | New contracts go through independent review before launch, followed by a small, capped pilot |
+| **Collateral controls** | Pledged assets are never lent, staked or reused. Coverage limits, price checks and depth caps control every sale |
 | **Withdrawal conditions** | Withdrawals rank ahead of new financing. Earn pays from idle cash, then a daily queue. Repayment and exit stay open during pauses |
 
-The layers absorb trading losses. Failures of a contract, an oracle, USDC or the chain sit outside them, and are listed under [known risks](#known-risks-across-all-three-products).
+The layers cover trading losses. They do not cover a failure of a contract, an oracle, USDC or the chain. Those are listed under [known risks](#known-risks-across-all-three-products).
 
 ### Reviews and audits
 
@@ -45,7 +47,7 @@ Three kinds of number appear below and they are different things:
 | **Planning allowance** | A budget line for expected loss | 5 bps a year on financing |
 | **Policy cushion** | Cash chosen to absorb losses | 1% of approved financing |
 
-None of them is a statistically certified lifetime guarantee. Nothing here was run on Arc. The results are price history from centralized exchanges.
+None of them is a guarantee. All results use price history from centralized exchanges, and nothing here was run on Arc.
 
 ## Earn and Trade
 
@@ -65,7 +67,7 @@ Stocks are chosen from `1.10 × the larger one or three-month-block four-hour an
 
 ### The full hourly history
 
-Binance BTC and ETH, January 2018 to September 2026, about 76,000 overlapping 14-day cohorts per asset and configuration. Missing timestamps are kept as outages, so adverse windows are not deleted.
+Binance BTC and ETH, January 2018 to September 2026, about 76,000 overlapping 14-day cohorts per asset and configuration. Missing timestamps are kept as outages, so bad windows stay in.
 
 | Scenario, 2× | Result |
 | --- | --- |
@@ -83,7 +85,7 @@ Normal annual principal-loss rates are zero at 2× and 2.5×, and about 0.107%, 
 
 ### The realistic-delay panel
 
-224 re-verified minute archives: 105 systematic monthly dates plus seven stress dates, for each asset. Each observation starts hypothetically exactly at the trigger and takes the worst fall over the detection minute plus five more, with 1% exit friction. It is a gap test, not a continuous replay or a liquidation frequency.
+224 re-verified minute archives: 105 systematic monthly dates plus seven stress dates, for each asset. Each observation starts at the trigger and takes the worst fall over the detection minute plus five more, with 1% exit friction. It shows how bad a fast drop could be, not how often sales happen.
 
 | Maximum shortfall on stress dates | BTC | ETH |
 | --- | ---: | ---: |
@@ -91,17 +93,17 @@ Normal annual principal-loss rates are zero at 2× and 2.5×, and about 0.107%, 
 | 4× at 120% | 1.07% | 4.80% |
 | 5× at 115% | 5.19% | 8.77% |
 
-The largest stress-date gaps were 16.71% on BTC and 19.85% on ETH. Every tier had zero hypothetical shortfall on the systematic dates. Windows are not independent, and these frequencies cannot be annualized.
+The largest stress-date gaps were 16.71% on BTC and 19.85% on ETH. Every tier had zero shortfall on the systematic dates. The windows overlap, so these results can't be read as yearly odds.
 
 ### A saturated mix
 
-At the most concentrated mix the caps allow, with correlated losses summed before aggregation, worst rolling annual loss is 0.186% in the one-hour case and 0.856% in the four-hour case, against total approved capacity. ES99 is 0.336% and 1.489%. The 2.6% stock exceeds those modeled cases. The 24-hour emergency still loses 16.53% in the worst historical rolling year.
+At the most concentrated mix the caps allow, counting correlated losses together, the worst rolling annual loss is 0.186% in the one-hour case and 0.856% in the four-hour case, against total approved capacity. ES99 is 0.336% and 1.489%. The 2.6% stock covers those modeled cases. The 24-hour emergency still loses 16.53% in the worst historical rolling year.
 
-Month resampling produced 30,000 one-year paths from 103 complete months. Those are not 30,000 independent years.
+Month resampling produced 30,000 one-year paths from 103 complete months, so the paths reuse the same history.
 
 ### What SIFT adds, and what it does not
 
-Account-level limits sit on top of the position-level ones, and they answer different questions.
+Account-level limits are added on top of the position-level ones, and they measure different things.
 
 | | Coverage | Account drawdown |
 | --- | --- | --- |
@@ -109,42 +111,52 @@ Account-level limits sit on top of the position-level ones, and they answer diff
 | **Trigger** | 160% at 2× | 10% pauses growth, 20% halves capacity, 30% freezes it |
 | **Effect** | Partial sale of the asset | Less or no new financing. Existing sales unchanged |
 
-- **Common shocks.** Many wallets buying BTC are one correlated liquidation. A transparent score cannot replace aggregate asset and route limits. Production limits must come from execution evidence, and 1%-of-financing protection is not a bound on an arbitrary crash.
+- **Common shocks.** Many wallets buying BTC can all be liquidated together. Aggregate asset and route limits are still needed, whatever the score says. Production limits must come from real execution data. The 1%-of-financing protection is not enough for every possible crash.
 - **Sticky limits.** Risk ceilings and freezes have no automatic recovery in v1.
-- **Identity.** Wallet splitting is limited by no double pledge, one newcomer budget and aggregate caps, not by knowing who is who.
-- **Oracles.** Canonical daily prices and rounds are versioned settings still to be chosen. Stale or missing data fails closed for new financing.
+- **Identity.** Wallet splitting is limited by no double pledge, one newcomer budget and aggregate caps. There is no identity check.
+- **Brought records.** A record from another venue can start an account at up to $50,000. It can be bought, rented or picked from several accounts, and exchange records rest on an attester. The trader's own capital beneath the financing, a 10% budget for unconfirmed records and the first repayment checkpoint limit the damage. None of this is tested.
+- **Oracles.** Canonical daily prices and rounds are versioned settings still to be chosen. Stale or missing data stops new financing.
 - **Selection can backfire.** Aggressive selection can leave capital idle and reduce income.
 
 ## Borrow
 
-Borrow's policy is **45% entry, 62.5% liquidation and 50% restoration**, the last two measured against full contractual debt. The 62.5% and 50% figures are controls chosen by judgment. The tests below describe how they behaved against history.
+Borrow's policy is set per collateral, with liquidation and restoration measured against full contractual debt:
+
+| Collateral | Entry | Liquidation | Restoration |
+| --- | ---: | ---: | ---: |
+| cirBTC | **55%** | **70%** | **60%** |
+| WETH | **50%** | **65%** | **55%** |
+
+These levels are judgment calls. They replaced a single 45% / 62.5% / 50% policy on 24 November 2026, to give borrowers more USDC per dollar of collateral. The tests below were rerun with the same model for the new levels, with every sale opened at its limit. The rerun has not been independently audited, and the Bybit and minute-gap checks were not repeated.
 
 | Test, 2018 to 2026, 30-day sales at 8% | BTC annual loss on financing | ETH annual loss on financing | Equal book |
 | --- | ---: | ---: | --- |
 | Binance one hour, 0.1% friction | 0 | 0 | No shortfall |
-| Binance four-hour path, 3% | 0 | 0 | No shortfall |
-| OKX four-hour path, 3% | 0 | 0.02462% | Worst year **0.101%**, ES99 **0.162%** |
-| Binance 24-hour path, 5% | 1.4886% | 1.5044% | Worst year **12.24%**, ES99 **18.55%** |
+| Binance four-hour path, 3% | 0 | 0.0002% | Worst year **0.0009%**, ES99 **0.0014%** |
+| OKX four-hour path, 3% | 0 | 0.0488% | Worst year **0.195%**, ES99 **0.313%** |
+| Binance 24-hour path, 5% | 2.1838% | 2.2398% | Worst year **17.14%**, ES99 **26.34%** |
 
-Sources are Binance, OKX and Bybit, with sampled minute gaps. Kraken lacks comparable history and no replay is claimed for it. The Bybit window excludes March 2020. At the 62.5% trigger, gross collateral is 1.6 times full debt, leaving 37.5% of further price fall before debt exceeds collateral, less slippage and costs.
+Sources are Binance and OKX hourly history. Kraken lacks comparable history and no replay is claimed for it. At the cirBTC trigger of 70%, gross collateral is 1.43 times full debt, leaving 30% of further price fall before debt exceeds collateral, less slippage and costs. At the WETH trigger of 65% the figures are 1.54 times and 35%.
 
-**What the 1% reserve covers.** It is about 6.2 times the four-hour ES99, which is a judgment margin. The day-long emergency would need about 19% of financing, so it remains uncovered. Investors bear it.
+**What the higher limits cost.** Against the earlier 45% policy, the four-hour OKX ES99 about doubles, from 0.162% to 0.313%, and the day-long ES99 rises from 18.55% to 26.34%. Borrowers at the limit are liquidated about twice as often on BTC. A 60% entry limit is excluded: in the four-hour case it either lost principal or left under 14% of price room before liquidation.
 
-**Sale frequency.** In healthy-repayment replay, 8.99% of BTC and 19.31% of ETH daily cohorts saw a price liquidation.
+**What the 1% reserve covers.** It is about 3.2 times the four-hour ES99, down from 6.2 times under the earlier policy. The margin is chosen by judgment. The day-long emergency would need about 26% of financing, so the reserve does not cover it. Investors bear that loss.
+
+**Sale frequency.** In healthy-repayment replay, 17.85% of BTC and 25.67% of ETH daily cohorts saw a price liquidation, up from 8.99% and 19.31% under the earlier policy.
 
 **Route controls.** A route's fixed-debt book cannot exceed 25% of independently measured USDC bid depth within five minutes at 1% slippage. Common bridge, oracle or custodian exposure counts together.
 
 **Maturity concentration.** At most 5% of approved financing due in one day, and 30% in seven.
 
-**Price controls.** New-risk pricing must be 60 seconds fresh or better, with two independently operated cross-checks. Over 1% disagreement, or USDC outside 0.98 to 1.02, freezes new risk. Debt health prices USDC at `max(1, validated USDC/USD)`, so a depeg cannot create borrowing power. Repayment and top-ups stay open. Enforcement needs valid prices and bounded quotes.
+**Price controls.** New-risk pricing must be 60 seconds fresh or better, with two independently operated cross-checks. Over 1% disagreement, or USDC outside 0.98 to 1.02, freezes new risk. Debt health prices USDC at `max(1, validated USDC/USD)`, so a depeg cannot create borrowing power. Repayment and top-ups stay open. Enforcement needs valid prices and quotes within limits.
 
-**Governance.** Risk increases carry a 35-day timelock, apply prospectively and stay within the mandate. Reductions and pauses can be immediate.
+**Governance.** Risk increases have a 35-day timelock, apply prospectively and stay within the mandate. Reductions and pauses can be immediate.
 
 ## Known risks across all three products
 
 | Risk | What could happen | What limits it |
 | --- | --- | --- |
-| Contract bug | Loss of deposits or pledged assets | Audits, caps and a bounded pilot. No audit has happened |
+| Contract bug | Loss of deposits or pledged assets | Audits, caps and a capped pilot. No audit has happened |
 | Stale or wrong price | Bad sales, or new risk at a wrong price | Freshness and cross-checks. Enforcement needs valid prices |
 | Thin Arc markets | Sales fail or fill badly | Depth caps and route limits. Arc depth is unmeasured, and a route is at zero capacity until proven |
 | Keeper delay | Sales arrive late | A 60-second target, unmeasured. Keepers are permissionless |
@@ -152,7 +164,7 @@ Sources are Binance, OKX and Bybit, with sampled minute gaps. Kraken lacks compa
 | USDC freeze or depeg | Circle can block an address. A depeg hits every pool | New-risk bands. Nothing inside the design fixes a freeze |
 | Arc outage | No sales or exits during a halt | Nothing inside the design |
 | Withdrawal wait | Earn depends on settlement. Borrow investors are committed for 12 months | Withdrawal priority, idle floors and maturity limits |
-| Admin keys | A captured key changes future settings | Timelocks, bounded limits, and pauses that protect exits |
+| Admin keys | A captured key changes future settings | Timelocks, hard limits, and pauses that protect exits |
 | Regulation | Eligibility differs by country. Leverage is restricted in some, including Türkiye | Legal review before each market |
 | Shariah | A board declines a key structure | The design changes. See [Shariah](/docs/shariah) |
 
@@ -162,4 +174,4 @@ Sources are Binance, OKX and Bybit, with sampled minute gaps. Kraken lacks compa
 - Real borrower repayment and real trader behavior.
 - Depositor willingness to accept conservation terms.
 - Anything a professional audit would find.
-- A crash worse than the history above. The past does not bound the future.
+- A crash worse than the history above, which can happen.

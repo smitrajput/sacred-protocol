@@ -3,41 +3,78 @@ import SiftCapacity from "../../figures/SiftCapacity";
 
 export const metadata = { title: "SIFT" };
 
-# SIFT: capital follows evidence
+# SIFT
 
-**SIFT means Skill-Informed Financing Tiers.** It decides how much financing each trader can use, from what they actually do with real capital. It is what Sacred's revenue rests on: financing earns only when it is in use and repaid, so the quality of who holds it decides what depositors and the protocol keep.
+**SIFT means Skill-Informed Financing Tiers.** A permissionless, onchain evidence-based capital allocation algorithm that decides how much financing each trader can use, based on what they actually do with real capital. Sacred's revenue depends on it: financing only makes money when it is in use and repaid, so who holds it decides what depositors and the protocol keep.
 
-SIFT allocates Sacred financing through real trading evidence. Traders contribute their own capital and begin with a small financing ceiling. Qualifying funded activity and successful repayment can earn $10,000 in two weeks, $50,000 in six weeks and $100,000 in twelve weeks. Percentage growth slows as capacity rises, and longer performance history informs the skill ranking. Every new financing request remains subject to the trader's fresh capital, available liquidity and protocol risk limits. Limits contract when actual economics or risk deteriorate. There is no paid challenge or simulated trading stage.
+SIFT allocates Sacred financing based on real trading results. There are two ways to start. A trader with a verified record on another venue, such as Hyperliquid, Binance or Bybit, can bring it and start at $10,000 or $50,000 of financing. Anyone else puts in their own capital and starts with a small ceiling, with no record and no permission needed. From either start, qualifying funded activity and successful repayment grow the ceiling along one published curve: from zero, $10,000 in two weeks, $50,000 in six weeks and $100,000 in twelve weeks. Percentage growth slows as capacity rises, and a longer track record feeds the skill ranking. Every new financing request still needs the trader's fresh capital, available liquidity and room under protocol risk limits. Limits shrink when the account's economics or risk get worse. There is no paid challenge or simulated trading stage.
 
-SIFT learns by updating account state from new observations under published rules. It changes dollar financing capacity and never leverage. Higher tiers open on their own terms.
+SIFT updates each account from new observations under published rules. It changes how many dollars of financing you can use. It never changes leverage, which opens tier by tier on separate terms.
 
-This is a proposed design. Its mechanics are tested on synthetic inputs, and the margin engine that would run it is not built. Whether it improves returns is what a live pilot has to show.
+This is a proposed design. Its mechanics are tested on synthetic inputs, and the margin engine that would run it is not built. A live pilot has to show whether it improves returns.
 
 <SiftLoop />
 
+## Two ways to start
+
+| | Build it here | Bring your record |
+| --- | --- | --- |
+| **Who it suits** | Anyone, with no history at all | Traders with a record on another venue |
+| **Starting ceiling** | $500 | $10,000 or $50,000 |
+| **What you show** | Nothing up front. Each qualifying day at Sacred adds to the record | The complete history of an outside account, verified |
+| **Path to $100,000** | 12 weeks at the fastest | 10 weeks from $10,000, 6 weeks from $50,000 |
+| **Permission** | None | None for onchain venues. Exchange records need an attestation |
+
+Both paths run on the same curve. A brought record sets the day you start on. It replaces the early weeks of building, and nothing else: the daily tests, repayment checkpoints, drawdown cuts and hard limits below apply to every account alike.
+
+### Bringing a record
+
+A record places you on the curve at day 14 or day 42. These thresholds are proposed and have not been tested:
+
+| Starting ceiling | Starts at curve day | Record length | Average account equity |
+| ---: | ---: | --- | ---: |
+| $10,000 | 14 | 90 days or more | $10,000 or more |
+| $50,000 | 42 | 180 days or more | $50,000 or more |
+
+Every record must also meet these:
+
+- **The whole account.** The venue's complete history for that account is read, including losing trades, fees and funding. You cannot submit selected trades.
+- **Net positive with controlled risk.** Positive after all costs over the window, with a drawdown from peak under 20%.
+- **Recent.** At least one trade in the last 30 days.
+- **Used once.** One record backs one Sacred account.
+
+**How a record is verified.** For onchain venues such as Hyperliquid and other DEXes, you sign a message with the wallet that traded, and the history is read from public data. No one's approval is needed. For exchanges such as Binance, Bybit and OKX, you give a read-only API key or a cryptographic proof of your account statement, and an attester checks it and posts the result onchain. That attester is a trust assumption, and it is limited: it can only place an account on a published starting day, never above day 42.
+
+**The last step is earned at Sacred.** A brought record cannot start above $50,000. Reaching $100,000 takes 42 more qualifying days and three repayment checkpoints at Sacred.
+
+**A brought ceiling is provisional.** The first repayment checkpoint after you start confirms it: at day 28 for a $10,000 start, needing $5,000 of fully repaid principal, and at day 56 for a $50,000 start, needing $25,000. If that checkpoint fails, the ceiling returns to the Starter level and the account builds from there.
+
+**What a record cannot show.** It cannot prove that the account belongs to the person presenting it, that it was not bought or rented, or that the same trader has no losing accounts elsewhere. It says nothing about repayment at Sacred. So the protections do not rely on it: your own capital still sits beneath every dollar of financing, and the account, vault and portfolio caps hold whatever the record says.
+
 ## What we took from prop trading, and what we left out
 
-Prop firms spent years working out how to hand capital to traders without being wrecked by them. That discipline is the most useful thing in the industry. Its weakness is the setting: most funded-trader programs now evaluate people in simulated accounts, paid for with challenge fees.
+Prop firms spent years working out how to hand capital to traders without being wrecked by them. That discipline is the most useful thing in the industry. The problem is where it is applied: most funded-trader programs now test people in simulated accounts, paid for with challenge fees.
 
-SIFT keeps the discipline and replaces the setting.
+SIFT keeps the discipline and applies it to real capital.
 
 | Practice | Where it comes from | What SIFT does with it |
 | --- | --- | --- |
 | Separate skill, risk and capacity | [Darwinex](https://help.darwinex.com/risk-adjustment-attribute) scores a track record apart from [the size a strategy can absorb](https://help.darwinex.com/capacity-attribute) | Three separate questions: does the record merit trust, how much can this account hold, is liquidity available right now |
 | Require evidence at size, cut the same day | [Topstep's live program](https://help.topstep.com/en/articles/11748475-dynamic-live-risk-expansion) requires time at a tier and removes limits immediately when results fall | Capacity grows one qualifying day at a time, with repayment checkpoints at size. Risk reductions apply at once |
 | Grow in steps | [FTMO](https://ftmo.com/en/reward-growth-and-scaling-plan/) scales 25% every four months on simulated accounts | The same idea on real positions, at a far faster pace that tapers as exposure rises |
-| Publish the rules and states | [Hypernova](https://hypernova.xyz/) and [Bungee](https://github.com/SocketDotTech/bungee-funded-perps-faq/blob/main/FAQ.md) state account rules up front; their own FAQs describe simulated trader accounts | Fixed public formulas, versioned rules, every decision emitted as an event |
+| Publish the rules and states | [Hypernova](https://hypernova.xyz/) and [Bungee](https://github.com/SocketDotTech/bungee-funded-perps-faq/blob/main/FAQ.md) state account rules up front. Their own FAQs describe simulated trader accounts | Fixed public formulas, versioned rules, every decision emitted as an event |
 | Count everything | Equity-based drawdown rules across the industry | Open losses, fees, full debt and failed accounts stay in the record |
 
 | | Typical funded-trader program | Sacred with SIFT |
 | --- | --- | --- |
 | **Getting in** | Pay a challenge fee | No fee. Bring your own capital |
 | **Accounts** | Often simulated | Real capital, real spot assets, from the first trade |
-| **Loss in the first position** | The firm's model | Yours first, because your capital sits under the financing |
+| **Loss in the first position** | The firm's model | Yours first, because your capital is beneath the financing |
 | **Revenue** | Challenge fees and a split of profit | Fixed markup on repaid financing |
 | **Evidence** | Pass a target | Complete account history, compared with market exposure |
+| **Past record** | Starts from zero at each firm | Bring a verified record from another venue, or build one here |
 
-The combination is Sacred's. The statistics inside it are established ideas, and no novelty is claimed for them. The faster timetable is Sacred's own proposed policy, not a copied or validated industry optimum. The durable advantage would be accumulated repayment and execution history, which a public formula cannot copy.
+The combination is Sacred's. The statistics inside it are established ideas. The faster timetable is Sacred's own proposed policy and has not been validated. The lasting advantage would be the repayment and execution history Sacred builds up, which nobody can copy from a public formula.
 
 ## The growth curve
 
@@ -52,11 +89,11 @@ C(q) = 500 × 20^(q/14)            0 ≤ q ≤ 14
 
 | Qualifying day | 0 | 7 | 14 | 21 | 28 | 35 | 42 | 56 | 70 | 84 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| Earned ceiling, USDC | 500 | 2,236 | **10,000** | 14,953 | 22,360 | 33,437 | **50,000** | 62,996 | 79,370 | **100,000** |
+| Unlocked ceiling, USDC | 500 | 2,236 | **10,000** | 14,953 | 22,360 | 33,437 | **50,000** | 62,996 | 79,370 | **100,000** |
 
-Weekly percentage growth falls from 347.21% to 49.53% to 12.25% across the three phases, and the first release stops at $100,000. Someone who qualifies every day reaches the milestones in 2, 6 and 12 calendar weeks. That is the maximum path, not a promise of funding. The contracts use a table of 85 whole-USDC values rounded down, so no onchain exponentiation is needed, and the site reads the same table.
+Weekly percentage growth falls from 347.21% to 49.53% to 12.25% across the three phases, and the first release stops at $100,000. Someone who starts from zero and qualifies every day reaches the milestones in 2, 6 and 12 calendar weeks. That is the fastest possible path without a brought record, which starts `q` at 14 or 42. Funding is not promised. The contracts use a table of 85 whole-USDC values rounded down, so no onchain exponentiation is needed, and the site reads the same table.
 
-Two weeks says little about lasting skill. Early capacity rests on real first-loss capital, controlled exposure, current performance and collected repayment. Longer records then inform the skill ranking.
+Two weeks says little about lasting skill. Early capacity is based on real first-loss capital, controlled exposure, current performance and collected repayment. Longer records then inform the skill ranking.
 
 ## What makes a day count
 
@@ -66,32 +103,33 @@ Each day is one complete 24-hour funded period from your first funded moment. It
 - **Positive rolling results.** Compounded net performance over the latest 14 days, or all funded history if younger, is above zero, after fixed markup, execution costs and open losses. A losing day can still count.
 - **Safe account.** Drawdown from the high-water mark is below **10%**, no principal shortfall exists, and the independent safety gates pass.
 - **Complete data.** Every required valuation and accounting observation is authenticated and current.
-- **Positive contribution.** Before the first full-term settlement, unknown contribution is not a loss. After the first checkpoint, known positive contribution is required.
+- **Positive contribution.** Before the first full-term settlement, an unknown contribution does not fail the day. After the first checkpoint, known positive contribution is required.
 - **Repayment evidence**, when the next day is a checkpoint.
 
-Failed days do not accrue or create catch-up credit, idle days are not banked, and duplicate calls earn nothing. Waiting twelve weeks earns nothing on its own.
+Failed days give no catch-up credit, idle days are not banked, and duplicate calls count for nothing. Waiting twelve weeks does nothing on its own.
 
 ## Repayment checkpoints
 
 At qualifying days **14, 28, 42, 56, 70 and 84**, whole 14-day contracts settled since the previous checkpoint must have fully repaid principal of at least **50% of the curve ceiling at that previous checkpoint**, and both collected contribution and the known contribution rate must be positive. The first checkpoint needs $250, half of C(0). The next needs $5,000, half of C(14).
 
-Each settlement counts once. Overlapping positions add up, so no single position has to match the newest ceiling, and early closes or dust trades cannot stand in for full-term principal. This is how capacity can grow daily while every sale keeps its real 14-day term.
+Each settlement counts once. Overlapping positions add up, so no single position has to match the newest ceiling, and early closes or dust trades cannot count as full-term principal. This is how capacity can grow daily while every sale keeps its real 14-day term.
 
 ## Starter, Serviced and Proven
 
 | Label | What it means | What it affects |
 | --- | --- | --- |
 | **Starter** | Before the first successful repayment checkpoint | Funded from the shared newcomer budget |
+| **Imported** | Started from a brought record, before its first successful repayment checkpoint at Sacred | Funded from a separate imported-record budget |
 | **Serviced** | After that checkpoint, with current economics and risk qualifying | Joins the seasoned allocation pool |
 | **Proven** | A separate long-window skill label: 8 complete weeks, 6 effective weeks and a positive score at two weekly reviews in a row | Can improve allocation ranking. It is not required for any milestone |
 
-**Skill is not an entry requirement.** Sacred earns markup, not trader PnL. A trader who safely earns a market return and repays again and again is a good customer. Refusing that trader capacity would leave depositor cash idle.
+**You don't need to prove skill to get in.** A brought record is a faster start. It is never a requirement. Sacred's income is markup on repaid financing, and it takes no share of trader PnL. A trader who safely earns a market return and repays again and again is a good customer. Refusing that trader capacity would leave depositor cash idle.
 
 Labels never change an existing sale, and neither does a score. The capacity clock runs daily, and the skill engine runs at most one transition per UTC week.
 
 ## A better score grants permission, not capital
 
-A ceiling is permission, and it reserves nothing. New financing always needs your own fresh capital beneath it: a dollar for each dollar at 2×, so $10,000, $50,000 and $100,000 of financing need the same again from you.
+A ceiling is a permission. No money is set aside for it. New financing always needs your own fresh capital beneath it: a dollar for each dollar at 2×, so $10,000, $50,000 and $100,000 of financing need the same again from you.
 
 <SiftCapacity />
 
@@ -118,7 +156,7 @@ No account exceeds the smaller of **$100,000 or 1% of vault NAV**, so $10,000, $
 SIFT score = n / (n + 8) × weighted mean  −  3 × max(s, 0.5%) / √(n + 8)
 ```
 
-`n` is the effective number of weekly observations and `s` their weighted volatility. The eight extra zero-return weeks express a skeptical start: a new trader has shown nothing yet. The volatility floor stops a flat record looking certain. The score is a conservative decision rule in weekly excess-return units. **It is not a probability that a trader is skilled.**
+`n` is the effective number of weekly observations and `s` their weighted volatility. The eight extra zero-return weeks start every trader from skepticism, since a new trader has shown nothing yet. The volatility floor stops a flat record looking certain. The score is a cautious cutoff measured in weekly excess return. **It is not a probability that a trader is skilled.**
 
 ### The exact calculation
 
@@ -145,7 +183,7 @@ n = max(1, nK / D)
 
 A missing week ages the evidence around it and supplies no observation. Missing data is never treated as zero. A single observation has `s = 0`, and no observations means ineligible.
 
-Invented example: a strong 16-week record has a weighted excess mean of 1.0052% a week, but correlation leaves 6.609 effective weeks. Shrinkage takes the mean to 0.4548%, the haircut removes 0.3924%, and the score is **+0.0623%**. That clears the test. These inputs are deliberately strong and are not an expected trader return. Pure market exposure and one lucky week both fail.
+Invented example: a strong 16-week record has a weighted excess mean of 1.0052% a week, but correlation leaves 6.609 effective weeks. Shrinkage takes the mean to 0.4548%, the haircut removes 0.3924%, and the score is **+0.0623%**. That clears the test. These inputs are deliberately strong. They are not what a typical trader should expect. Pure market exposure and one lucky week both fail.
 
 ## When capacity contracts
 
@@ -161,11 +199,11 @@ Growth pauses as soon as a day fails, and risk reductions apply at once to futur
 | Changing the asset mandate | Allowance returns to the Starter level, with all history and lower limits kept |
 | Oracle, sequencer, route or portfolio failure | The relevant pause applies. Repayment and exit stay open |
 
-The effective ceiling is the minimum of curve, risk and hard ceilings, so a later healthy day cannot undo a sticky reduction. Sticky restrictions have no automatic recovery in v2. Partial sales are the margin engine's own behavior and are separate from SIFT.
+The effective ceiling is the minimum of curve, risk and hard ceilings, so a later healthy day cannot undo a sticky reduction. Sticky restrictions have no automatic recovery in v2. Partial sales are handled by the margin engine, separately from SIFT.
 
 ## How scarce financing is allocated
 
-The financing objective is **collected markup minus total principal losses minus protocol-paid variable costs**. Reserve-funded losses still count, because consuming protection is an economic cost. The commercial test is net contribution per vault NAV: this catches idle capital, while contribution per financed dollar-day catches bad financing.
+The financing objective is **collected markup minus total principal losses minus protocol-paid variable costs**. Losses paid from reserves still count, because using up protection costs real money. The commercial test is net contribution per vault NAV: this catches idle capital, while contribution per financed dollar-day catches bad financing.
 
 ```text
 collected_rate = min(contract APR, 365 × M / A)
@@ -176,13 +214,14 @@ J = collected_rate − loss_allowance − 365 × V / A
 `M` is collected markup, `L` total principal losses, `V` protocol-paid variable costs and `A` original contractual financed dollar-days.
 
 1. **Starters first.** Viable Starter requests are funded in FIFO order, up to 5% of the deployable envelope. Unused starter room is released.
-2. **Then Serviced demand**, ranked by `J`, then skill score, then FIFO. Missing skill evidence does not block a qualified request.
+2. **Then Imported accounts**, in FIFO order, up to 10% of the deployable envelope. This keeps unconfirmed brought records from crowding out traders who have already repaid at Sacred. Unused room is released.
+3. **Then Serviced demand**, ranked by `J`, then skill score, then FIFO. Missing skill evidence does not block a qualified request.
 
-Whichever trader earns $100 or $1,000, $1,000 financed for 14 days pays the same $3.84 of markup. About $2.95 belongs to depositors and $0.88 to the manager, before costs and losses. Curation helps through sustainable repeat use, lower losses and retained capital. It is no multiplier on fees, and a selector that leaves cash idle makes the business worse.
+Whether the trader makes $100 or $1,000, $1,000 financed for 14 days pays the same $3.84 of markup. About $2.95 goes to depositors and $0.88 to the manager, before costs and losses. Good selection helps through steady repeat use, lower losses and retained capital. It does not multiply fees, and a selector that leaves cash idle makes the business worse.
 
 ## Starting from zero
 
-The first release is a closed pilot that instruments the system. Illustrative values:
+The first release is a closed pilot to measure how the system behaves. Illustrative values:
 
 | | |
 | --- | --- |
@@ -190,16 +229,16 @@ The first release is a closed pilot that instruments the system. Illustrative va
 | Financing ceiling | $25,000, absolute |
 | Per account | $500, which is also 1% of NAV |
 | Newcomers | Up to all of the pilot |
-| Protection | The pilot backstop, while primary and tail protection are earned |
+| Protection | The pilot backstop, while primary and tail protection fill up |
 
-SIFT cannot raise this ceiling, and the pilot cannot deliver the curve: its $500 account cap stalls progression before the first repayment checkpoint. At full continuous use the manager's share is about $575 a year, roughly $88 over 56 days before costs, so the pilot does not fund the company.
+SIFT cannot raise this ceiling, and the pilot will not reach the curve: its $500 account cap stops progression before the first repayment checkpoint. At full continuous use the manager's share is about $575 a year, roughly $88 over 56 days before costs, so the pilot does not fund the company. Brought records are not used in the pilot, since its $500 cap is below every imported starting ceiling.
 
-**The curve belongs to a funded public release.** That needs viable real demand, enough vault NAV for the sizes offered, earned protection for the full approved envelope, execution evidence and release approval. It starts with a Starter cohort inside the normal 5% newcomer budget, so no earlier Serviced accounts are required.
+**The curve starts at a funded public release.** That needs real demand, enough vault NAV for the sizes offered, protection funded for the full approved envelope, execution evidence and release approval. It starts with a Starter cohort inside the normal 5% newcomer budget, so no earlier Serviced accounts are required.
 
 ## What is onchain
 
 1. **Margin engine:** purchases, sales, debts and pledges, calling the ledger on every economic path.
-2. **Account ledger:** unitization, daily observations, exposure, capital-days and a bounded 52-week ring.
+2. **Account ledger:** unitization, daily observations, exposure, capital-days and a fixed-size 52-week ring.
 3. **Score engine:** the weekly skill label from canonical state. A separate daily transition reads the published ceiling table and repayment checkpoints.
 4. **Capacity controller:** every limit, checked on every opening, with pending commitments counted before any external call.
 5. **Permissionless keepers:** deterministic checkpoints, reviews and partial sales. They cannot choose a score or rewrite accounting.
@@ -207,14 +246,18 @@ SIFT cannot raise this ceiling, and the pilot cannot deliver the curve: its $500
 
 `CapacityUpdated(account, old, new, reason, epoch, policyVersion)` is emitted with the score inputs and binding constraint. Timelocked governance changes future policy. An emergency guardian can tighten or pause, but cannot award more credit or delete a loss. A validity proof over a contract-maintained event log is a later scaling option, and it must bind the full event range and oracle roots.
 
+A brought record enters as one event, `RecordImported(account, source, startDay, attester, policyVersion)`. The outside history itself stays offchain. Everything after that event runs on the same onchain ledger as any other account.
+
 Public data can prove Sacred's actions and state changes. It cannot prove that a wallet is one person, reveal outside hedges or promise a future edge. So aggregate limits hold whether or not identity is solved: no double pledge, one newcomer budget, complete histories and portfolio caps however many wallets exist.
 
 ## What is tested and what is not
 
 The reference model passes **53 of 53 deterministic checks** covering the exact 14, 42 and 84-day path, the hard $100,000 stop, daily replay protection, idle and underuse pauses, required settlements, consumed evidence, complete data, capital and NAV limits, and the retained skill and accounting controls. That path is synthetic and attainable. It does not forecast how many live traders will qualify.
 
-In one synthetic 1,000-wallet, 52-week no-edge sample, 1 wallet passed the two-review skill gate, against 105 under a lighter haircut. That test helped select the haircut for the long-window label. It is not a live false-positive rate, and it is no evidence about the default rate of the faster curve.
+In one synthetic 1,000-wallet, 52-week no-edge sample, 1 wallet passed the two-review skill gate, against 105 under a lighter haircut. That test helped pick the haircut for the long-window label. It is a synthetic result, so it says nothing about live false positives or default rates on the faster curve.
 
 There is no live data. Nothing here shows that SIFT finds skilled traders or raises yield, or that this pace is commercially sound. Aggressive selection can leave capital idle and reduce income. The pilot compares SIFT with simple risk-only allocation under the same safety limits, tracking 14, 28 and 56-day contribution, utilization, principal loss, execution costs and retention, with policy versions frozen per cohort.
 
-Not yet set: the pilot loss stop, oracle sources and round selection, the epoch anchor, position and batch limits, asset and route limits, and the production loss allowance.
+Brought records are a newer addition and are not covered by the 53 checks. Their thresholds, the 10% budget and the provisional-ceiling rule are proposed values with no model run or live data behind them. Whether outside records predict repayment at Sacred is unknown.
+
+Not yet set: the venues accepted for brought records, the attesters and proof method for exchange records, the pilot loss stop, oracle sources and round selection, the epoch anchor, position and batch limits, asset and route limits, and the production loss allowance.

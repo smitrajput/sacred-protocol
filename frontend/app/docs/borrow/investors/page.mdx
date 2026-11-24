@@ -2,24 +2,26 @@ export const metadata = { title: "Funding Borrow" };
 
 # Funding Borrow
 
-Borrow has its own investor pool, separate from Earn. Investors commit USDC for a year, the pool sells it to borrowers at fixed prices, and profit is shared by an agreed ratio. Nothing is guaranteed: not the return, the principal or an early exit. It is not open, and the mandate has not been approved.
+Borrow is funded by Earn, through Earn's second vault contract. Earn depositors who choose the Borrow vault commit USDC for a year, the vault sells it to borrowers at fixed prices, and profit is shared by an agreed ratio. These pages call them investors, because they commit for a term and share actual profit. The return, your principal and an early exit are not guaranteed. The vault is not open yet, and its mandate has not been approved.
 
-## How it differs from Earn
+## How Earn's two vaults differ
 
-| | Earn | Funding Borrow |
+The Trade vault and the Borrow vault are separate contracts. Both take Earn deposits, and the risk in one never reaches the other.
+
+| | Trade vault | Borrow vault |
 | --- | --- | --- |
 | **Finances** | Trade positions, 14 days | Borrow sales, 30 days |
 | **Commitment** | Daily withdrawal queue | 12 months |
 | **Income** | Fixed share of markup | Share of actual distributable profit |
-| **Protection** | Earned by the manager's cash waterfall | Investor-owned reserve, from investors' own profit |
+| **Protection** | Funded by the manager's cash waterfall | Investor-owned reserve, from investors' own profit |
 | **Reference cash return** | 3.55% to 7.14% modeled APY | 2.39% to 4.05% APR while the reserve builds |
 
-Each pool keeps its own ownership, receivables, reserves, loss carry, withdrawals and emergency permissions. Losses in one never reach the other.
+Each vault keeps its own ownership, receivables, reserves, loss carry, withdrawals and emergency permissions. A loss in one can't touch the other, and neither contract can spend from the other.
 
 ## The mandate
 
 - **Contract.** A restricted mudarabah. Investors provide capital, Sacred manages it, and profit is shared by a ratio agreed before the vintage starts.
-- **Term.** 365 days. This is Sacred's liquidity and underwriting policy, not a universal Shariah requirement.
+- **Term.** 365 days. This is Sacred's own liquidity and underwriting policy. Shariah does not generally require it.
 - **Vintages.** Ownership records are non-transferable, and each year's capital is its own vintage. New investors do not inherit old losses or buy old debts.
 - **Fixed terms.** Your share is fixed when you subscribe and never changes within the vintage.
 
@@ -29,13 +31,13 @@ Every 30 days, realized profit after impairment and loss carry is distributed as
 
 ## The reserve is yours
 
-The investment risk reserve belongs to the investors who funded it. It is not company equity and it is not free liquidity. [AAOIFI SS45](https://aaoifi.com/download/24233/) places such a reserve in the investors' profit entitlement. Sacred's own share of profit is not an automatic investor guarantee, and no manager guarantee is assumed. Manager misconduct, negligence or breach are a separate matter.
+The investment risk reserve belongs to the investors who funded it. Sacred can't count it as company equity or spend it as free cash. [AAOIFI SS45](https://aaoifi.com/download/24233/) treats such a reserve as part of the investors' share of profit. Sacred's own share of profit does not automatically cover investor losses, and the model assumes no manager guarantee. Misconduct, negligence or breach by the manager is handled separately.
 
 At exit, unused reserve returns to its owners. Keeping it for another year requires your explicit consent.
 
 ## When losses happen
 
-Losses are recovered before fresh profit is shared. A reserve draw is a transfer, never income.
+Losses are recovered before fresh profit is shared. Money drawn from the reserve is a transfer and is never counted as income.
 
 | Step | Principal | Reserve | Loss carry | Manager share |
 | --- | --- | --- | --- | --- |
@@ -44,7 +46,7 @@ Losses are recovered before fresh profit is shared. A reserve draw is a transfer
 | Next 5 of earnings restores the reserve | 100 | 10 | 0 | None |
 | Following 10 of profit | 100 | 11.5 | 0 | 2.5, with 6 of investor cash |
 
-Once a reserve is exhausted, any remaining impairment reduces principal. At runoff, unrecovered impairment belongs to that vintage. It does not pass to new investors. Sacred compensates misconduct or negligence under the contract, not routine investment losses.
+Once a reserve is exhausted, any remaining impairment reduces principal. At runoff, unrecovered impairment belongs to that vintage. It does not pass to new investors. Under the contract, Sacred compensates you for its misconduct or negligence. It does not cover routine investment losses.
 
 ## Runoff
 
@@ -59,13 +61,13 @@ Unresolved claims can delay final collection. Open claims keep non-transferable 
 
 ## What you can expect
 
-At the audited 8%/75% reference with $10m capital, cash APR is 4.05%, 3.34% or 2.39% at 85%, 70% or 50% use while the reserve builds. A first closed vintage returns 4.68%, 3.85% or 2.75% on original capital including returned reserve, with zero realized losses. [Pricing and reserves](/docs/borrow/economics) has the tables, which do not apply automatically to other prices or shares.
+At the audited 8%/75% reference with $10m capital, cash APR is 4.05%, 3.34% or 2.39% at 85%, 70% or 50% use while the reserve builds. A first closed vintage returns 4.68%, 3.85% or 2.75% on original capital including returned reserve, with zero realized losses. [Pricing and reserves](/docs/borrow/economics) has the tables. They are for this reference only, and other prices or shares give different results.
 
 The pilot differs from these scale figures. Your funds are protected by 4 layers of backstops before a loss touches your principal: the borrower's collateral, the primary and tail reserve sleeves, and the [pilot backstop](/docs/risk#how-your-funds-are-protected). Total capacity is at most $250,000.
 
 ## Risks
 
-- A reserve of 1% does not cover a day-long outage. Modeled annual ES99 for that emergency is 18.55% of financing.
+- A reserve of 1% does not cover a day-long outage. Modeled annual ES99 for that emergency is 26.34% of financing.
 - USDC can be frozen or depeg. The product's debts are in USDC units.
 - A borrower default depends on selling collateral at a price, on Arc, through routes not yet measured.
-- Twelve months is a long commitment for these returns. Whether investors want it is a demand test.
+- Twelve months is a long commitment for these returns. We don't know yet whether investors want it.

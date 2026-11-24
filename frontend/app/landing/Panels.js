@@ -34,7 +34,7 @@ export function EarnPanel() {
         </tbody>
       </table>
       <p className={shared.note}>
-        Scenarios, not forecasts. APY assumes reinvestment every 14 days, before any loss that reaches principal. Weak
+        APY assumes reinvestment every 14 days, before any loss that reaches principal. Weak
         demand uses the proposed 70% share. A small first pilot would earn less, about 3.85% a year fully used.
       </p>
     </div>
